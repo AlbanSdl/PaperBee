@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.asdl.minder.Fade
 import fr.asdl.minder.R
 
 class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: Int) : RecyclerView(context, attr, defStyleAttr) {
@@ -27,13 +28,10 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
                 emptyView = (getContext() as Activity).findViewById(emptyViewRes)
                 if (emptyView == null) return
             }
-            if (adapter?.itemCount == 0) {
-                emptyView!!.visibility = View.VISIBLE
-                visibility = View.GONE
-            } else {
-                emptyView!!.visibility = View.GONE
-                visibility = View.VISIBLE
-            }
+            if (adapter?.itemCount == 0)
+                Fade.fadeIn(emptyView!!)
+            else
+                Fade.fadeOut(emptyView!!)
         }
     }
 

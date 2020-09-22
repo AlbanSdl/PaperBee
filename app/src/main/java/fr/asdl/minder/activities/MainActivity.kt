@@ -21,9 +21,9 @@ class MainActivity : AppCompatActivity() {
             val noteManager = NoteManager(this)
             recycler.adapter = NoteAdapter(noteManager, findViewById(R.id.no_note))
             runOnUiThread {
-                Fade.shortFadeIn(recycler.parent as View)
-                Fade.shortFadeOut(findViewById(R.id.loadingBar))
-                Fade.shortFadeOut(findViewById(R.id.loadingText))
+                Fade.fadeIn(recycler.parent as View)
+                Fade.fadeOut(findViewById(R.id.loadingBar))
+                Fade.fadeOut(findViewById(R.id.loadingText))
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
                     noteManager.add(Note(0, "Bonjour"))
                 }
