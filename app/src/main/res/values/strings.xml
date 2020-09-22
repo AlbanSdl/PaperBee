@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Minder</string>
+    <string name="loading">Loading</string>
+    <string name="preferences_file">fr.asdl.minder</string>
+    <string name="pref_generic_name">generic_name</string>
+    <string name="notes_directory_name">notes</string>
+    <string name="no_note">No note found</string>
+    <string name="namespace">http://schemas.android.com/apk/res-auto</string>
+    <string name="namespaced_recycler_emptyViewId">emptyView</string>
+</resources>
