@@ -1,8 +1,6 @@
 package fr.asdl.minder.note
 
-import android.view.View
 import android.widget.TextView
-import fr.asdl.minder.Fade
 import fr.asdl.minder.R
 import fr.asdl.minder.view.SentientRecyclerViewAdapter
 

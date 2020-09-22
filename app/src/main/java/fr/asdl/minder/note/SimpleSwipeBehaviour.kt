@@ -13,8 +13,7 @@ class SimpleSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerVie
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        if (sentientRecyclerView.adapter is SentientRecyclerViewAdapter<*>)
-            (sentientRecyclerView.adapter as SentientRecyclerViewAdapter<*>).getDataHolder().remove(viewHolder.adapterPosition)
+        (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.remove(viewHolder.adapterPosition)
     }
 
 }
