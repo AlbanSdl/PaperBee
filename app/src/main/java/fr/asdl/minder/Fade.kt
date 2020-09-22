@@ -14,7 +14,11 @@ object Fade {
         if (fadeIn.animation?.hasEnded() == false) fadeIn.animation.cancel()
         fadeIn.alpha = 0f
         fadeIn.visibility = View.VISIBLE
-        fadeIn.animate().alpha(1f).duration = millis.toLong()
+        fadeIn.animate().alpha(1f).setDuration(millis.toLong()).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationCancel(animation: Animator) {
+                fadeIn.alpha = 1f
+            }
+        })
     }
 
     fun fadeOut(fadeOut: View) {

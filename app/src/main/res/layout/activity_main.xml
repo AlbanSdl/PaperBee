@@ -26,24 +26,21 @@
         android:indeterminate="true"
         app:layout_constraintBottom_toTopOf="@+id/loadingText"/>
 
-    <ScrollView
-        android:id="@+id/notes_scroll"
+    <fr.asdl.minder.view.SentientRecyclerView
+        android:id="@+id/notes_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible">
-
-        <fr.asdl.minder.view.SentientRecyclerView
-            android:id="@+id/notes_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/padding_small"
-            android:paddingRight="@dimen/padding_small"
-            android:paddingTop="@dimen/padding_tiny"
-            android:paddingBottom="@dimen/padding_tiny"
-            android:nestedScrollingEnabled="false"
-            app:emptyView="@+id/no_note" />
-
-    </ScrollView>
+        android:paddingLeft="@dimen/padding_small"
+        android:paddingRight="@dimen/padding_small"
+        android:paddingTop="@dimen/padding_tiny"
+        android:paddingBottom="@dimen/padding_tiny"
+        android:nestedScrollingEnabled="false"
+        android:clipToPadding="false"
+        android:fadeScrollbars="true"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:emptyView="@+id/no_note"/>
 
     <TextView
         android:id="@+id/no_note"

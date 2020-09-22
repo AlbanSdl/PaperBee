@@ -29,10 +29,17 @@ abstract class DataHolderList<T: DataHolder> {
             this.onChange(ModificationType.UPDATE, position, null)
         }
     }
-    fun remove(cnt: T) {
+    fun remove(cnt: T?) {
+        if (cnt == null) return
         val index = this.retrieveContent().indexOf(cnt)
         if (this.retrieveContent().remove(cnt) && index >= 0)
             this.onChange(ModificationType.REMOVAL, index, null)
+    }
+    fun remove(index: Int) {
+        if (this.retrieveContent().size > index && index >= 0) {
+            this.retrieveContent().removeAt(index)
+            this.onChange(ModificationType.REMOVAL, index, null)
+        }
     }
     fun move(fromPos: Int, toPos: Int) {
         if (fromPos < this.retrieveContent().size) {

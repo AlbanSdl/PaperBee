@@ -7,16 +7,23 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 abstract class SentientRecyclerViewAdapter<T : DataHolder>(
-    private val dataContainer: DataHolderList<T>,
-    private val empty: View?
+    private val dataContainer: DataHolderList<T>
 ) : RecyclerView.Adapter<SentientRecyclerViewAdapter.ViewHolder>() {
 
     init {
-        this.dataContainer.on(ModificationType.ADDITION) { i: Int, _: Int? -> if (this.itemCount == 1) super.notifyDataSetChanged() else super.notifyItemInserted(i) }
+        this.dataContainer.on(ModificationType.ADDITION) { i: Int, _: Int? -> super.notifyItemInserted(i) }
         this.dataContainer.on(ModificationType.REMOVAL) { i: Int, _: Int? -> super.notifyItemRemoved(i) }
         this.dataContainer.on(ModificationType.UPDATE) { i: Int, _: Int? -> super.notifyItemChanged(i) }
-        this.dataContainer.on(ModificationType.UPDATE) { i: Int, it: Int? -> super.notifyItemMoved(i, it!!) }
+        this.dataContainer.on(ModificationType.MOVED) { i: Int, it: Int? -> super.notifyItemMoved(i, it!!) }
         this.dataContainer.on(ModificationType.CLEAR) { _: Int, _: Int? -> super.notifyDataSetChanged() }
+    }
+
+    fun getDataHolder(): DataHolderList<T> {
+        return this.dataContainer
+    }
+
+    fun getData(index: Int): T? {
+        return this.dataContainer.getContents()[index]
     }
 
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
