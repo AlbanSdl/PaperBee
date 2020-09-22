@@ -22,19 +22,26 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     }
 
     private var emptyView: View? = null
+    private var wasEmptyDisplayed = false
     private val emptyViewRes: Int = attr.getAttributeResourceValue(context.getString(R.string.namespace),
         context.getString(R.string.namespaced_recycler_emptyViewId), -1)
 
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
-        private fun update() {
+        private fun setupEmptyView(): Boolean {
             if (emptyView == null) {
                 emptyView = (getContext() as Activity).findViewById(emptyViewRes)
-                if (emptyView == null) return
+                if (emptyView == null) return false
             }
-            if (adapter?.itemCount == 0)
-                Fade.fadeIn(emptyView!!)
-            else
-                Fade.fadeOut(emptyView!!)
+            return true
+        }
+        private fun update() {
+            if (wasEmptyDisplayed != (adapter?.itemCount == 0) && setupEmptyView()) {
+                wasEmptyDisplayed = adapter?.itemCount == 0
+                if (wasEmptyDisplayed)
+                    Fade.fadeIn(emptyView!!)
+                else
+                    Fade.fadeOut(emptyView!!)
+            }
         }
         override fun onChanged() {
             this.update()
