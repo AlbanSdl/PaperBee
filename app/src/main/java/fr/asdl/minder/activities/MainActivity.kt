@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
                 Fade.fadeOut(findViewById(R.id.loadingBar))
                 Fade.fadeOut(findViewById(R.id.loadingText))
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
-                    noteManager.add(Note("Test #"))
+                    noteManager.add(Note("Test Note... Click to add content"))
                 }
             }
         }.start()

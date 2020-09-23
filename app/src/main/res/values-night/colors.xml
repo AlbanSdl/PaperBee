@@ -6,4 +6,5 @@
     <color name="blank">#111</color>
     <color name="semiBlank">#000</color>
     <color name="dark">#eee</color>
+    <color name="red">#8c0900</color>
 </resources>

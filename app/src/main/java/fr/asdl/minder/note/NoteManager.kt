@@ -21,10 +21,8 @@ class NoteManager(private val context: Context) : DataHolderList<Note>() {
         return notes
     }
     override fun save(element: Note) {
-        if (element.id == null) {
+        if (element.id == null)
             element.id = idAllocator.allocate()
-            element.title += element.id
-        }
         this.dataDirectory.saveDataAsync(element)
     }
     override fun delete(element: Note) {
@@ -44,11 +42,29 @@ class NoteManager(private val context: Context) : DataHolderList<Note>() {
     }
 }
 
+/**
+ * The structure of a note, containing a title and contents.
+ *
+ * This will extend DataHolderList<NotePart> in the future and will be displayed
+ * with a recycler view ↓
+ */
 @Serializable
-data class Note(var title: String, val lines: List<NotePart> = LinkedList()) : DataHolder {
+data class Note(var title: String, val contents: List<NotePart> = LinkedList()) : DataHolder {
     override var id: Int? = null
     override val creationStamp: Long = Date().time
 }
 
+/**
+ * A part of a note. This can be text, image, checkbox-indented item, or whatever implements
+ * this interface. It must be displayable by the Note and its recycler view.
+ *
+ * This will implement DataHolder in the future and will be displayed in the recycler view of
+ * its Note ↑
+ */
+interface NotePart
+
 @Serializable
-data class NotePart(val type: String, val content: String)
+data class NoteText(val content: String) : NotePart
+
+@Serializable
+data class NoteImage(val src: String) : NotePart
