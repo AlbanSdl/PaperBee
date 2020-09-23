@@ -30,8 +30,6 @@
         android:id="@+id/notes_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/padding_small"
-        android:paddingRight="@dimen/padding_small"
         android:paddingTop="@dimen/padding_tiny"
         android:paddingBottom="@dimen/padding_tiny"
         android:nestedScrollingEnabled="false"
@@ -40,7 +38,8 @@
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
         app:layout_constraintTop_toTopOf="parent"
-        app:emptyView="@+id/no_note"/>
+        app:emptyView="@+id/no_note"
+        app:swipeableView="@+id/note_element"/>
 
     <TextView
         android:id="@+id/no_note"

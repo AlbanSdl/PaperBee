@@ -1,27 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:focusable="true"
-    android:backgroundTint="@color/blank"
-    android:layout_marginTop="@dimen/padding_tiny"
-    android:layout_marginBottom="@dimen/padding_tiny">
+    android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/note_header"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/padding_small">
+        android:layout_height="match_parent"
+        android:backgroundTint="@color/red"
+        android:elevation="@dimen/elevation_low"
+        android:layout_marginTop="@dimen/padding_tiny"
+        android:layout_marginBottom="@dimen/padding_tiny"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:layout_marginRight="@dimen/padding_small"
+        android:id="@+id/note_background">
 
-        <TextView
-            android:id="@+id/note_title"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/dark"/>
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_baseline_delete"
+            android:contentDescription="@string/delete"
+            android:layout_marginStart="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small" />
 
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-</androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:focusable="true"
+        android:backgroundTint="@color/blank"
+        android:elevation="@dimen/elevation_medium"
+        android:layout_marginTop="@dimen/padding_tiny"
+        android:layout_marginBottom="@dimen/padding_tiny"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:layout_marginRight="@dimen/padding_small"
+        android:id="@+id/note_element">
+
+        <LinearLayout
+            android:id="@+id/note_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_small">
+
+            <TextView
+                android:id="@+id/note_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/dark"
+                android:textSize="@dimen/note_title_size"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

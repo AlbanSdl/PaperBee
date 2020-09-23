@@ -25,6 +25,8 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     private var wasEmptyDisplayed = false
     private val emptyViewRes: Int = attr.getAttributeResourceValue(context.getString(R.string.namespace),
         context.getString(R.string.namespaced_recycler_emptyViewId), -1)
+    val swipeableViewRes: Int = attr.getAttributeResourceValue(context.getString(R.string.namespace),
+        context.getString(R.string.namespaced_recycler_swipeableViewId), -1)
 
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
         private fun setupEmptyView(): Boolean {

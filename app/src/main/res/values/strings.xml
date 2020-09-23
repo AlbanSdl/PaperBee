@@ -7,4 +7,6 @@
     <string name="no_note">No note found</string>
     <string name="namespace">http://schemas.android.com/apk/res-auto</string>
     <string name="namespaced_recycler_emptyViewId">emptyView</string>
+    <string name="namespaced_recycler_swipeableViewId">swipeableView</string>
+    <string name="delete">Delete</string>
 </resources>

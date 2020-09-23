@@ -2,4 +2,8 @@
 <resources>
     <dimen name="padding_small">10dp</dimen>
     <dimen name="padding_tiny">5dp</dimen>
+    <dimen name="elevation_low">1dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="padding_medium">15dp</dimen>
+    <dimen name="note_title_size">18sp</dimen>
 </resources>

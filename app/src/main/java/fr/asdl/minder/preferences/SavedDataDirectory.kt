@@ -15,24 +15,28 @@ import kotlin.collections.ArrayList
 
 class SavedDataDirectory(private var directoryName: String, private var context: Context) {
 
-    inline fun <reified T: DataHolder> saveData(dataHolder: T? = null, id: Int? = null) {
+    inline fun <reified T: DataHolder> saveDataAsync(dataHolder: T? = null, id: Int? = null) {
         if (dataHolder != null) save(Json.encodeToString(dataHolder), dataHolder.id!!)
         else if (id != null) delete(id)
     }
 
     fun save(content: String, id: Int) {
-        val folder = this.getDirectoryFile()
-        if (!folder.exists()) folder.mkdir()
-        val file = this.getDirectoryFile(id.toString())
-        if (!file.exists()) file.createNewFile()
-        val outputStream = FileOutputStream(file)
-        outputStream.write(content.toByteArray(Charset.forName("UTF-8")))
-        outputStream.close()
+        Thread {
+            val folder = this.getDirectoryFile()
+            if (!folder.exists()) folder.mkdir()
+            val file = this.getDirectoryFile(id.toString())
+            if (!file.exists()) file.createNewFile()
+            val outputStream = FileOutputStream(file)
+            outputStream.write(content.toByteArray(Charset.forName("UTF-8")))
+            outputStream.close()
+        }.start()
     }
 
     fun delete(id: Int) {
-        val file = getDirectoryFile(id.toString())
-        if (file.exists()) file.delete()
+        Thread {
+            val file = getDirectoryFile(id.toString())
+            if (file.exists()) file.delete()
+        }.start()
     }
 
     inline fun <reified T: DataHolder> getData(): LinkedList<T> {

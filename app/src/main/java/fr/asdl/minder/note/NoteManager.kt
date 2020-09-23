@@ -25,12 +25,12 @@ class NoteManager(private val context: Context) : DataHolderList<Note>() {
             element.id = idAllocator.allocate()
             element.title += element.id
         }
-        this.dataDirectory.saveData(element)
+        this.dataDirectory.saveDataAsync(element)
     }
     override fun delete(element: Note) {
         if (element.id == null) return
         this.idAllocator.release(element.id!!)
-        this.dataDirectory.saveData(null, element.id!!)
+        this.dataDirectory.saveDataAsync(null, element.id!!)
     }
 
     private fun getNoteIds(): ArrayList<Int> {
