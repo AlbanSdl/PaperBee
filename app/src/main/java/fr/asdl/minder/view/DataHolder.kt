@@ -7,6 +7,9 @@ abstract class DataHolderList<T: DataHolder> {
     private val listeners: HashMap<ModificationType, (Int, Int?) -> Unit> = HashMap()
 
     abstract fun retrieveContent(): LinkedList<T>
+    abstract fun save(element: T)
+    abstract fun delete(element: T)
+
     fun getContents(): List<T> {
         return this.retrieveContent()
     }
@@ -18,26 +21,31 @@ abstract class DataHolderList<T: DataHolder> {
             this.retrieveContent().add(position, cnt)
             this.onChange(ModificationType.ADDITION, position, null)
         }
+        this.save(cnt)
     }
     fun add(cnt: T) {
         this.retrieveContent().add(cnt)
+        this.save(cnt)
         this.onChange(ModificationType.ADDITION, this.retrieveContent().size - 1, null)
     }
     fun update(position: Int, lambda: (old: T) -> T) {
         if (position < this.retrieveContent().size) {
             retrieveContent()[position] = lambda.run{retrieveContent()[position]}
+            this.save(retrieveContent()[position])
             this.onChange(ModificationType.UPDATE, position, null)
         }
     }
     fun remove(cnt: T?) {
         if (cnt == null) return
         val index = this.retrieveContent().indexOf(cnt)
-        if (this.retrieveContent().remove(cnt) && index >= 0)
+        if (this.retrieveContent().remove(cnt) && index >= 0) {
+            this.delete(cnt)
             this.onChange(ModificationType.REMOVAL, index, null)
+        }
     }
     fun remove(index: Int) {
         if (this.retrieveContent().size > index && index >= 0) {
-            this.retrieveContent().removeAt(index)
+            this.delete(this.retrieveContent().removeAt(index))
             this.onChange(ModificationType.REMOVAL, index, null)
         }
     }
@@ -49,6 +57,7 @@ abstract class DataHolderList<T: DataHolder> {
         }
     }
     fun clear() {
+        this.retrieveContent().forEach { this.delete(it) }
         this.retrieveContent().clear()
         this.onChange(ModificationType.CLEAR, 0, null)
     }
@@ -62,7 +71,10 @@ abstract class DataHolderList<T: DataHolder> {
     }
 }
 
-interface DataHolder
+interface DataHolder {
+    val id: Int?
+    val creationStamp: Long
+}
 
 enum class ModificationType {
     ADDITION, REMOVAL, CLEAR, UPDATE, MOVED

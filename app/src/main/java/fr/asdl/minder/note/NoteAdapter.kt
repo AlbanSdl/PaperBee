@@ -11,7 +11,7 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
     }
 
     override fun onBindViewHolder(holder: ViewHolder, content: Note) {
-        (holder.findViewById(R.id.note_title)!! as TextView).text = content.name
+        (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
     }
 
 }

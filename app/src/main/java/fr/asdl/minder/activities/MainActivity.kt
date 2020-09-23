@@ -18,12 +18,12 @@ class MainActivity : AppCompatActivity() {
         val recycler = findViewById<SentientRecyclerView>(R.id.notes_recycler)
         Thread {
             val noteManager = NoteManager(this)
-            recycler.adapter = NoteAdapter(noteManager)
             runOnUiThread {
+                recycler.adapter = NoteAdapter(noteManager)
                 Fade.fadeOut(findViewById(R.id.loadingBar))
                 Fade.fadeOut(findViewById(R.id.loadingText))
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
-                    noteManager.add(Note(0, "Test"))
+                    noteManager.add(Note("Test #"))
                 }
             }
         }.start()
