@@ -1,4 +1,4 @@
-package fr.asdl.minder.note
+package fr.asdl.minder.view
 
 import android.graphics.Canvas
 import android.view.View
@@ -6,10 +6,8 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.R
-import fr.asdl.minder.view.SentientRecyclerView
-import fr.asdl.minder.view.SentientRecyclerViewAdapter
 
-class SimpleSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerView) :
+class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerView) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {

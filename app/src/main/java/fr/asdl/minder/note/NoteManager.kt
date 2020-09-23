@@ -14,8 +14,12 @@ import kotlin.collections.ArrayList
 
 class NoteManager(private val context: Context) : DataHolderList<Note>() {
     private val dataDirectory = SavedDataDirectory(this.context.getString(R.string.notes_directory_name), context)
-    private val notes = dataDirectory.getData<Note>()
+    private val notes = LinkedList<Note>()
     private val idAllocator = IntAllocator(this.getNoteIds())
+
+    init {
+        dataDirectory.loadData(this)
+    }
 
     override fun retrieveContent(): LinkedList<Note> {
         return notes

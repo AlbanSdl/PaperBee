@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.Fade
 import fr.asdl.minder.R
-import fr.asdl.minder.note.SimpleSwipeBehaviour
 
 class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: Int) : RecyclerView(context, attr, defStyleAttr) {
 
@@ -18,7 +17,7 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     init {
         this.layoutManager = LinearLayoutManager(context)
         this.setHasFixedSize(false)
-        ItemTouchHelper(SimpleSwipeBehaviour(this)).attachToRecyclerView(this)
+        ItemTouchHelper(SentientSwipeBehaviour(this)).attachToRecyclerView(this)
     }
 
     private var emptyView: View? = null

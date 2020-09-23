@@ -4,14 +4,12 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import fr.asdl.minder.view.DataHolder
+import fr.asdl.minder.view.DataHolderList
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.*
 import java.nio.charset.Charset
-import java.util.*
-import java.util.stream.Collectors
-import kotlin.collections.ArrayList
 
 class SavedDataDirectory(private var directoryName: String, private var context: Context) {
 
@@ -39,14 +37,13 @@ class SavedDataDirectory(private var directoryName: String, private var context:
         }.start()
     }
 
-    inline fun <reified T: DataHolder> getData(): LinkedList<T> {
+    inline fun <reified T: DataHolder, H: DataHolderList<T>> loadData(context: H) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val returnValue = ArrayList<T>()
             for (str in this.load()!!)
-                returnValue.add(Json.decodeFromString(str))
-            return LinkedList(returnValue.sortedBy { it.creationStamp })
+                context.add(Json.decodeFromString(str))
+            return
         }
-        return LinkedList(this.load()?.stream()!!.map { Json.decodeFromString<T>(it) }.collect(Collectors.toList()).sortedBy { it.creationStamp })
+        this.load()?.stream()!!.forEach { context.add(Json.decodeFromString(it)) }
     }
 
     fun load(): List<String>? {
