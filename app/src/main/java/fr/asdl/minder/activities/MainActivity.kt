@@ -9,8 +9,7 @@ import fr.asdl.minder.note.Note
 import fr.asdl.minder.note.NoteAdapter
 import fr.asdl.minder.note.NoteManager
 import fr.asdl.minder.note.NoteText
-import fr.asdl.minder.view.SentientRecyclerView
-import kotlinx.serialization.ExperimentalSerializationApi
+import fr.asdl.minder.view.sentient.SentientRecyclerView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
                     val note = Note("Test Note... Click to add content", noteManager = noteManager)
                     noteManager.add(note)
-                    note.add(NoteText("This is a test text", 0))
+                    note.add(NoteText("This is a test text"))
                 }
             }
         }.start()

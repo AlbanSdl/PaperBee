@@ -2,7 +2,7 @@ package fr.asdl.minder.note
 
 import android.widget.TextView
 import fr.asdl.minder.R
-import fr.asdl.minder.view.SentientRecyclerViewAdapter
+import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
 
 class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note>(dataContainer) {
 

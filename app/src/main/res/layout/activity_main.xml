@@ -26,7 +26,7 @@
         android:indeterminate="true"
         app:layout_constraintBottom_toTopOf="@+id/loadingText"/>
 
-    <fr.asdl.minder.view.SentientRecyclerView
+    <fr.asdl.minder.view.sentient.SentientRecyclerView
         android:id="@+id/notes_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

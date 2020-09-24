@@ -3,8 +3,8 @@ package fr.asdl.minder.preferences
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import fr.asdl.minder.view.DataHolder
-import fr.asdl.minder.view.DataHolderList
+import fr.asdl.minder.view.sentient.DataHolder
+import fr.asdl.minder.view.sentient.DataHolderList
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

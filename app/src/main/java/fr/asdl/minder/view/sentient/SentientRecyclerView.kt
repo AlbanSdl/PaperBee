@@ -1,4 +1,4 @@
-package fr.asdl.minder.view
+package fr.asdl.minder.view.sentient
 
 import android.app.Activity
 import android.content.Context

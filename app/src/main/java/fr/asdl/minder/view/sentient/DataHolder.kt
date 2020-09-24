@@ -1,4 +1,4 @@
-package fr.asdl.minder.view
+package fr.asdl.minder.view.sentient
 
 import java.util.*
 import kotlin.collections.HashMap
@@ -6,9 +6,9 @@ import kotlin.collections.HashMap
 abstract class DataHolderList<T: DataHolder> {
     private val listeners: HashMap<ModificationType, (Int, Int?) -> Unit> = HashMap()
 
-    abstract fun retrieveContent(): LinkedList<T>
-    abstract fun save(element: T)
-    abstract fun delete(element: T)
+    protected abstract fun retrieveContent(): LinkedList<T>
+    protected abstract fun save(element: T)
+    protected abstract fun delete(element: T)
 
     fun getContents(): List<T> {
         return this.retrieveContent()

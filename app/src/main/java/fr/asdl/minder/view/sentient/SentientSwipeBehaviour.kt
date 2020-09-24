@@ -1,4 +1,4 @@
-package fr.asdl.minder.view
+package fr.asdl.minder.view.sentient
 
 import android.graphics.Canvas
 import android.view.View
