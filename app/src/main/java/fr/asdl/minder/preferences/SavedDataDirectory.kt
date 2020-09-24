@@ -5,7 +5,7 @@ import android.os.Build
 import android.util.Log
 import fr.asdl.minder.view.DataHolder
 import fr.asdl.minder.view.DataHolderList
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.*
@@ -13,8 +13,11 @@ import java.nio.charset.Charset
 
 class SavedDataDirectory(private var directoryName: String, private var context: Context) {
 
-    inline fun <reified T: DataHolder> saveDataAsync(dataHolder: T? = null, id: Int? = null) {
-        if (dataHolder != null) save(Json.encodeToString(dataHolder), dataHolder.id!!)
+    inline fun <reified T: DataHolder> saveDataAsync(dataHolder: T? = null, id: Int? = null, serializer: KSerializer<T>? = null) {
+        if (dataHolder != null) {
+            if (serializer == null) save(Json.encodeToString(dataHolder), dataHolder.id!!)
+            else save(Json.encodeToString(serializer, dataHolder), dataHolder.id!!)
+        }
         else if (id != null) delete(id)
     }
 
@@ -37,13 +40,10 @@ class SavedDataDirectory(private var directoryName: String, private var context:
         }.start()
     }
 
-    inline fun <reified T: DataHolder, H: DataHolderList<T>> loadData(context: H) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            for (str in this.load()!!)
-                context.add(Json.decodeFromString(str))
-            return
-        }
-        this.load()?.stream()!!.forEach { context.add(Json.decodeFromString(it)) }
+    inline fun <reified T: DataHolder, H: DataHolderList<T>> loadData(context: H, serializer: KSerializer<T>) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+            for (str in this.load()!!) context.add(Json.decodeFromString(serializer, str))
+        else this.load()!!.stream().forEach { context.add(Json.decodeFromString(serializer, it)) }
     }
 
     fun load(): List<String>? {

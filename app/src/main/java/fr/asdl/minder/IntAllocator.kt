@@ -20,4 +20,8 @@ class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
         if (!isAllocated(int)) throw Exception("Cannot release non-allocated Integer")
         this.allocated.remove(int)
     }
+
+    fun forceAllocate(int: Int) {
+        if (!allocated.contains(int)) allocated.add(int)
+    }
 }
