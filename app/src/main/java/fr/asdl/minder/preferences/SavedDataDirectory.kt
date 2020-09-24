@@ -10,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.*
 import java.nio.charset.Charset
+import kotlin.collections.ArrayList
 
 class SavedDataDirectory(private var directoryName: String, private var context: Context) {
 
@@ -41,9 +42,14 @@ class SavedDataDirectory(private var directoryName: String, private var context:
     }
 
     inline fun <reified T: DataHolder, H: DataHolderList<T>> loadData(context: H, serializer: KSerializer<T>) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
-            for (str in this.load()!!) context.add(Json.decodeFromString(serializer, str))
-        else this.load()!!.stream().forEach { context.add(Json.decodeFromString(serializer, it)) }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val values = ArrayList<T>()
+            for (str in this.load()!!) values.add(Json.decodeFromString(serializer, str))
+            values.sortWith { o1, o2 -> (o1.creationStamp - o2.creationStamp).toInt() }
+            for (t in values)
+                context.add(t)
+        }
+        else this.load()!!.stream().map { Json.decodeFromString(serializer, it) }.sorted { o1, o2 -> (o1.creationStamp - o2.creationStamp).toInt() }.forEach { context.add(it) }
     }
 
     fun load(): List<String>? {

@@ -3,6 +3,7 @@ package fr.asdl.minder.view.sentient
 import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,6 +61,25 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
         super.setAdapter(adapter)
         adapter?.registerAdapterDataObserver(emptyObserver)
         emptyObserver.onChanged()
+    }
+
+    fun addTouchDelegation(v: View) {
+        this.addOnItemTouchListener(ViewPropagationTouchListener(v))
+    }
+
+    private inner class ViewPropagationTouchListener(private val v: View) : OnItemTouchListener {
+
+        override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+            v.onTouchEvent(MotionEvent.obtain(e.downTime, e.eventTime, e.action, e.x - v.x + rv.x, e.y - v.y + rv.y, e.metaState))
+            return false
+        }
+
+        override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+        }
+
+        override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+        }
+
     }
 
 }

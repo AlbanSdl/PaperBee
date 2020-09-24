@@ -19,6 +19,7 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
         if (content.retrieveContent().size > 0) {
             rec.visibility = View.VISIBLE
             rec.adapter = NotePartAdapter(content)
+            rec.addTouchDelegation(holder.findViewById(R.id.note_element) as View)
         } else {
             rec.visibility = View.GONE
         }
