@@ -17,7 +17,7 @@ class Note(var title: String,
 
     private fun save() {
         if (this.noteManager != null)
-            if (this.id == null) noteManager!!.add(this) else noteManager!!.update(this)
+            if (this.id == null) noteManager!!.add(this) else noteManager!!.update(this, false)
     }
 
     public override fun retrieveContent(): LinkedList<NotePart> {

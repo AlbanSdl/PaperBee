@@ -35,11 +35,12 @@ abstract class DataHolderList<T: DataHolder> {
             this.onChange(ModificationType.UPDATE, position, null)
         }
     }
-    fun update(cnt: T) {
+    fun update(cnt: T, executeListener: Boolean = true) {
         val index = this.retrieveContent().indexOf(cnt)
         if (index >= 0) {
             this.save(cnt)
-            this.onChange(ModificationType.UPDATE, index, null)
+            if (executeListener)
+                this.onChange(ModificationType.UPDATE, index, null)
         }
     }
     fun remove(cnt: T?) {

@@ -15,9 +15,10 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     constructor(context: Context, attr: AttributeSet) : this(context, attr, 0)
 
     init {
-        this.layoutManager = LinearLayoutManager(context)
+        if (this.layoutManager == null) this.layoutManager = LinearLayoutManager(context)
         this.setHasFixedSize(false)
-        ItemTouchHelper(SentientSwipeBehaviour(this)).attachToRecyclerView(this)
+        if (attr.getAttributeBooleanValue(context.getString(R.string.namespace), context.getString(R.string.namespaced_recycler_swipeable), true))
+            ItemTouchHelper(SentientSwipeBehaviour(this)).attachToRecyclerView(this)
     }
 
     private var emptyView: View? = null

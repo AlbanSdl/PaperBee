@@ -9,4 +9,5 @@
     <string name="namespaced_recycler_emptyViewId">emptyView</string>
     <string name="namespaced_recycler_swipeableViewId">swipeableView</string>
     <string name="delete">Delete</string>
+    <string name="namespaced_recycler_swipeable">allowSwipe</string>
 </resources>

@@ -3,5 +3,6 @@
     <declare-styleable name="SentientRecyclerView">
         <attr name="emptyView" format="reference"/>
         <attr name="swipeableView" format="reference"/>
+        <attr name="allowSwipe" format="boolean"/>
     </declare-styleable>
 </resources>
