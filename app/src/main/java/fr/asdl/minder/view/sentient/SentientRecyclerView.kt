@@ -63,14 +63,13 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
         emptyObserver.onChanged()
     }
 
-    fun addTouchDelegation(v: View) {
-        this.addOnItemTouchListener(ViewPropagationTouchListener(v))
+    fun addTouchDelegation() {
+        this.addOnItemTouchListener(ViewPropagationTouchListener())
     }
 
-    private inner class ViewPropagationTouchListener(private val v: View) : OnItemTouchListener {
+    private inner class ViewPropagationTouchListener : OnItemTouchListener {
 
         override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-            v.onTouchEvent(MotionEvent.obtain(e.downTime, e.eventTime, e.action, e.x - v.x + rv.x, e.y - v.y + rv.y, e.metaState))
             return false
         }
 

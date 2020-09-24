@@ -1,5 +1,8 @@
 package fr.asdl.minder.note
 
+import android.annotation.SuppressLint
+import android.graphics.Rect
+import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
@@ -18,14 +21,15 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
         if (content.retrieveContent().size > 0) {
             rec.visibility = View.VISIBLE
-            rec.adapter = NotePartAdapter(content)
-            rec.addTouchDelegation(holder.findViewById(R.id.note_element) as View)
+            rec.adapter = NotePartAdapter(content, holder.findViewById(R.id.note_element) as View)
+            rec.addTouchDelegation()
         } else {
             rec.visibility = View.GONE
         }
     }
 
-    inner class NotePartAdapter(note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
+    inner class NotePartAdapter(note: Note, private val clickDelegateView: View) : SentientRecyclerViewAdapter<NotePart>(note) {
+        @SuppressLint("ClickableViewAccessibility")
         override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
             // TextNoteParts
             val textView = (holder.findViewById(R.id.note_text) as TextView)
@@ -44,6 +48,18 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
                 checkBox.visibility = View.GONE
                 checkBox.setOnClickListener(null)
             }
+            holder.itemView.setOnTouchListener { v, e ->
+                val rect = Rect()
+                val rect2 = Rect()
+                v.getGlobalVisibleRect(rect)
+                clickDelegateView.getGlobalVisibleRect(rect2)
+                clickDelegateView.onTouchEvent(MotionEvent.obtain(e.downTime, e.eventTime, e.action,
+                    e.x + rect.left - rect2.left,
+                    e.y + rect.top - rect2.top,
+                    e.metaState))
+                false
+            }
+            holder.itemView.setOnClickListener { clickDelegateView.performClick() }
         }
 
         override fun getLayoutId(): Int {
