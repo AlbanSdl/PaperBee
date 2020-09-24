@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginTop="@dimen/padding_tiny"
-    android:layout_marginBottom="@dimen/padding_tiny">
+    android:paddingTop="@dimen/padding_tiny"
+    android:paddingBottom="@dimen/padding_tiny">
 
     <CheckBox
         android:id="@+id/note_checkbox"
