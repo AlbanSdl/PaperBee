@@ -6,6 +6,7 @@
     <dimen name="elevation_medium">4dp</dimen>
     <dimen name="padding_medium">15dp</dimen>
     <dimen name="note_title_size">18sp</dimen>
-    <dimen name="max_note_display">150dp</dimen>
     <dimen name="max_note_display_contents">120dp</dimen>
+    <dimen name="note_fading_edge_length">30dp</dimen>
+    <dimen name="note_content_size">14sp</dimen>
 </resources>

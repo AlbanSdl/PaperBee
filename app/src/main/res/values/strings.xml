@@ -10,4 +10,9 @@
     <string name="namespaced_recycler_swipeableViewId">swipeableView</string>
     <string name="delete">Delete</string>
     <string name="namespaced_recycler_swipeable">allowSwipe</string>
+    <string name="transition_name">editorTransitionOpen</string>
+    <string name="transition_name_title">editorTransitionOpenTitle</string>
+    <string name="transition_name_contents">editorTransitionOpenContents</string>
+    <string name="note_title">Title</string>
+    <string name="note_content">Write something here !</string>
 </resources>

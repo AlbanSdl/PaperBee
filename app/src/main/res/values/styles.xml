@@ -24,4 +24,15 @@
         <item name="android:textColor">@color/blank</item>
     </style>
 
+    <style name="EditorTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="statusBarBackground">@color/colorPrimaryDark</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/note_editor_open</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
+
 </resources>

@@ -11,23 +11,35 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.Fade
 import fr.asdl.minder.R
 
-class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: Int) : RecyclerView(context, attr, defStyleAttr) {
+class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: Int) : RecyclerView(
+    context,
+    attr,
+    defStyleAttr
+) {
 
     constructor(context: Context, attr: AttributeSet) : this(context, attr, 0)
 
     init {
         if (this.layoutManager == null) this.layoutManager = LinearLayoutManager(context)
         this.setHasFixedSize(false)
-        if (attr.getAttributeBooleanValue(context.getString(R.string.namespace), context.getString(R.string.namespaced_recycler_swipeable), true))
+        if (attr.getAttributeBooleanValue(
+                context.getString(R.string.namespace),
+                context.getString(R.string.namespaced_recycler_swipeable),
+                true
+            ))
             ItemTouchHelper(SentientSwipeBehaviour(this)).attachToRecyclerView(this)
     }
 
     private var emptyView: View? = null
     private var wasEmptyDisplayed = false
-    private val emptyViewRes: Int = attr.getAttributeResourceValue(context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_emptyViewId), -1)
-    val swipeableViewRes: Int = attr.getAttributeResourceValue(context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_swipeableViewId), -1)
+    private val emptyViewRes: Int = attr.getAttributeResourceValue(
+        context.getString(R.string.namespace),
+        context.getString(R.string.namespaced_recycler_emptyViewId), -1
+    )
+    val swipeableViewRes: Int = attr.getAttributeResourceValue(
+        context.getString(R.string.namespace),
+        context.getString(R.string.namespaced_recycler_swipeableViewId), -1
+    )
 
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
         private fun setupEmptyView(): Boolean {

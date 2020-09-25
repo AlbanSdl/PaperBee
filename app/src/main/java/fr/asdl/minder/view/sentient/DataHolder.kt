@@ -9,6 +9,7 @@ abstract class DataHolderList<T: DataHolder> {
     protected abstract fun retrieveContent(): LinkedList<T>
     protected abstract fun save(element: T)
     protected abstract fun delete(element: T)
+    protected abstract fun shouldNotify(): Boolean
 
     fun getContents(): List<T> {
         return this.retrieveContent()
@@ -70,8 +71,8 @@ abstract class DataHolderList<T: DataHolder> {
         this.onChange(ModificationType.CLEAR, 0, null)
     }
 
-    private fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
-        this.listeners[actionType]?.invoke(position, toPosition)
+    protected fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
+        if (shouldNotify()) this.listeners[actionType]?.invoke(position, toPosition)
     }
 
     fun on(actionType: ModificationType, lambda: (changePosition: Int, otherPosition: Int?) -> Unit) {

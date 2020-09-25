@@ -13,12 +13,16 @@
         android:layout_gravity="center_vertical"
         android:padding="@dimen/padding_tiny"/>
 
-    <TextView
+    <EditText
         android:id="@+id/note_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textColor="@color/almostDark"
+        android:hint="@string/note_content"
+        android:autofillHints="@string/note_content"
+        android:inputType="textMultiLine"
+        android:background="@android:color/transparent"
         android:textSize="@dimen/note_content_size"/>
 
 </LinearLayout>

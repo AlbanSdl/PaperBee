@@ -31,4 +31,8 @@ class Note(var title: String,
     override fun delete(element: NotePart) {
         this.save()
     }
+
+    override fun shouldNotify(): Boolean {
+        return true
+    }
 }

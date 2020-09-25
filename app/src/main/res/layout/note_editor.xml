@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="UselessParent">
+
+    <FrameLayout
+        android:id="@+id/transitionBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blank"
+        android:transitionName="@string/transition_name">
+
+        <LinearLayout
+            android:id="@+id/transitionContents"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/ActionBar">
+                
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/note_editor_title"
+                    android:inputType="text"
+                    android:hint="@string/note_title"
+                    android:autofillHints="@string/note_title"
+                    android:transitionName="@string/transition_name_title"
+                    android:background="@android:color/transparent"/>
+                
+            </androidx.appcompat.widget.Toolbar>
+
+            <fr.asdl.minder.view.sentient.SentientRecyclerView
+                android:id="@+id/note_editor_elements"
+                android:layout_margin="@dimen/padding_small"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:allowSwipe="true"
+                android:transitionName="@string/transition_name_contents"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>
