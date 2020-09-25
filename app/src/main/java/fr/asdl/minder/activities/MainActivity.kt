@@ -1,5 +1,6 @@
 package fr.asdl.minder.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -13,11 +14,14 @@ import fr.asdl.minder.R
 import fr.asdl.minder.note.*
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import kotlinx.serialization.json.Json
+import java.util.*
+import kotlin.random.Random
 
 
 class MainActivity : AppCompatActivity() {
 
     private var noteManager: NoteManager? = null
+    private val statusCodeNoteSave = Random(Date().time).nextBits(16)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,25 +35,30 @@ class MainActivity : AppCompatActivity() {
                 Fade.fadeOut(findViewById(R.id.loadingBar))
                 Fade.fadeOut(findViewById(R.id.loadingText))
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
-                    val note = Note("Test Note !", noteManager = noteManager)
-                    noteManager!!.add(note)
-                    note.add(NoteText("This is a test text made to describe the note"))
-                    note.add(NoteCheckBoxable("Does it really describe the note ?", false))
-                    note.add(NoteCheckBoxable("Is the note working ? Check data persistence !", true))
+                    val note = Note("", noteManager = null)
+                    note.add(NoteText(""))
+                    this.openNote(note)
                 }
             }
         }.start()
     }
 
-    override fun onResume() {
-        super.onResume()
-        noteManager?.reload(this)
+    fun openNote(note: Note, vararg sharedViews: View) {
+        startActivityForResult(
+            Intent(this@MainActivity, NoteEditor::class.java).putExtra("note", Json.encodeToString(noteManager!!.serializer, note)),
+            statusCodeNoteSave, ActivityOptionsCompat.makeSceneTransitionAnimation(this@MainActivity, *arrayOf(*sharedViews).plusElement(findViewById<FloatingActionButton>(R.id.add_note_button)).map { v -> Pair(v, ViewCompat.getTransitionName(v)) }.toTypedArray()).toBundle()
+        )
     }
 
-    fun openNote(note: Note, vararg sharedViews: View) {
-        startActivity(
-            Intent(this@MainActivity, NoteEditor::class.java).putExtra("note", Json.encodeToString((note.noteManager as NoteManager).serializer, note)),
-            ActivityOptionsCompat.makeSceneTransitionAnimation(this@MainActivity, *arrayOf(*sharedViews).map { v -> Pair(v, ViewCompat.getTransitionName(v)) }.toTypedArray()).toBundle()
-        )
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == statusCodeNoteSave && resultCode == Activity.RESULT_OK) {
+            val noteStr = data?.getStringExtra("note")
+            if (noteStr != null) {
+                val note = Json.decodeFromString(noteManager!!.serializer, noteStr)
+                note.noteManager = noteManager
+                note.save()
+            }
+        }
     }
 }

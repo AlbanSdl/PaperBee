@@ -15,7 +15,7 @@ class Note(var title: String,
     override var id: Int? = null
     override var creationStamp: Long = Date().time
 
-    private fun save() {
+    fun save() {
         if (this.noteManager != null)
             if (this.id == null) noteManager!!.add(this) else noteManager!!.update(this, false)
     }

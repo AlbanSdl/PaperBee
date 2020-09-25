@@ -1,9 +1,12 @@
 package fr.asdl.minder.activities
 
 import android.animation.ObjectAnimator
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
@@ -12,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import fr.asdl.minder.R
 import fr.asdl.minder.note.*
-import fr.asdl.minder.preferences.SavedDataDirectory
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import kotlinx.serialization.json.Json
 
@@ -20,7 +22,6 @@ class NoteEditor : AppCompatActivity() {
 
     private var transitionContents: View? = null
     private var note: Note? = null
-    private var dataDirectory: SavedDataDirectory? = null
     private val serializer = NoteSerializer()
 
     override fun onBackPressed() {
@@ -31,9 +32,8 @@ class NoteEditor : AppCompatActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        this.dataDirectory = SavedDataDirectory(getString(R.string.notes_directory_name), this)
         if (intent.hasExtra("note")) note = Json.decodeFromString(
-            NoteSerializer(), intent.getStringExtra(
+            serializer, intent.getStringExtra(
                 "note"
             )!!
         )
@@ -46,7 +46,12 @@ class NoteEditor : AppCompatActivity() {
 
         // We add the note contents
         (findViewById<EditText>(R.id.note_editor_title)).setText(note?.title)
-        (findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(EditTextChangeWatcher(note, null))
+        (findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(
+            EditTextChangeWatcher(
+                note,
+                null
+            )
+        )
 
         val rec = (findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         if (note != null && note!!.retrieveContent().size > 0) {
@@ -61,10 +66,24 @@ class NoteEditor : AppCompatActivity() {
             this.animateFade(0f, 1f, 250, 300)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.editor_menu, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                return true
+            }
+            R.id.add_text_element -> {
+                note!!.add(NoteText(""))
+                return true
+            }
+            R.id.add_checkbox_element -> {
+                note!!.add(NoteCheckBoxable("", false))
                 return true
             }
         }
@@ -78,9 +97,12 @@ class NoteEditor : AppCompatActivity() {
         anim.setDuration(duration).start()
     }
 
-    private fun save() {
-        if (this.dataDirectory != null && this.note != null)
-            this.dataDirectory!!.saveDataAsync(note, serializer = serializer)
+    override fun finish() {
+        // We send the new value to the main activity which will execute the save
+        val resultIntent = Intent()
+        resultIntent.putExtra("note", Json.encodeToString(serializer, note!!))
+        setResult(Activity.RESULT_OK, resultIntent)
+        super.finish()
     }
 
     private inner class NotePartEditorAdapter(note: Note) : NoteAdapter.NotePartAdapter(note) {
@@ -102,12 +124,10 @@ class NoteEditor : AppCompatActivity() {
 
     }
 
-    override fun onPause() {
-        this.save()
-        super.onPause()
-    }
-
-    private class EditTextChangeWatcher(private val note: Note?, private val notePart: TextNotePart?) : TextWatcher {
+    private class EditTextChangeWatcher(
+        private val note: Note?,
+        private val notePart: TextNotePart?
+    ) : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         }
 

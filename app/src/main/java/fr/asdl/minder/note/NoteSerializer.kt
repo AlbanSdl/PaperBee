@@ -28,7 +28,7 @@ class NoteSerializer : KSerializer<Note> {
             for (i in 0 until descriptor.elementsCount)
                 when(descriptor.getElementName(i)) {
                     "title" -> this.encodeStringElement(descriptor, i, value.title)
-                    "id" -> this.encodeIntElement(descriptor, i, value.id!!)
+                    "id" -> if (value.id != null) this.encodeIntElement(descriptor, i, value.id!!)
                     "creationStamp" -> this.encodeLongElement(descriptor, i, value.creationStamp)
                     "items" -> this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.retrieveContent())
                 }
@@ -54,7 +54,7 @@ class NoteSerializer : KSerializer<Note> {
             }
             this.endStructure(descriptor)
             val note = Note(title!!, LinkedList(items!!), null)
-            note.id = id!!
+            note.id = id
             note.creationStamp = creationStamp!!
             return note
         }

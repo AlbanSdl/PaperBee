@@ -31,7 +31,7 @@ abstract class DataHolderList<T: DataHolder> {
     }
     fun update(position: Int, lambda: (old: T) -> T) {
         if (position < this.retrieveContent().size) {
-            retrieveContent()[position] = lambda.run{retrieveContent()[position]}
+            retrieveContent()[position] = lambda.invoke(retrieveContent()[position])
             this.save(retrieveContent()[position])
             this.onChange(ModificationType.UPDATE, position, null)
         }
@@ -42,6 +42,16 @@ abstract class DataHolderList<T: DataHolder> {
             this.save(cnt)
             if (executeListener)
                 this.onChange(ModificationType.UPDATE, index, null)
+        } else {
+            var realIndex: Int = -1
+            for (elementIndex in 0 until this.retrieveContent().size) {
+                if (this.getContents()[elementIndex].id == cnt.id) {
+                    realIndex = elementIndex
+                    break
+                }
+            }
+            if (realIndex >= 0)
+                this.update(realIndex) { cnt }
         }
     }
     fun remove(cnt: T?) {
@@ -71,7 +81,7 @@ abstract class DataHolderList<T: DataHolder> {
         this.onChange(ModificationType.CLEAR, 0, null)
     }
 
-    protected fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
+    private fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
         if (shouldNotify()) this.listeners[actionType]?.invoke(position, toPosition)
     }
 

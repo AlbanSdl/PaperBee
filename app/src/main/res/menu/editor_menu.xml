@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/add_text_element"
+        android:orderInCategory="100"
+        android:title="@string/add_text_element"
+        android:icon="@drawable/ic_text_fields"
+        android:tint="@color/dark"
+        android:titleCondensed="@string/add_text_element"
+        app:showAsAction="ifRoom"
+        app:iconTint="@color/dark"/>
+
+    <item
+        android:id="@+id/add_checkbox_element"
+        android:orderInCategory="101"
+        android:title="@string/add_checkbox_element"
+        android:icon="@drawable/ic_check_box"
+        android:tint="@color/dark"
+        android:titleCondensed="@string/add_checkbox_element"
+        app:showAsAction="ifRoom"
+        app:iconTint="@color/dark"/>
+
+</menu>

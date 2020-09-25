@@ -13,6 +13,10 @@
     <string name="transition_name">editorTransitionOpen</string>
     <string name="transition_name_title">editorTransitionOpenTitle</string>
     <string name="transition_name_contents">editorTransitionOpenContents</string>
+    <string name="transition_name_fab">editorTransitionOpenFAB</string>
     <string name="note_title">Title</string>
     <string name="note_content">Write something here !</string>
+    <string name="add_element">Add element</string>
+    <string name="add_text_element">Add text element</string>
+    <string name="add_checkbox_element">Add checkbox element</string>
 </resources>

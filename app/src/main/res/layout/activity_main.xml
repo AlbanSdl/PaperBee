@@ -61,6 +61,7 @@
         app:srcCompat="@drawable/ic_baseline_add_24"
         app:backgroundTint="@color/colorAccent"
         app:tint="@color/blank"
-        app:rippleColor="@color/blank"/>
+        app:rippleColor="@color/blank"
+        android:transitionName="@string/transition_name_fab"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
