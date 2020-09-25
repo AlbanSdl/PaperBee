@@ -1,5 +1,6 @@
 package fr.asdl.minder.view.sentient
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
@@ -18,6 +19,9 @@ import fr.asdl.minder.R
  * view to swipe in the "app:swipeableView" attribute.
  * You can also provide a view that should be displayed if no element is contained in the Adapter
  * data set. You can do so by adding its id to the "app:emptyView" attribute.
+ * The [SentientRecyclerView] also enforces the android:nestedScrollingEnabled="false" attribute
+ * which doesn't work with multiple inputs at once (ie. when the user touches the screen with
+ * multiple fingers)
  * The [SentientRecyclerView] has been designed to work with a [SentientRecyclerViewAdapter], using
  * a [DataHolderList] but this is NOT mandatory.
  */
@@ -37,7 +41,7 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
      * SentientSwipeBehaviour if requested in the AttributeSet.
      */
     init {
-        if (this.layoutManager == null) this.layoutManager = LinearLayoutManager(context)
+        if (this.layoutManager == null) this.layoutManager = SentientLinearLayoutManager(context)
         if (attr.getAttributeBooleanValue(
                 context.getString(R.string.namespace),
                 context.getString(R.string.namespaced_recycler_swipeable),
@@ -123,6 +127,14 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
         this.addOnItemTouchListener(ViewPropagationTouchListener())
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(e: MotionEvent?): Boolean {
+        if (!this.isNestedScrollingEnabled) (this.layoutManager as? SentientLinearLayoutManager)?.setScrollEnabled(false)
+        val returnValue = super.onTouchEvent(e)
+        if (!this.isNestedScrollingEnabled) (this.layoutManager as? SentientLinearLayoutManager)?.setScrollEnabled(true)
+        return returnValue
+    }
+
     /**
      * A listener that tells the [SentientRecyclerView] not to intercept any [MotionEvent].
      * Used in the [addTouchDelegation] method.
@@ -139,6 +151,27 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
         override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
         }
 
+    }
+
+    /**
+     * A custom [LinearLayoutManager] that allows the usage of fadingEdges and enforces
+     * android:nestedScrollingEnabled="false"
+     */
+    private class SentientLinearLayoutManager(context: Context) : LinearLayoutManager(context) {
+
+        private var isScrollEnabled: Boolean = true
+
+        override fun canScrollHorizontally(): Boolean {
+            return super.canScrollHorizontally() && isScrollEnabled
+        }
+
+        override fun canScrollVertically(): Boolean {
+            return super.canScrollVertically() && isScrollEnabled
+        }
+
+        fun setScrollEnabled(enabled: Boolean) {
+            this.isScrollEnabled = enabled
+        }
     }
 
 }
