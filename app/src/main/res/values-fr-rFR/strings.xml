@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Minder</string>
+    <string name="loading">Chargement</string>
+    <string name="no_note">Tu n\'as pas encore de notes</string>
+    <string name="delete">Supprimer</string>
+    <string name="note_title">Titre</string>
+    <string name="note_content">Ecris quelque chose</string>
+    <string name="add_text_element">Ajouter du texte</string>
+    <string name="add_checkbox_element">Ajouter une coche</string>
+</resources>

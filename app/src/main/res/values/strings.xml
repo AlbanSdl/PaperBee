@@ -1,22 +1,24 @@
 <resources>
+    <!-- App Resource Strings -->
+    <string name="preferences_file" translatable="false">fr.asdl.minder</string>
+    <string name="pref_generic_name" translatable="false">generic_name</string>
+    <string name="notes_directory_name" translatable="false">notes</string>
+    <string name="namespace" translatable="false">http://schemas.android.com/apk/res-auto</string>
+    <string name="namespaced_recycler_emptyViewId" translatable="false">emptyView</string>
+    <string name="namespaced_recycler_swipeableViewId" translatable="false">swipeableView</string>
+    <string name="namespaced_recycler_swipeable" translatable="false">allowSwipe</string>
+    <string name="transition_name" translatable="false">editorTransitionOpen</string>
+    <string name="transition_name_title" translatable="false">editorTransitionOpenTitle</string>
+    <string name="transition_name_contents" translatable="false">editorTransitionOpenContents</string>
+    <string name="transition_name_fab" translatable="false">editorTransitionOpenFAB</string>
+    <string name="note_content">Write something</string>
+
+    <!-- Translatable Strings (displayed) -->
     <string name="app_name">Minder</string>
     <string name="loading">Loading</string>
-    <string name="preferences_file">fr.asdl.minder</string>
-    <string name="pref_generic_name">generic_name</string>
-    <string name="notes_directory_name">notes</string>
-    <string name="no_note">No note found</string>
-    <string name="namespace">http://schemas.android.com/apk/res-auto</string>
-    <string name="namespaced_recycler_emptyViewId">emptyView</string>
-    <string name="namespaced_recycler_swipeableViewId">swipeableView</string>
+    <string name="no_note">You don\'t have any note yet</string>
     <string name="delete">Delete</string>
-    <string name="namespaced_recycler_swipeable">allowSwipe</string>
-    <string name="transition_name">editorTransitionOpen</string>
-    <string name="transition_name_title">editorTransitionOpenTitle</string>
-    <string name="transition_name_contents">editorTransitionOpenContents</string>
-    <string name="transition_name_fab">editorTransitionOpenFAB</string>
     <string name="note_title">Title</string>
-    <string name="note_content">Write something here !</string>
-    <string name="add_element">Add element</string>
     <string name="add_text_element">Add text element</string>
     <string name="add_checkbox_element">Add checkbox element</string>
 </resources>
