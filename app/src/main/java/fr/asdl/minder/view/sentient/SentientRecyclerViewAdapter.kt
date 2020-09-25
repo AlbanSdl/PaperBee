@@ -5,11 +5,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-
+/**
+ * An pre-implementation of the [RecyclerView.Adapter]. This handles the display of the contents of
+ * the [RecyclerView] it is attached to. The data of the [SentientRecyclerViewAdapter] is provided
+ * by a [DataHolderList] that notifies the [SentientRecyclerViewAdapter] every time a change
+ * is made to the data set it contains.
+ * The [SentientRecyclerViewAdapter] has been designed to work with the [SentientRecyclerView] but
+ * should also work with a regular [RecyclerView].
+ *
+ * Already inflates the layout given in [getLayoutId] for any new [ViewHolder].
+ * Customization can be made in [onBindViewHolder] to add the content of the [DataHolder].
+ */
 abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     private val dataContainer: DataHolderList<T>
 ) : RecyclerView.Adapter<SentientRecyclerViewAdapter.ViewHolder>() {
 
+    /**
+     * Called on the initialization of the Adapter.
+     * Initializes the communication with the DataHolderList.
+     */
     init {
         this.dataContainer.on(ModificationType.ADDITION) { i: Int, _: Int? -> super.notifyItemInserted(i) }
         this.dataContainer.on(ModificationType.REMOVAL) { i: Int, _: Int? -> super.notifyItemRemoved(i) }
@@ -18,10 +32,18 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
         this.dataContainer.on(ModificationType.CLEAR) { _: Int, _: Int? -> super.notifyDataSetChanged() }
     }
 
+    /**
+     * Retrieves the [DataHolderList] containing the data set of the [SentientRecyclerViewAdapter].
+     */
     fun getDataHolder(): DataHolderList<T> {
         return this.dataContainer
     }
 
+    /**
+     * Retrieves the [DataHolder] contained at the given position in the [DataHolderList].
+     *
+     * @param index the index of the [DataHolder] to retrieve.
+     */
     fun getData(index: Int): T? {
         return this.dataContainer.getContents()[index]
     }
@@ -34,21 +56,46 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
         if (this.getHeldItem(position) != null) this.onBindViewHolder(holder, this.getHeldItem(position)!!)
     }
 
+    /**
+     * Customize the [ViewHolder] in this method. The [ViewHolder] has the layout given in
+     * [getLayoutId]. However remember that this [ViewHolder] can already have been used. Thus don't
+     * forget to reset values, visibility when you change them for some reason.
+     *
+     * @param holder the [ViewHolder] allocated to the [content]
+     * @param content the [DataHolder] from the [DataHolderList] attached to the [ViewHolder]
+     */
     abstract fun onBindViewHolder(holder: ViewHolder, content: T)
 
     final override fun getItemCount(): Int {
         return this.dataContainer.getContents().size
     }
 
+    /**
+     * Retrieves the id of the layout to use when new [ViewHolder] are inflated by the
+     * [SentientRecyclerViewAdapter].
+     *
+     * @return the id of the layout to inflate.
+     */
     abstract fun getLayoutId(): Int
 
+    /**
+     * Similar to [getData] at the difference that this method will never throw any
+     * [ArrayIndexOutOfBoundsException] as the index is checked before accessing the data.
+     *
+     * @param pos the index of the [DataHolder] to retrieve.
+     * @return the [DataHolder] contained at the given index if it exists. Returns null instead.
+     */
     private fun getHeldItem(pos: Int): T? {
         return if (this.dataContainer.getContents().size > pos) this.dataContainer.getContents()[pos] else null
     }
 
-    class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    /**
+     * Similar to a regular [RecyclerView.ViewHolder]. Only contains a shortened method
+     * [findViewById] instead of [itemView].findViewById
+     */
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun findViewById(id: Int): View? {
-            return this.view.findViewById(id)
+            return this.itemView.findViewById(id)
         }
     }
 

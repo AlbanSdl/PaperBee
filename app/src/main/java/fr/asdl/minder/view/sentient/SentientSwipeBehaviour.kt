@@ -7,6 +7,14 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.R
 
+/**
+ * Handles Swipe gesture for [SentientRecyclerView]. Only works when the [SentientRecyclerView] it
+ * is attached to uses a [SentientRecyclerViewAdapter] as [RecyclerView.Adapter]. (Otherwise
+ * callback will not be called but the animation will be kept)
+ *
+ * The [SentientSwipeBehaviour] only tracks swipe to right gesture and attaches it to the deletion
+ * of the swiped item.
+ */
 class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerView) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
