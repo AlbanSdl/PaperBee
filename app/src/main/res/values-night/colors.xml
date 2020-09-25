@@ -9,4 +9,5 @@
     <color name="almostDark">#aaa</color>
     <color name="red">#8c0900</color>
     <color name="blankPressed">#bbbb</color>
+    <color name="editorStatusBar">#444</color>
 </resources>

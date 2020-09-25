@@ -23,6 +23,7 @@ class NoteEditor : AppCompatActivity() {
     private var transitionContents: View? = null
     private var note: Note? = null
     private val serializer = NoteSerializer()
+    private val watchers = hashMapOf<NotePart, TextWatcher>()
 
     override fun onBackPressed() {
         this.animateFade(1f, 0f)
@@ -111,13 +112,23 @@ class NoteEditor : AppCompatActivity() {
             super.onBindViewHolder(holder, content)
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? EditText)
-                textView?.addTextChangedListener(EditTextChangeWatcher(note, content))
+                this@NoteEditor.watchers[content] = EditTextChangeWatcher(note, content)
+                textView?.addTextChangedListener(this@NoteEditor.watchers[content])
+                textView?.setText(content.content)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
                 checkBox?.setOnClickListener { content.checked = checkBox.isChecked }
             }
         }
+
+        override fun onViewRecycled(holder: ViewHolder) {
+            super.onViewRecycled(holder)
+            val textView = (holder.findViewById(R.id.note_text) as? EditText)
+            if (textView != null)
+                this@NoteEditor.watchers.values.forEach { textView.removeTextChangedListener(it) }
+        }
+
         override fun getLayoutId(): Int {
             return R.layout.note_part_editor_layout
         }

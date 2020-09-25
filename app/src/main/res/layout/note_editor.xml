@@ -39,9 +39,10 @@
 
             <fr.asdl.minder.view.sentient.SentientRecyclerView
                 android:id="@+id/note_editor_elements"
-                android:layout_margin="@dimen/padding_small"
+                android:padding="@dimen/padding_small"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:overScrollMode="ifContentScrolls"
                 app:allowSwipe="true"
                 android:transitionName="@string/transition_name_contents"/>
 

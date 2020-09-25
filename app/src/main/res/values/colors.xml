@@ -10,4 +10,5 @@
     <color name="translucentDark">#6000</color>
     <color name="red">#c20d00</color>
     <color name="blankPressed">#b888</color>
+    <color name="editorStatusBar">#888</color>
 </resources>
