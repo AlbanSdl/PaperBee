@@ -7,35 +7,25 @@ import fr.asdl.minder.preferences.SavedDataDirectory
 import fr.asdl.minder.view.sentient.DataHolderList
 import java.util.*
 
-class NoteManager(private val context: Context) : DataHolderList<Note>() {
-    
+class NoteManager(private val context: Context, idAllocator: IntAllocator) : DataHolderList<Note>(idAllocator) {
+
     private val dataDirectory = SavedDataDirectory(this.context.getString(R.string.notes_directory_name), context)
     override val contents = LinkedList<Note>()
-    private val idAllocator = IntAllocator()
     val serializer = NoteSerializer()
-    private var notify = true
 
-    init {
+    fun load() {
         dataDirectory.loadData(this, this.serializer)
     }
 
     override fun save(element: Note) {
-        if (element.id == null) {
-            element.id = idAllocator.allocate()
-        }
-        if (element.noteManager == null && element.id != null) {
-            element.noteManager = this
-            idAllocator.forceAllocate(element.id!!)
-        }
+        if (element.noteManager == null) element.noteManager = this
         this.dataDirectory.saveDataAsync(element, serializer = this.serializer)
     }
 
-    override fun delete(element: Note) {
-        if (element.id == null) return
-        this.idAllocator.release(element.id!!)
-        this.dataDirectory.saveDataAsync(id = element.id!!, serializer = this.serializer)
+    override fun delete(element: Note, oldId: Int) {
+        this.dataDirectory.saveDataAsync(id = oldId, serializer = this.serializer)
     }
 
-    override fun shouldNotify(): Boolean = notify
+    override fun shouldNotify(): Boolean = true
 
 }

@@ -1,10 +1,8 @@
 package fr.asdl.minder
 
-import kotlinx.serialization.Serializable
 import java.lang.Exception
 import kotlin.collections.ArrayList
 
-@Serializable
 class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
     fun allocate(): Int {
         var i = 0
@@ -27,12 +25,6 @@ class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
         return allocate()
     }
 
-    private fun reset() {
-        this.allocated.clear()
-    }
+    fun isAllocated(int: Int): Boolean = int in allocated
 
-    fun update(intAllocator: IntAllocator) {
-        this.reset()
-        this.allocated.addAll(intAllocator.allocated)
-    }
 }

@@ -53,7 +53,7 @@ class NoteSerializer : KSerializer<Note> {
                 }
             }
             this.endStructure(descriptor)
-            val note = Note(title!!, LinkedList(items!!), null)
+            val note = Note(title!!, null, LinkedList(items!!), null)
             note.id = id
             note.order = order!!
             return note

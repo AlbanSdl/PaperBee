@@ -1,5 +1,6 @@
 package fr.asdl.minder.view.sentient
 
+import fr.asdl.minder.IntAllocator
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -8,8 +9,11 @@ import kotlin.collections.HashMap
  * This structure handles the transmission of changes between the data set and the views.
  * This structure is relying on a [LinkedList] of any type inheriting from [DataHolder], which
  * gives ids to items manages their order.
+ *
+ * @param idAllocator the id allocator of the base NoteManager. It will be used to generate new ids
+ * for any sub-component of its tree
  */
-abstract class DataHolderList<T: DataHolder> {
+abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
 
     /**
      * The listeners of the [DataHolder]. Registered by the [SentientRecyclerViewAdapter],
@@ -28,7 +32,9 @@ abstract class DataHolderList<T: DataHolder> {
 
     /**
      * Called when an element should be saved. It can be a brand new item in the set or
-     * an older one. This function should also dedicate an id to the [DataHolder] if it hasn't any.
+     * an older one.
+     * Only use this method in order to save the element as persistent data. If the element is part
+     * of another one, don't do anything in this method.
      *
      * @param element the [DataHolder] to handle save for.
      */
@@ -36,12 +42,14 @@ abstract class DataHolderList<T: DataHolder> {
 
     /**
      * Called when a element should be deleted. The item is asserted to exist and to have been
-     * registered calling the [save] method. Thus this function should free the id of this
-     * [DataHolder].
+     * registered calling the [save] method.
+     * Only use this method in order to delete the element as persistent data. If the element is
+     * part of another one, don't do anything in this method.
      *
      * @param element the [DataHolder] to handle deletion for.
+     * @param oldId the old id of the [element]
      */
-    protected abstract fun delete(element: T)
+    protected abstract fun delete(element: T, oldId: Int)
 
     /**
      * Details whether the listeners should be called after a modification in the data set.
@@ -57,6 +65,51 @@ abstract class DataHolderList<T: DataHolder> {
      */
     fun getContents(): List<T> {
         return this.contents
+    }
+
+    /**
+     * Allocates ids and saves data for every sub elements of the element to save.
+     *
+     * @param element the base [DataHolder] to save.
+     * @param holderList the [DataHolderList] in which [element] is contained (or should be)
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun <K: DataHolder> saveRecursively(element: K, holderList: DataHolderList<K>) {
+        if (element.id == null)
+            element.id = idAllocator?.allocate()
+        else if (idAllocator?.isAllocated(element.id!!) == false) {
+            val allocated = idAllocator?.forceAllocate(element.id!!)
+            if (allocated != element.id!!) holderList.delete(element, element.id!!)
+            element.id = allocated
+        }
+
+        if (element is DataHolderList<*>) {
+            element.idAllocator = idAllocator
+            element.getContents().forEach { saveRecursively(it, element as DataHolderList<DataHolder>) }
+        }
+
+        holderList.save(element)
+    }
+
+    /**
+     * Allocates an id if the element hasn't one already and saves it.
+     */
+    private fun allocateAndSave(element: T) {
+        this.saveRecursively(element, this)
+    }
+
+    /**
+     * Releases the id of the element and deletes it from the current structure.
+     */
+    private fun releaseAndDelete(element: T) {
+        if (element.id != null) {
+            val oldId = element.id!!
+            idAllocator?.release(element.id!!)
+            element.id = null
+            if (element is DataHolderList<*>)
+                element.clear()
+            this.delete(element, oldId)
+        }
     }
 
     /**
@@ -77,7 +130,7 @@ abstract class DataHolderList<T: DataHolder> {
             this.contents.add(position, cnt)
             this.onChange(ModificationType.ADDITION, position, null)
         }
-        this.save(cnt)
+        this.allocateAndSave(cnt)
     }
 
     /**
@@ -90,7 +143,7 @@ abstract class DataHolderList<T: DataHolder> {
         if (cnt.order >= 0) return this.add(cnt, cnt.order)
         cnt.order = this.contents.size
         this.contents.add(cnt)
-        this.save(cnt)
+        this.allocateAndSave(cnt)
         this.onChange(ModificationType.ADDITION, this.contents.size - 1, null)
     }
 
@@ -103,8 +156,9 @@ abstract class DataHolderList<T: DataHolder> {
      */
     fun update(position: Int, lambda: (old: T) -> T) {
         if (position < this.contents.size) {
+            this.releaseAndDelete(contents[position])
             contents[position] = lambda.invoke(contents[position])
-            this.save(contents[position])
+            this.allocateAndSave(contents[position])
             this.onChange(ModificationType.UPDATE, position, null)
         }
     }
@@ -123,13 +177,13 @@ abstract class DataHolderList<T: DataHolder> {
     fun update(cnt: T, executeListener: Boolean = true) {
         val index = this.contents.indexOf(cnt)
         if (index >= 0) {
-            this.save(cnt)
+            this.allocateAndSave(cnt)
             if (executeListener)
                 this.onChange(ModificationType.UPDATE, index, null)
         } else {
             var realIndex: Int = -1
             for (elementIndex in 0 until this.contents.size) {
-                if (this.getContents()[elementIndex].id == cnt.id) {
+                if (this.contents[elementIndex].id == cnt.id) {
                     realIndex = elementIndex
                     break
                 }
@@ -150,7 +204,7 @@ abstract class DataHolderList<T: DataHolder> {
         val index = this.contents.indexOf(cnt)
         if (this.contents.remove(cnt) && index >= 0) {
             this.reIndex(index, indexDiff = -1)
-            this.delete(cnt)
+            this.releaseAndDelete(cnt)
             this.onChange(ModificationType.REMOVAL, index, null)
         }
     }
@@ -163,8 +217,8 @@ abstract class DataHolderList<T: DataHolder> {
      */
     fun remove(index: Int) {
         if (this.contents.size > index && index >= 0) {
-            this.reIndex(index, indexDiff = -1)
-            this.delete(this.contents.removeAt(index))
+            this.reIndex(index + 1, indexDiff = -1)
+            this.releaseAndDelete(this.contents.removeAt(index))
             this.onChange(ModificationType.REMOVAL, index, null)
         }
     }
@@ -186,7 +240,7 @@ abstract class DataHolderList<T: DataHolder> {
             if (fromPos < realDestination)
                 this.reIndex(fromPos, realDestination - 1, -1)
             else this.reIndex(realDestination + 1, fromPos, 1)
-            this.save(elem)
+            this.allocateAndSave(elem)
             this.onChange(ModificationType.MOVED, fromPos, realDestination)
         }
     }
@@ -197,7 +251,7 @@ abstract class DataHolderList<T: DataHolder> {
      * on every [DataHolder].
      */
     fun clear() {
-        this.contents.forEach { this.delete(it) }
+        this.contents.forEach { this.releaseAndDelete(it) }
         this.contents.clear()
         this.onChange(ModificationType.CLEAR, 0, null)
     }
@@ -214,7 +268,7 @@ abstract class DataHolderList<T: DataHolder> {
         for (i in fromPos..toPos) {
             if (i > max) break
             this.contents[i].order += indexDiff
-            this.save(this.contents[i])
+            this.allocateAndSave(this.contents[i])
         }
     }
 
@@ -249,7 +303,7 @@ interface DataHolder {
     /**
      * The id of the [DataHolder] (in his [DataHolderList])
      */
-    val id: Int?
+    var id: Int?
     /**
      * The order of the [DataHolder] in its [DataHolderList]
      * Default (unset) value must be negative.

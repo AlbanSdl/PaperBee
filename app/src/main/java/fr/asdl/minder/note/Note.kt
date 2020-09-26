@@ -1,5 +1,6 @@
 package fr.asdl.minder.note
 
+import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.view.sentient.DataHolder
 import fr.asdl.minder.view.sentient.DataHolderList
 import java.util.*
@@ -8,9 +9,10 @@ import java.util.*
  * The structure of a note, containing a title and contents.
  */
 class Note(var title: String,
+           var noteManager: DataHolderList<Note>?,
            content: LinkedList<NotePart> = LinkedList(),
-           var noteManager: DataHolderList<Note>?
-) : DataHolder, DataHolderList<NotePart>() {
+           idAllocator: IntAllocator?
+) : DataHolder, DataHolderList<NotePart>(idAllocator) {
 
     override var id: Int? = null
     override var order: Int = -1
@@ -22,11 +24,9 @@ class Note(var title: String,
     }
 
     override fun save(element: NotePart) {
-        this.save()
     }
 
-    override fun delete(element: NotePart) {
-        this.save()
+    override fun delete(element: NotePart, oldId: Int) {
     }
 
     override fun shouldNotify(): Boolean = true
