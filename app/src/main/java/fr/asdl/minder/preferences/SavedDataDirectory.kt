@@ -45,11 +45,11 @@ class SavedDataDirectory(private var directoryName: String, private var context:
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val values = ArrayList<T>()
             for (str in this.load()!!) values.add(Json.decodeFromString(serializer, str))
-            values.sortWith { o1, o2 -> (o1.creationStamp - o2.creationStamp).toInt() }
+            values.sortWith { o1, o2 -> o1.order - o2.order }
             for (t in values)
                 context.add(t)
         }
-        else this.load()!!.stream().map { Json.decodeFromString(serializer, it) }.sorted { o1, o2 -> (o1.creationStamp - o2.creationStamp).toInt() }.forEach { context.add(it) }
+        else this.load()!!.stream().map { Json.decodeFromString(serializer, it) }.sorted { o1, o2 -> o1.order - o2.order }.forEach { context.add(it) }
     }
 
     fun load(): List<String>? {

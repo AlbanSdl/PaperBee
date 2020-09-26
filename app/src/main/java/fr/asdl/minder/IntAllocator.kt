@@ -23,6 +23,7 @@ class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
 
     fun forceAllocate(int: Int) {
         if (!allocated.contains(int)) allocated.add(int)
+        else throw  Exception("Cannot allocate already-allocated Integer ! Check you haven't called this method twice")
     }
 
     fun reset() {

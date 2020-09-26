@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * this sealed class. It must be displayable by the Note and its recycler view.
  */
 @Serializable
-sealed class NotePart(override val id: Int = 0, override val creationStamp: Long = 0L) : DataHolder
+sealed class NotePart(override val id: Int = 0, override var order: Int = -1) : DataHolder
 
 interface TextNotePart {
     var content: String

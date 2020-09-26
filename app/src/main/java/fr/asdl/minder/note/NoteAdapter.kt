@@ -20,7 +20,7 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
     override fun onBindViewHolder(holder: ViewHolder, content: Note) {
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
-        if (content.retrieveContent().size > 0) {
+        if (content.getContents().isNotEmpty()) {
             rec.visibility = View.VISIBLE
             rec.adapter = NotePartAdapterInList(content, holder.findViewById(R.id.note_element) as View)
             rec.addTouchDelegation()

@@ -55,7 +55,7 @@ class NoteEditor : AppCompatActivity() {
         )
 
         val rec = (findViewById<SentientRecyclerView>(R.id.note_editor_elements))
-        if (note != null && note!!.retrieveContent().size > 0) {
+        if (note != null && note!!.getContents().isNotEmpty()) {
             rec.visibility = View.VISIBLE
             rec.adapter = NotePartEditorAdapter(note!!)
         } else {

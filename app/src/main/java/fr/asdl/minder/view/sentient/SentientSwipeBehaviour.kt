@@ -16,22 +16,25 @@ import fr.asdl.minder.R
  * of the swiped item.
  */
 class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerView) :
-    ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
         return false
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.remove(viewHolder.adapterPosition)
+        if (direction == ItemTouchHelper.RIGHT)
+            (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.remove(viewHolder.adapterPosition)
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-        return when (val view = this.getSwipeableView(recyclerView, viewHolder.itemView)) {
-            null -> super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            else -> this.viewTranslate(view, dX, isCurrentlyActive, recyclerView)
-        }
+        val view = this.getSwipeableView(recyclerView, viewHolder.itemView)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG || view == null)
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        else
+            this.viewTranslate(view, dX, isCurrentlyActive, recyclerView)
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {

@@ -18,7 +18,7 @@ class NoteSerializer : KSerializer<Note> {
     override val descriptor = buildClassSerialDescriptor("fr.asdl.minder.serial.dataholderlist") {
         element("title", String.serializer().descriptor)
         element("id", Int.serializer().descriptor)
-        element("creationStamp", Long.serializer().descriptor)
+        element("order", Int.serializer().descriptor)
         element("items", listSerialDescriptor(NotePart::class.serializer().descriptor))
     }
 
@@ -29,8 +29,8 @@ class NoteSerializer : KSerializer<Note> {
                 when(descriptor.getElementName(i)) {
                     "title" -> this.encodeStringElement(descriptor, i, value.title)
                     "id" -> if (value.id != null) this.encodeIntElement(descriptor, i, value.id!!)
-                    "creationStamp" -> this.encodeLongElement(descriptor, i, value.creationStamp)
-                    "items" -> this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.retrieveContent())
+                    "order" -> this.encodeIntElement(descriptor, i, value.order)
+                    "items" -> this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
                 }
             this.endStructure(descriptor)
         }
@@ -41,13 +41,13 @@ class NoteSerializer : KSerializer<Note> {
         with (decoder.beginStructure(descriptor)) {
             var title: String? = null
             var id: Int? = null
-            var creationStamp: Long? = null
+            var order: Int? = null
             var items: List<NotePart>? = null
             loop@ while (true) {
                 when(val index = decodeElementIndex(descriptor)) {
                     descriptor.getElementIndex("title") -> title = this.decodeStringElement(descriptor, index)
                     descriptor.getElementIndex("id") -> id = this.decodeIntElement(descriptor, index)
-                    descriptor.getElementIndex("creationStamp") -> creationStamp = this.decodeLongElement(descriptor, index)
+                    descriptor.getElementIndex("order") -> order = this.decodeIntElement(descriptor, index)
                     descriptor.getElementIndex("items") -> items = this.decodeSerializableElement(descriptor, index, ListSerializer(NotePart::class.serializer()))
                     CompositeDecoder.DECODE_DONE -> break@loop
                 }
@@ -55,7 +55,7 @@ class NoteSerializer : KSerializer<Note> {
             this.endStructure(descriptor)
             val note = Note(title!!, LinkedList(items!!), null)
             note.id = id
-            note.creationStamp = creationStamp!!
+            note.order = order!!
             return note
         }
     }
