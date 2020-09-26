@@ -9,7 +9,7 @@ import java.util.*
  */
 class Note(var title: String,
            content: LinkedList<NotePart> = LinkedList(),
-           var noteManager: DataHolderList<Note>?,
+           var noteManager: DataHolderList<Note>?
 ) : DataHolder, DataHolderList<NotePart>() {
 
     override var id: Int? = null
@@ -29,7 +29,6 @@ class Note(var title: String,
         this.save()
     }
 
-    override fun shouldNotify(): Boolean {
-        return true
-    }
+    override fun shouldNotify(): Boolean = true
+
 }
