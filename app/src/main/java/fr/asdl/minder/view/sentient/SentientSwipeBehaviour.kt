@@ -6,6 +6,8 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.R
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Handles Swipe gesture for [SentientRecyclerView]. Only works when the [SentientRecyclerView] it
@@ -31,10 +33,12 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
         val view = this.getSwipeableView(recyclerView, viewHolder.itemView)
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG || view == null)
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        else
-            this.viewTranslate(view, dX, isCurrentlyActive, recyclerView)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            val holderY = viewHolder.itemView.top - recyclerView.paddingTop
+            val maxScrollY = recyclerView.height - recyclerView.paddingBottom - viewHolder.itemView.top - viewHolder.itemView.height
+            super.onChildDraw(c, recyclerView, viewHolder, dX, min(max(dY, -holderY.toFloat()), maxScrollY.toFloat()), actionState, isCurrentlyActive)
+        } else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE)
+            this.viewTranslate(view ?: viewHolder.itemView, dX, isCurrentlyActive, recyclerView)
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
