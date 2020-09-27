@@ -50,7 +50,11 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
             if (content is CheckableNotePart) {
                 checkBox.isChecked = content.checked
                 checkBox.visibility = View.VISIBLE
-                checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
+                checkBox.setOnClickListener {
+                    content.checked = checkBox.isChecked
+                    this.getDataHolder().update(content)
+                    this.getDataHolder().save(false)
+                }
             } else {
                 checkBox.visibility = View.GONE
                 checkBox.setOnClickListener(null)

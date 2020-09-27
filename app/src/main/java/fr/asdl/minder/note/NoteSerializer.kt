@@ -20,6 +20,7 @@ class NoteSerializer : KSerializer<Note> {
         element("id", Int.serializer().descriptor)
         element("order", Int.serializer().descriptor)
         element("items", listSerialDescriptor(NotePart::class.serializer().descriptor))
+        element("parentId", Int.serializer().descriptor)
     }
 
     @InternalSerializationApi
@@ -31,6 +32,7 @@ class NoteSerializer : KSerializer<Note> {
                     "id" -> if (value.id != null) this.encodeIntElement(descriptor, i, value.id!!)
                     "order" -> this.encodeIntElement(descriptor, i, value.order)
                     "items" -> this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
+                    "parentId" -> if (value.parentId != null) this.encodeIntElement(descriptor, i, value.parentId!!)
                 }
             this.endStructure(descriptor)
         }
@@ -43,17 +45,19 @@ class NoteSerializer : KSerializer<Note> {
             var id: Int? = null
             var order: Int? = null
             var items: List<NotePart>? = null
+            var parentId: Int? = null
             loop@ while (true) {
                 when(val index = decodeElementIndex(descriptor)) {
                     descriptor.getElementIndex("title") -> title = this.decodeStringElement(descriptor, index)
                     descriptor.getElementIndex("id") -> id = this.decodeIntElement(descriptor, index)
                     descriptor.getElementIndex("order") -> order = this.decodeIntElement(descriptor, index)
                     descriptor.getElementIndex("items") -> items = this.decodeSerializableElement(descriptor, index, ListSerializer(NotePart::class.serializer()))
+                    descriptor.getElementIndex("parentId") -> parentId = this.decodeIntElement(descriptor, index)
                     CompositeDecoder.DECODE_DONE -> break@loop
                 }
             }
             this.endStructure(descriptor)
-            val note = Note(title!!, null, LinkedList(items!!), null)
+            val note = Note(title!!, null, LinkedList(items!!), null, parentId)
             note.id = id
             note.order = order!!
             return note

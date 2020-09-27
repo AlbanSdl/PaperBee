@@ -1,7 +1,9 @@
 package fr.asdl.minder.note
 
 import fr.asdl.minder.view.sentient.DataHolder
+import fr.asdl.minder.view.sentient.DataHolderList
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 
 /**
@@ -9,7 +11,12 @@ import kotlinx.serialization.Serializable
  * this sealed class. It must be displayable by the Note and its recycler view.
  */
 @Serializable
-sealed class NotePart(override var id: Int? = null, override var order: Int = -1) : DataHolder
+sealed class NotePart(override var id: Int? = null, override var order: Int = -1,
+                      @Transient override var noteManager: NoteManager? = null) : DataHolder {
+
+    override fun getParent(): DataHolderList<*>? = noteManager?.findElementById(this.parentId) as DataHolderList<*>
+
+}
 
 interface TextNotePart {
     var content: String
@@ -20,7 +27,10 @@ interface CheckableNotePart {
 }
 
 @Serializable
-class NoteText(override var content: String) : NotePart(), TextNotePart
+class NoteText(override var content: String,
+               override var parentId: Int? = null) : NotePart(), TextNotePart
 
 @Serializable
-class NoteCheckBoxable(override var content: String, override var checked: Boolean) : NotePart(), TextNotePart, CheckableNotePart
+class NoteCheckBoxable(override var content: String,
+                       override var checked: Boolean,
+                       override var parentId: Int? = null) : NotePart(), TextNotePart, CheckableNotePart

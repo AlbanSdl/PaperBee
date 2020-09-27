@@ -7,7 +7,7 @@ import fr.asdl.minder.preferences.SavedDataDirectory
 import fr.asdl.minder.view.sentient.DataHolderList
 import java.util.*
 
-class NoteManager(private val context: Context, idAllocator: IntAllocator) : DataHolderList<Note>(idAllocator) {
+class NoteManager(private val context: Context, idAllocator: IntAllocator) : DataHolderList<Note>(idAllocator, null, null) {
 
     private val dataDirectory = SavedDataDirectory(this.context.getString(R.string.notes_directory_name), context)
     override val contents = LinkedList<Note>()
@@ -18,6 +18,7 @@ class NoteManager(private val context: Context, idAllocator: IntAllocator) : Dat
     }
 
     override fun save(element: Note) {
+        element.noteManager = this
         if (element.noteManager == null) element.noteManager = this
         this.dataDirectory.saveDataAsync(element, serializer = this.serializer)
     }
@@ -27,5 +28,7 @@ class NoteManager(private val context: Context, idAllocator: IntAllocator) : Dat
     }
 
     override fun shouldNotify(): Boolean = true
+    override var id: Int? = -1
+    override var order: Int = 0
 
 }

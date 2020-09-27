@@ -80,11 +80,11 @@ class NoteEditor : AppCompatActivity() {
                 return true
             }
             R.id.add_text_element -> {
-                note!!.add(NoteText(""))
+                note!!.add(NoteText("", parentId = note?.id))
                 return true
             }
             R.id.add_checkbox_element -> {
-                note!!.add(NoteCheckBoxable("", false))
+                note!!.add(NoteCheckBoxable("", false, parentId = note?.id))
                 return true
             }
         }

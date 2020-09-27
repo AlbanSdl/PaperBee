@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 Fade.fadeOut(findViewById(R.id.loadingBar))
                 Fade.fadeOut(findViewById(R.id.loadingText))
                 findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener {
-                    val note = Note("", noteManager = null, idAllocator = idAllocator)
+                    val note = Note("", null, idAllocator = idAllocator, parentId = noteManager.id)
                     note.add(NoteText(""))
                     this.openNote(note)
                 }

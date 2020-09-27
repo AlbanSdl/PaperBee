@@ -1,6 +1,8 @@
 package fr.asdl.minder.view.sentient
 
 import fr.asdl.minder.IntAllocator
+import fr.asdl.minder.note.NoteManager
+import kotlinx.serialization.Transient
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -13,7 +15,10 @@ import kotlin.collections.HashMap
  * @param idAllocator the id allocator of the base NoteManager. It will be used to generate new ids
  * for any sub-component of its tree
  */
-abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
+abstract class DataHolderList<T: DataHolder>(
+    @Transient var idAllocator: IntAllocator?,
+    @Transient override var noteManager: NoteManager?,
+    override var parentId: Int?) : DataHolder {
 
     /**
      * The listeners of the [DataHolder]. Registered by the [SentientRecyclerViewAdapter],
@@ -38,7 +43,7 @@ abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
      *
      * @param element the [DataHolder] to handle save for.
      */
-    protected abstract fun save(element: T)
+    protected open fun save(element: T): Any = {}
 
     /**
      * Called when a element should be deleted. The item is asserted to exist and to have been
@@ -49,7 +54,7 @@ abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
      * @param element the [DataHolder] to handle deletion for.
      * @param oldId the old id of the [element]
      */
-    protected abstract fun delete(element: T, oldId: Int)
+    protected open fun delete(element: T, oldId: Int): Any = {}
 
     /**
      * Details whether the listeners should be called after a modification in the data set.
@@ -63,8 +68,45 @@ abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
      *
      * @return the contents of the set
      */
-    fun getContents(): List<T> {
-        return this.contents
+    fun getContents(): List<T> = this.contents
+
+    /**
+     * Retrieves the parent of this [DataHolderList] by calling [findElementById] on the
+     * [NoteManager] (the root of notes)
+     */
+    @Suppress("UNCHECKED_CAST")
+    override fun getParent(): DataHolderList<DataHolderList<T>>? =
+        noteManager?.findElementById(this.parentId) as? DataHolderList<DataHolderList<T>>
+
+    /**
+     * Retrieves any [DataHolder] that has the given [id], contained in any nested
+     * [DataHolderList] contained in the current [DataHolderList].
+     *
+     * @param id the id of the element to look for.
+     * @return the [DataHolder] if it has been found, null instead.
+     */
+    fun findElementById(id: Int?): DataHolder? {
+        if (id == null) return null
+        if (this.id == id) return this
+        for (element in contents) {
+            if (element.id == id) return element
+            if (element is DataHolderList<*>) {
+                val foundElement = element.findElementById(id)
+                if (foundElement != null) return foundElement
+            }
+        }
+        return null
+    }
+
+    /**
+     * Saves the current [DataHolderList] until it reaches
+     */
+    fun save(shouldSaveRecursively: Boolean = true) {
+        if (this.id == null) this.getParent()?.add(this) else this.getParent()?.update(this, false)
+        if (shouldSaveRecursively)
+            for (element in contents)
+                this.saveRecursively(element, this)
+        this.getParent()?.save(false)
     }
 
     /**
@@ -82,7 +124,8 @@ abstract class DataHolderList<T: DataHolder>(var idAllocator: IntAllocator?) {
             if (allocated != element.id!!) holderList.delete(element, element.id!!)
             element.id = allocated
         }
-
+        element.parentId = holderList.id
+        element.noteManager = noteManager
         if (element is DataHolderList<*>) {
             element.idAllocator = idAllocator
             element.getContents().forEach { saveRecursively(it, element as DataHolderList<DataHolder>) }
@@ -309,6 +352,23 @@ interface DataHolder {
      * Default (unset) value must be negative.
      */
     var order: Int
+    /**
+     * The id of the [DataHolderList] which contains this [DataHolder]
+     * If this value is null, it means that this [DataHolder] has not been attached to any parent
+     * or that it is contained in the note manager (in the root view)
+     */
+    var parentId: Int?
+    /**
+     * The note manager this [DataHolder] is registered in. Can be used to retrieve the parent
+     */
+    @Transient
+    var noteManager: NoteManager?
+
+    /**
+     * Retrieves the [DataHolderList] which contains this [DataHolder].
+     * This value can be null if the [DataHolder] has not been attached to any parent.
+     */
+    fun getParent(): DataHolderList<*>?
 }
 
 /**
