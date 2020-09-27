@@ -4,5 +4,6 @@
         <attr name="emptyView" format="reference"/>
         <attr name="swipeableView" format="reference"/>
         <attr name="allowSwipe" format="boolean"/>
+        <attr name="underSwipeableView" format="reference"/>
     </declare-styleable>
 </resources>

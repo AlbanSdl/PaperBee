@@ -13,7 +13,8 @@
         android:layout_marginBottom="@dimen/padding_tiny"
         android:layout_marginLeft="@dimen/padding_small"
         android:layout_marginRight="@dimen/padding_small"
-        android:id="@+id/note_background">
+        android:id="@+id/note_background"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -70,7 +71,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/note_title"
                 app:layout_constraintHeight_default="spread"
                 app:layout_constraintHeight_max="@dimen/max_note_display_contents"
-                android:transitionName="@string/transition_name"
+                android:transitionName="@string/transition_name_contents"
                 android:requiresFadingEdge="vertical"
                 android:fadingEdgeLength="@dimen/note_fading_edge_length"/>
 

@@ -11,25 +11,23 @@ import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
 
-class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Notable<*>>(dataContainer) {
+class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(dataContainer) {
 
     override fun getLayoutId(): Int {
         return R.layout.notes_layout
     }
 
     override fun onBindViewHolder(holder: ViewHolder, content: Notable<*>) {
-        if (content !is Note) return
-        // FIXME: 27/09/2020 Implement the folder UI and behaviour
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
-        if (content.getContents().isNotEmpty()) {
+        if (content.getContents().isNotEmpty() && content is Note) {
             rec.visibility = View.VISIBLE
             rec.adapter = NotePartAdapterInList(content, holder.findViewById(R.id.note_element) as View)
             rec.addTouchDelegation()
         } else {
             rec.visibility = View.GONE
         }
-        (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNote(
+        (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNotable(
             content,
             it,
             holder.findViewById(R.id.note_title) as View,

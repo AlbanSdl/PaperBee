@@ -1,7 +1,6 @@
 package fr.asdl.minder.view.sentient
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -16,7 +15,9 @@ import fr.asdl.minder.R
  * A special [RecyclerView] that feels the presence of content in its data set.
  * It also handles swipe deletion gesture if the "app:allowSwipe" attribute is set to true.
  * You can choose only to swipe a part of the [RecyclerView.ViewHolder] by passing the id of the
- * view to swipe in the "app:swipeableView" attribute.
+ * view to swipe in the "app:swipeableView" attribute. Precise the "app:underSwipeView" if you
+ * have problems with animations (if you put a view under the swipeableView and if you see it
+ * because of animations such as "destroy" or "fade")
  * You can also provide a view that should be displayed if no element is contained in the Adapter
  * data set. You can do so by adding its id to the "app:emptyView" attribute.
  * The [SentientRecyclerView] also enforces the android:nestedScrollingEnabled="false" attribute
@@ -77,6 +78,15 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     )
 
     /**
+     * The id of the view which is under the Swipeable view, as explained in the description of
+     * [SentientRecyclerView].
+     */
+    val underSwipeableViewRes: Int = attr.getAttributeResourceValue(
+        context.getString(R.string.namespace),
+        context.getString(R.string.namespaced_recycler_underSwipeableViewId), -1
+    )
+
+    /**
      * An Observer that is notified every time the data set of the [RecyclerView.Adapter] changes.
      * This is used in order to detect when the [RecyclerView.Adapter] has no more items and to
      * display the [emptyView] at the proper time.
@@ -84,7 +94,7 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
         private fun setupEmptyView(): Boolean {
             if (emptyView == null) {
-                emptyView = (getContext() as Activity).findViewById(emptyViewRes)
+                emptyView = rootView.findViewById(emptyViewRes)
                 if (emptyView == null) return false
             }
             return true

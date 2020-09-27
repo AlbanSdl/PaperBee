@@ -10,15 +10,15 @@ android {
         applicationId "fr.asdl.minder"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "0.1-unstable"
+        versionCode 2
+        versionName "0.2-unstable"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

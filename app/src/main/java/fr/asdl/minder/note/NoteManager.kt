@@ -5,10 +5,10 @@ import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.R
 import fr.asdl.minder.preferences.SavedDataDirectory
 
-class NoteManager(private val context: Context, idAllocator: IntAllocator) : NoteFolder("", idAllocator = idAllocator, noteManager = null, parentId = null) {
+class NoteManager(private val context: Context, idAllocator: IntAllocator) : NoteFolder(context.getString(R.string.app_name), idAllocator = idAllocator, noteManager = null, parentId = null) {
 
     private val dataDirectory = SavedDataDirectory(this.context.getString(R.string.notes_directory_name), context)
-    val serializer = NoteSerializer()
+    private val serializer = NoteSerializer()
 
     fun load() {
         val saved = dataDirectory.loadData(this.serializer)

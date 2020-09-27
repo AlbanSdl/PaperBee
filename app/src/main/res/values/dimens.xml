@@ -9,4 +9,5 @@
     <dimen name="max_note_display_contents">120dp</dimen>
     <dimen name="note_fading_edge_length">30dp</dimen>
     <dimen name="note_content_size">14sp</dimen>
+    <dimen name="appBarTextSize">20sp</dimen>
 </resources>

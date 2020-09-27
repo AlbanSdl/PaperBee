@@ -38,18 +38,18 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
             val maxScrollY = recyclerView.height - recyclerView.paddingBottom - viewHolder.itemView.top - viewHolder.itemView.height
             super.onChildDraw(c, recyclerView, viewHolder, dX, min(max(dY, -holderY.toFloat()), maxScrollY.toFloat()), actionState, isCurrentlyActive)
         } else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE)
-            this.viewTranslate(view ?: viewHolder.itemView, dX, isCurrentlyActive, recyclerView)
+            this.viewTranslate(view ?: viewHolder.itemView, dX, isCurrentlyActive, recyclerView, false, this.getUnderSwipeableView(recyclerView, viewHolder.itemView))
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         return when (val view = this.getSwipeableView(recyclerView, viewHolder.itemView)) {
             null -> super.clearView(recyclerView, viewHolder)
-            else -> this.viewTranslate(view, 0f, false, null)
+            else -> this.viewTranslate(view, 0f, false, recyclerView, true, this.getUnderSwipeableView(recyclerView, viewHolder.itemView))
         }
     }
 
-    private fun viewTranslate(view: View, dX: Float, isCurrentlyActive: Boolean, recyclerView: RecyclerView?) {
-        if (isCurrentlyActive && recyclerView != null) {
+    private fun viewTranslate(view: View, dX: Float, isCurrentlyActive: Boolean, recyclerView: RecyclerView, clear: Boolean, underSwipeable: View?) {
+        if (isCurrentlyActive && !clear) {
             var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
             if (originalElevation == null) {
                 originalElevation = ViewCompat.getElevation(view)
@@ -57,17 +57,22 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
                 ViewCompat.setElevation(view, newElevation)
                 view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
             }
-        } else if (dX == 0f && recyclerView == null) {
+        } else if (dX == 0f && clear) {
             val tag: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
             if (tag is Float)
                 ViewCompat.setElevation(view, tag)
             view.setTag(R.id.item_touch_helper_previous_elevation, null)
         }
+        if (underSwipeable != null) underSwipeable.visibility = if (clear || dX == 0f) View.GONE else View.VISIBLE
         view.translationX = dX
     }
 
     private fun getSwipeableView(recyclerView: RecyclerView, itemView: View): View? {
         return itemView.findViewById((recyclerView as? SentientRecyclerView)?.swipeableViewRes ?: -1)
+    }
+
+    private fun getUnderSwipeableView(recyclerView: RecyclerView, itemView: View): View? {
+        return itemView.findViewById((recyclerView as? SentientRecyclerView)?.underSwipeableViewRes ?: -1)
     }
 
     private fun findMaxElevation(recyclerView: RecyclerView): Float {

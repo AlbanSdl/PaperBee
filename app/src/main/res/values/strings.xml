@@ -6,6 +6,7 @@
     <string name="namespace" translatable="false">http://schemas.android.com/apk/res-auto</string>
     <string name="namespaced_recycler_emptyViewId" translatable="false">emptyView</string>
     <string name="namespaced_recycler_swipeableViewId" translatable="false">swipeableView</string>
+    <string name="namespaced_recycler_underSwipeableViewId" translatable="false">underSwipeableView</string>
     <string name="namespaced_recycler_swipeable" translatable="false">allowSwipe</string>
     <string name="transition_name" translatable="false">editorTransitionOpen</string>
     <string name="transition_name_title" translatable="false">editorTransitionOpenTitle</string>

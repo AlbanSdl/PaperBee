@@ -45,7 +45,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
             var id: Int? = null
             var order: Int? = null
             var items: List<NotePart>? = null
-            var parentId: Int? = null
+            var parentId: Int = -1
             loop@ while (true) {
                 when(val index = decodeElementIndex(descriptor)) {
                     descriptor.getElementIndex("title") -> title = this.decodeStringElement(descriptor, index)
