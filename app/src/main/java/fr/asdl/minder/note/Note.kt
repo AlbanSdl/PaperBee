@@ -18,7 +18,8 @@ class Note(var title: String,
     override var id: Int? = null
     override var order: Int = -1
     override val contents: LinkedList<NotePart> = content
+    var notify: Boolean = false
 
-    override fun shouldNotify(): Boolean = true
+    override fun shouldNotify(): Boolean = notify
 
 }
