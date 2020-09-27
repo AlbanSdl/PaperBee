@@ -11,13 +11,15 @@ import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
 
-class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note>(dataContainer) {
+class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Notable<*>>(dataContainer) {
 
     override fun getLayoutId(): Int {
         return R.layout.notes_layout
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, content: Note) {
+    override fun onBindViewHolder(holder: ViewHolder, content: Notable<*>) {
+        if (content !is Note) return
+        // FIXME: 27/09/2020 Implement the folder UI and behaviour
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
         if (content.getContents().isNotEmpty()) {

@@ -37,7 +37,8 @@ class NoteEditor : AppCompatActivity() {
             serializer, intent.getStringExtra(
                 "note"
             )!!
-        )
+        ) as? Note
+        // FIXME: 27/09/2020 Implement the folder UI and behaviour
 
         setContentView(R.layout.note_editor)
         transitionContents = findViewById(R.id.transitionContents)!!

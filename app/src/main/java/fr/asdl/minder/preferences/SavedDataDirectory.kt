@@ -1,10 +1,8 @@
 package fr.asdl.minder.preferences
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import fr.asdl.minder.view.sentient.DataHolder
-import fr.asdl.minder.view.sentient.DataHolderList
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -41,15 +39,10 @@ class SavedDataDirectory(private var directoryName: String, private var context:
         }.start()
     }
 
-    inline fun <reified T: DataHolder, H: DataHolderList<T>> loadData(context: H, serializer: KSerializer<T>) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val values = ArrayList<T>()
-            for (str in this.load()!!) values.add(Json.decodeFromString(serializer, str))
-            values.sortWith { o1, o2 -> o1.order - o2.order }
-            for (t in values)
-                context.add(t)
-        }
-        else this.load()!!.stream().map { Json.decodeFromString(serializer, it) }.sorted { o1, o2 -> o1.order - o2.order }.forEach { context.add(it) }
+    inline fun <reified T: DataHolder> loadData(serializer: KSerializer<T>): ArrayList<T> {
+        val values = ArrayList<T>()
+        for (str in this.load()!!) values.add(Json.decodeFromString(serializer, str))
+        return values
     }
 
     fun load(): List<String>? {

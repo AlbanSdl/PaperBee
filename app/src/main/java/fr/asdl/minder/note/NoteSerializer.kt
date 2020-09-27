@@ -11,8 +11,8 @@ import kotlinx.serialization.encoding.Encoder
 import java.util.*
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-@Serializer(forClass = Note::class)
-class NoteSerializer : KSerializer<Note> {
+@Serializer(forClass = Notable::class)
+class NoteSerializer : KSerializer<Notable<*>> {
 
     @InternalSerializationApi
     override val descriptor = buildClassSerialDescriptor("fr.asdl.minder.serial.dataholderlist") {
@@ -24,14 +24,14 @@ class NoteSerializer : KSerializer<Note> {
     }
 
     @InternalSerializationApi
-    override fun serialize(encoder: Encoder, value: Note) {
+    override fun serialize(encoder: Encoder, value: Notable<*>) {
         with (encoder.beginStructure(descriptor)) {
             for (i in 0 until descriptor.elementsCount)
                 when(descriptor.getElementName(i)) {
                     "title" -> this.encodeStringElement(descriptor, i, value.title)
                     "id" -> if (value.id != null) this.encodeIntElement(descriptor, i, value.id!!)
                     "order" -> this.encodeIntElement(descriptor, i, value.order)
-                    "items" -> this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
+                    "items" -> if (value is Note) this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
                     "parentId" -> if (value.parentId != null) this.encodeIntElement(descriptor, i, value.parentId!!)
                 }
             this.endStructure(descriptor)
@@ -39,7 +39,7 @@ class NoteSerializer : KSerializer<Note> {
     }
 
     @InternalSerializationApi
-    override fun deserialize(decoder: Decoder): Note {
+    override fun deserialize(decoder: Decoder): Notable<*> {
         with (decoder.beginStructure(descriptor)) {
             var title: String? = null
             var id: Int? = null
@@ -57,10 +57,18 @@ class NoteSerializer : KSerializer<Note> {
                 }
             }
             this.endStructure(descriptor)
-            val note = Note(title!!, null, LinkedList(items!!), null, parentId)
-            note.id = id
-            note.order = order!!
-            return note
+
+            return if (items != null) {
+                val note = Note(title!!, null, LinkedList(items), null, parentId)
+                note.id = id
+                note.order = order!!
+                note
+            } else {
+                val folder = NoteFolder(title!!, null, LinkedList(), null, parentId)
+                folder.id = id
+                folder.order = order!!
+                folder
+            }
         }
     }
 }
