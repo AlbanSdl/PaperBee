@@ -24,15 +24,15 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
             rec.visibility = View.VISIBLE
             rec.adapter = NotePartAdapterInList(content, holder.findViewById(R.id.note_element) as View)
             rec.addTouchDelegation()
-            (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNote(
-                content,
-                it,
-                holder.findViewById(R.id.note_title) as View,
-                rec
-            )}
         } else {
             rec.visibility = View.GONE
         }
+        (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNote(
+            content,
+            it,
+            holder.findViewById(R.id.note_title) as View,
+            rec
+        )}
     }
 
     abstract class NotePartAdapter(note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
@@ -50,11 +50,7 @@ class NoteAdapter(dataContainer: NoteManager) : SentientRecyclerViewAdapter<Note
             if (content is CheckableNotePart) {
                 checkBox.isChecked = content.checked
                 checkBox.visibility = View.VISIBLE
-                checkBox.setOnClickListener {
-                    content.checked = checkBox.isChecked
-                    this.getDataHolder().update(content)
-                    this.getDataHolder().save(false)
-                }
+                checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
             } else {
                 checkBox.visibility = View.GONE
                 checkBox.setOnClickListener(null)

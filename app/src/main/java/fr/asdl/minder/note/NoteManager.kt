@@ -17,14 +17,16 @@ class NoteManager(private val context: Context, idAllocator: IntAllocator) : Dat
         dataDirectory.loadData(this, this.serializer)
     }
 
-    override fun save(element: Note) {
+    override fun save(element: Note): Boolean {
         element.noteManager = this
         if (element.noteManager == null) element.noteManager = this
         this.dataDirectory.saveDataAsync(element, serializer = this.serializer)
+        return true
     }
 
-    override fun delete(element: Note, oldId: Int) {
+    override fun delete(element: Note, oldId: Int): Boolean {
         this.dataDirectory.saveDataAsync(id = oldId, serializer = this.serializer)
+        return true
     }
 
     override fun shouldNotify(): Boolean = true

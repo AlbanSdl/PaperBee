@@ -55,12 +55,8 @@ class NoteEditor : AppCompatActivity() {
         )
 
         val rec = (findViewById<SentientRecyclerView>(R.id.note_editor_elements))
-        if (note != null && note!!.getContents().isNotEmpty()) {
-            rec.visibility = View.VISIBLE
-            rec.adapter = NotePartEditorAdapter(note!!)
-        } else {
-            rec.visibility = View.GONE
-        }
+        rec.visibility = View.VISIBLE
+        rec.adapter = NotePartEditorAdapter(note!!)
 
         // We perform the fade transition
         if (savedInstanceState == null)
