@@ -20,10 +20,10 @@ class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.On
 
     override fun onLayoutInflated(view: View) {
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.folder_toolbar))
-        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(folder.id != -1)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(folder.id!! >= 0)
         val title = view.findViewById<EditText>(R.id.folder_name)
         title.setText(folder.title)
-        if (folder.id != -1)
+        if (folder.id!! >= 0)
             title.addTextChangedListener(FolderTitleListener())
         else
             title.inputType = InputType.TYPE_NULL

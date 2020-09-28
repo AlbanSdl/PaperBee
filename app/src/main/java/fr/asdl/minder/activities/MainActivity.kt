@@ -19,7 +19,7 @@ import fr.asdl.minder.note.NoteManager
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super.onCreate(null)
         setContentView(R.layout.main_activity)
         this.loadFragment(Fragment(R.layout.loading), null)
         Thread {
