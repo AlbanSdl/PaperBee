@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.view.ViewCompat
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.view.sentient.SentientRecyclerView
@@ -19,6 +20,7 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
 
     override fun onBindViewHolder(holder: ViewHolder, content: Notable<*>) {
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
+        this.setTransitionNames(holder, content)
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
         if (content.getContents().isNotEmpty() && content is Note) {
             rec.visibility = View.VISIBLE
@@ -33,6 +35,13 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
             holder.findViewById(R.id.note_title) as View,
             rec
         )}
+    }
+
+    private fun setTransitionNames(holder: ViewHolder, content: Notable<*>) {
+        val transitionComponents = listOf(holder.findViewById(R.id.note_element), holder.findViewById(R.id.note_title), holder.findViewById(R.id.note_elements_recycler))
+        for (view in transitionComponents)
+            if (view != null)
+                ViewCompat.setTransitionName(view, "${ViewCompat.getTransitionName(view)}#${content.id}")
     }
 
     abstract class NotePartAdapter(note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {

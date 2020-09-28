@@ -57,7 +57,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         val transaction = supportFragmentManager.beginTransaction()
-        arrayOf(*sharedViews).forEach { transaction.addSharedElement(it, ViewCompat.getTransitionName(it) ?: "") }
+        arrayOf(*sharedViews).forEach {
+            val targetTransitionName = (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
+            transaction.addSharedElement(it, targetTransitionName)
+        }
         transaction.replace(R.id.folder_contents, frag, addToBackStackTag)
         if (addToBackStackTag != null) transaction.addToBackStack(addToBackStackTag)
         transaction.commit()
