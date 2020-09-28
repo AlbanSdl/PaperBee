@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <fade>
+        <targets>
+            <target android:excludeId="@+id/folder_toolbar"/>
+            <target android:excludeId="@+id/add_note_button"/>
+        </targets>
+    </fade>
+
+    <explode>
+        <targets>
+            <target android:targetId="@+id/folder_toolbar"/>
+            <target android:targetId="@+id/add_note_button"/>
+        </targets>
+    </explode>
+
+</transitionSet>
