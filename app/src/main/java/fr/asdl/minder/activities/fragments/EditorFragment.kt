@@ -61,7 +61,7 @@ class EditorFragment(private val note: Note) : MinderFragment() {
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
-                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; note.update(content) }
+                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; note.update(content, false) }
             }
         }
 
