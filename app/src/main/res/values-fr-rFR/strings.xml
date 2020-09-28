@@ -9,4 +9,5 @@
     <string name="add_text_element">Ajouter du texte</string>
     <string name="add_checkbox_element">Ajouter une coche</string>
     <string name="drag_action">Déplaçable</string>
+    <string name="folder_name">Nom du dossier</string>
 </resources>

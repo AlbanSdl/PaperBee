@@ -32,7 +32,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openNotable(notable: Notable<*>, vararg sharedViews: View) {
-        this.openNotable(notable, true, *sharedViews)
+        this.openNotable(notable, true,
+            *(if (notable is NoteFolder) arrayOf(*sharedViews).plusElement(findViewById(R.id.add_note_button)) else sharedViews))
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(
@@ -49,11 +50,19 @@ class MainActivity : AppCompatActivity() {
         if (transition != null) {
             val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)
             if (currentFragment != null) {
-                currentFragment.sharedElementReturnTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
-                currentFragment.exitTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animOut)
+                if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
+                    currentFragment.sharedElementReturnTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
+                    currentFragment.exitTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animOut)
+                } else {
+                    currentFragment.exitTransition = TransitionInflater.from(this@MainActivity).inflateTransition(FragmentTransition.SLIDE.animOut)
+                }
             }
-            frag.sharedElementEnterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
-            frag.enterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animIn)
+            if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
+                frag.sharedElementEnterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
+                frag.enterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animIn)
+            } else {
+                frag.enterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(FragmentTransition.SLIDE.animIn)
+            }
         }
 
         val transaction = supportFragmentManager.beginTransaction()
@@ -67,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private enum class FragmentTransition(val animIn: Int, val animOut: Int) {
-        SLIDE(android.R.transition.slide_left, android.R.transition.slide_right),
+        SLIDE(R.transition.slide_right, android.R.transition.fade),
         LOADING_FADE(android.R.transition.no_transition, android.R.transition.fade),
         EXPLODE(android.R.transition.explode, android.R.transition.explode)
     }

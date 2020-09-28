@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#005cb2</color>
     <color name="colorAccent">#6ab7ff</color>
     <color name="blank">#111</color>
+    <color name="blankHint">#444</color>
     <color name="semiBlank">#000</color>
     <color name="dark">#eee</color>
     <color name="almostDark">#aaa</color>

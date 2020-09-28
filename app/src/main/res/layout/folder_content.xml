@@ -12,13 +12,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <EditText
             android:id="@+id/folder_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
+            android:inputType="text"
             android:textColor="@color/blank"
-            android:textSize="@dimen/appBarTextSize" />
+            android:textSize="@dimen/appBarTextSize"
+            android:background="@android:color/transparent"
+            android:autofillHints="@string/folder_name"
+            android:textColorHint="@color/blankHint"
+            android:hint="@string/folder_name" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -51,19 +56,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_note_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_small"
-        android:clickable="true"
-        android:focusable="true"
-        android:transitionName="@string/transition_name_fab"
-        app:backgroundTint="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:rippleColor="@color/blank"
-        app:srcCompat="@drawable/ic_baseline_add_24"
-        app:tint="@color/blank" />
+    <include layout="@layout/fab_add_from_folder"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

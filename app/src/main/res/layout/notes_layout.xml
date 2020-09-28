@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -51,14 +52,28 @@
             android:orientation="vertical"
             android:padding="@dimen/padding_small">
 
+            <ImageView
+                android:id="@+id/note_folder_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/padding_small"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:src="@drawable/ic_folder_open"
+                app:tint="@color/dark"
+                android:contentDescription="@string/folder_name"
+                tools:ignore="RtlSymmetry" />
+
             <TextView
                 android:id="@+id/note_title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/dark"
                 android:textSize="@dimen/note_title_size"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/note_folder_icon"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:transitionName="@string/transition_name_title"/>
             
             <fr.asdl.minder.view.sentient.SentientRecyclerView

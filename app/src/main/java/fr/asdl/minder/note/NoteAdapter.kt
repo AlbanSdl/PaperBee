@@ -35,6 +35,12 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
             holder.findViewById(R.id.note_title) as View,
             rec
         )}
+        // We display the folder icon if content is a folder
+        val fold = holder.findViewById(R.id.note_folder_icon)
+        if (content is NoteFolder)
+            fold?.visibility = View.VISIBLE
+        else
+            fold?.visibility = View.GONE
     }
 
     private fun setTransitionNames(holder: ViewHolder, content: Notable<*>) {
