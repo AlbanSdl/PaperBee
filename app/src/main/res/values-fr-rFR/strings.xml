@@ -18,4 +18,6 @@
     <string name="trash_delete">Supprimer ?</string>
     <string name="trash_delete_details">Etes vous sûr de vouloir supprimer cet élément ?</string>
     <string name="trash_cannot_edit">Impossible d\'éditer des notes placées dans corbeille</string>
+    <string name="notable_move">Déplacer vers</string>
+    <string name="folder">Dossier</string>
 </resources>

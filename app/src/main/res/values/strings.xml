@@ -33,4 +33,6 @@
     <string name="trash_delete">Delete ?</string>
     <string name="trash_delete_details">Are you sure you want to delete this ? This action cannot be undone.</string>
     <string name="trash_cannot_edit">Cannot edit notes located in trash</string>
+    <string name="notable_move">Move to</string>
+    <string name="folder">Folder</string>
 </resources>

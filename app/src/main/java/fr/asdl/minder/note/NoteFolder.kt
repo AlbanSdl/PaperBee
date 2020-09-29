@@ -20,4 +20,6 @@ open class NoteFolder(title: String,
         return true
     }
 
+    override fun shouldNotify(): Boolean = true
+
 }

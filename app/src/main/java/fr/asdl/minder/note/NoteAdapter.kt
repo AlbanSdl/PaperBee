@@ -3,11 +3,11 @@ package fr.asdl.minder.note
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.widget.CheckBox
-import android.widget.TextView
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import fr.asdl.minder.R
@@ -113,8 +113,18 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
     }
     
     override fun onSwipeLeft(context: Context, content: Notable<*>) {
-        // TODO: 29/09/2020 add ui for moving content to another folder/location
-        this.getDataHolder().update(content)
+        AlertDialog.Builder(context).setTitle(R.string.notable_move).apply {
+            val adapter = SwipeMoveDirectoryList(context, content)
+            setAdapter(adapter) { _, which ->
+                val destination = adapter.getItem(which)
+                this@NoteAdapter.folder.remove(content, false)
+                destination.folder.add(content)
+            }
+            setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
+            setOnCancelListener {
+                this@NoteAdapter.getDataHolder().update(content)
+            }
+        }.show()
     }
 
     override fun onSwipeRight(context: Context, content: Notable<*>) {
@@ -126,9 +136,45 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         } else {
             AlertDialog.Builder(context).setTitle(R.string.trash_delete).setMessage(R.string.trash_delete_details).apply {
                 setPositiveButton(android.R.string.ok) { _, _ -> this@NoteAdapter.getDataHolder().remove(content) }
-                setNegativeButton(android.R.string.cancel) { _, _ -> this@NoteAdapter.getDataHolder().update(content) }
+                setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
                 setOnCancelListener { this@NoteAdapter.getDataHolder().update(content) }
             }.show()
+        }
+    }
+
+    private class SwipeMoveDirectoryList(context: Context, notable: Notable<*>) : BaseAdapter() {
+        data class Directory(val name: String, val folder: NoteFolder)
+        private val directories = arrayListOf<Directory>()
+        private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        init {
+            val parent = notable.getParent()
+            fun findDirectory(folder: Notable<*>, directory: String) {
+                if (folder is NoteFolder && folder != notable) {
+                    val dir = "$directory/${folder.title}"
+                    if (folder != parent) directories.add(Directory(dir, folder))
+                    folder.getContents().forEach { findDirectory(it, dir) }
+                }
+            }
+            findDirectory(notable.noteManager!!, "")
+            directories.sortBy { it.name }
+        }
+
+        override fun getCount(): Int {
+            return this.directories.size
+        }
+
+        override fun getItem(position: Int): Directory {
+            return this.directories[position]
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = convertView ?: inflater.inflate(R.layout.directory_view, parent, false)
+            view.findViewById<TextView>(R.id.directory_name).text = getItem(position).name
+            return view
         }
     }
 
