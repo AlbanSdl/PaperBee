@@ -1,18 +1,22 @@
 package fr.asdl.minder.note
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
+import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
 
-class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(dataContainer) {
+class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(folder) {
 
     override fun getLayoutId(): Int {
         return R.layout.notes_layout
@@ -29,12 +33,16 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
         } else {
             rec.visibility = View.GONE
         }
-        (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNotable(
-            content,
-            it,
-            holder.findViewById(R.id.note_title) as View,
-            rec
-        )}
+        if (folder.id != TRASH_ID) {
+            (holder.findViewById(R.id.note_element) as View).setOnClickListener { (holder.itemView.context as MainActivity).openNotable(
+                content,
+                it,
+                holder.findViewById(R.id.note_title) as View,
+                rec
+            )}
+        } else {
+            (holder.findViewById(R.id.note_element) as View).setOnClickListener {  Toast.makeText(holder.itemView.context, R.string.trash_cannot_edit, Toast.LENGTH_SHORT).show() }
+        }
         // We display the folder icon if content is a folder
         val fold = holder.findViewById(R.id.note_folder_icon)
         if (content is NoteFolder)
@@ -50,7 +58,7 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
                 ViewCompat.setTransitionName(view, "${ViewCompat.getTransitionName(view)}#${content.id}")
     }
 
-    abstract class NotePartAdapter(note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
+    abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
 
         override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
             // TextNoteParts
@@ -65,7 +73,10 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
             if (content is CheckableNotePart) {
                 checkBox.isChecked = content.checked
                 checkBox.visibility = View.VISIBLE
-                checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
+                if (this.note.id != TRASH_ID)
+                    checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
+                else
+                    checkBox.isEnabled = false
             } else {
                 checkBox.visibility = View.GONE
                 checkBox.setOnClickListener(null)
@@ -99,6 +110,26 @@ class NoteAdapter(dataContainer: NoteFolder) : SentientRecyclerViewAdapter<Notab
             return R.layout.note_part_layout
         }
 
+    }
+    
+    override fun onSwipeLeft(context: Context, content: Notable<*>) {
+        // TODO: 29/09/2020 add ui for moving content to another folder/location
+        this.getDataHolder().update(content)
+    }
+
+    override fun onSwipeRight(context: Context, content: Notable<*>) {
+        if (folder.id != TRASH_ID) {
+            val trash = this.getDataHolder().noteManager?.findElementById(TRASH_ID) as? NoteFolder
+            this.getDataHolder().remove(content, false)
+            trash?.add(content)
+            if (content is NoteFolder) content.getContents().forEach { onSwipeRight(context, it) }
+        } else {
+            AlertDialog.Builder(context).setTitle(R.string.trash_delete).setMessage(R.string.trash_delete_details).apply {
+                setPositiveButton(android.R.string.ok) { _, _ -> this@NoteAdapter.getDataHolder().remove(content) }
+                setNegativeButton(android.R.string.cancel) { _, _ -> this@NoteAdapter.getDataHolder().update(content) }
+                setOnCancelListener { this@NoteAdapter.getDataHolder().update(content) }
+            }.show()
+        }
     }
 
 }

@@ -39,7 +39,9 @@
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
         app:emptyView="@+id/no_note"
-        app:underSwipeableView="@+id/note_background"
+        app:allowSwipe="left|right"
+        app:rightUnderSwipeableView="@+id/note_background_delete"
+        app:leftUnderSwipeableView="@+id/note_background_move"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/folder_toolbar"
         app:swipeableView="@+id/note_element" />

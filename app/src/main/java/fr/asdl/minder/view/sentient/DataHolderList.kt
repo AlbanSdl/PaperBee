@@ -96,7 +96,7 @@ abstract class DataHolderList<T: DataHolder>(
      * @param id the id of the element to look for.
      * @return the [DataHolder] if it has been found, null instead.
      */
-    fun findElementById(id: Int?): DataHolder? {
+    open fun findElementById(id: Int?): DataHolder? {
         if (id == null) return null
         if (this.id == id) return this
         for (element in contents) {
@@ -159,14 +159,16 @@ abstract class DataHolderList<T: DataHolder>(
      * Releases the id of the element and deletes it from the current structure.
      *
      * @param element the element to delete
+     * @param shouldDeleteRecursively whether the contents of [element] should get deleted too.
+     * Only use it set to true when you definitively delete the [DataHolder] (eg. from trash)
      * @return whether data has been persistently saved
      */
-    private fun releaseAndDelete(element: T): Boolean {
+    private fun releaseAndDelete(element: T, shouldDeleteRecursively: Boolean = true): Boolean {
         if (element.id != null) {
             val oldId = element.id!!
             idAllocator?.release(element.id!!)
             element.id = null
-            if (element is DataHolderList<*>)
+            if (shouldDeleteRecursively && element is DataHolderList<*>)
                 element.clear()
             return this.delete(element, oldId)
         }
@@ -268,14 +270,16 @@ abstract class DataHolderList<T: DataHolder>(
      * If [cnt] is not in the set, nothing happens.
      *
      * @param cnt the [DataHolder] to removed from the set.
+     * @param recursive whether the content of the [DataHolder] ([cnt]) should be deleted too.
+     * Delete the content only if [cnt] gets fully deleted (from trash for example)
      * @return whether data has been persistently saved
      */
-    fun remove(cnt: T?): Boolean {
+    fun remove(cnt: T?, recursive: Boolean = true): Boolean {
         if (cnt == null) return false
         val index = this.contents.indexOf(cnt)
         if (this.contents.remove(cnt) && index >= 0) {
             this.reIndex(index, indexDiff = -1)
-            val r = this.releaseAndDelete(cnt)
+            val r = this.releaseAndDelete(cnt, recursive)
             this.onChange(ModificationType.REMOVAL, index, null)
             return r
         }

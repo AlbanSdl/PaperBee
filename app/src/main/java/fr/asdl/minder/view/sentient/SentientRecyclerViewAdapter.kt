@@ -1,5 +1,6 @@
 package fr.asdl.minder.view.sentient
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -98,5 +99,25 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
             return this.itemView.findViewById(id)
         }
     }
+
+    /**
+     * Called when a the [ViewHolder] attached to the [content] has been swiped on the left.
+     * This method will only be called if have set "app:allowSwipe" to "left" (or any composition
+     * containing left)
+     *
+     * @param context the current android context
+     * @param content the [DataHolder] attached to the swiped view
+     */
+    open fun onSwipeLeft(context: Context, content: T) {}
+
+    /**
+     * Called when a the [ViewHolder] attached to the [content] has been swiped on the right.
+     * This method will only be called if have set "app:allowSwipe" to "right" (or any composition
+     * containing right)
+     *
+     * @param context the current android context
+     * @param content the [DataHolder] attached to the swiped view
+     */
+    open fun onSwipeRight(context: Context, content: T) {}
 
 }

@@ -7,20 +7,24 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
+import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
+import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
 class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.folder_content
+    override val menuLayoutId: Int? = if (folder.id!! == TRASH_ID) R.menu.trash_menu else R.menu.folder_menu
 
     override fun onLayoutInflated(view: View) {
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.folder_toolbar))
-        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(folder.id!! >= 0)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(folder.id != ROOT_ID)
         val title = view.findViewById<EditText>(R.id.folder_name)
         title.setText(folder.title)
         if (folder.id!! >= 0)
@@ -29,14 +33,27 @@ class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.On
             title.inputType = InputType.TYPE_NULL
         val recycler = view.findViewById<SentientRecyclerView>(R.id.notes_recycler)
         recycler.adapter = NoteAdapter(folder)
-        view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this)
-        view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this)
-        view.findViewById<FloatingActionButton>(R.id.add_folder_selector).setOnClickListener(this)
+        if (folder.id != TRASH_ID) {
+            view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this)
+            view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this)
+            view.findViewById<FloatingActionButton>(R.id.add_folder_selector).setOnClickListener(this)
+        } else {
+            val fab = view.findViewById<FloatingActionButton>(R.id.add_note_button)
+            fab.scaleX = 0f
+            fab.scaleY = 0f
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
+            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(folder.noteManager?.findElementById(TRASH_ID) as NoteFolder)
+            R.id.empty_trash -> {
+                if (activity != null) AlertDialog.Builder(activity!!).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
+                    setPositiveButton(android.R.string.ok) { _, _ -> folder.clear() }
+                    setNegativeButton(android.R.string.cancel) { _, _ -> }
+                }.show()
+            }
             else -> return false
         }
         return true

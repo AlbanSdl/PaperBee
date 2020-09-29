@@ -14,7 +14,7 @@
         android:layout_marginBottom="@dimen/padding_tiny"
         android:layout_marginLeft="@dimen/padding_small"
         android:layout_marginRight="@dimen/padding_small"
-        android:id="@+id/note_background"
+        android:id="@+id/note_background_delete"
         android:visibility="gone">
 
         <ImageView
@@ -22,6 +22,29 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_baseline_delete"
+            android:contentDescription="@string/delete"
+            android:layout_marginStart="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small" />
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="@dimen/elevation_low"
+        android:layout_marginTop="@dimen/padding_tiny"
+        android:layout_marginBottom="@dimen/padding_tiny"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:layout_marginRight="@dimen/padding_small"
+        android:id="@+id/note_background_move"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/ic_folder_move"
             android:contentDescription="@string/delete"
             android:layout_marginStart="@dimen/padding_small"
             android:layout_marginEnd="@dimen/padding_small" />
@@ -82,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                app:allowSwipe="false"
+                app:allowSwipe="none"
                 app:layout_constraintTop_toBottomOf="@+id/note_title"
                 app:layout_constraintHeight_default="spread"
                 app:layout_constraintHeight_max="@dimen/max_note_display_contents"

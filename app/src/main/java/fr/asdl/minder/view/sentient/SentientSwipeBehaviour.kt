@@ -17,17 +17,22 @@ import kotlin.math.min
  * The [SentientSwipeBehaviour] only tracks swipe to right gesture and attaches it to the deletion
  * of the swiped item.
  */
-class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerView) :
-    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
+class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: SentientRecyclerView) :
+    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, swipeDir or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
-        return false
+        return true
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        if (direction == ItemTouchHelper.RIGHT)
-            (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.remove(viewHolder.adapterPosition)
+        val recycler = (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder>)
+        val viewHolderAttached = recycler?.getData(viewHolder.adapterPosition)
+        if (direction == ItemTouchHelper.RIGHT && viewHolderAttached != null)
+            recycler.onSwipeRight(viewHolder.itemView.context, viewHolderAttached)
+        if (direction == ItemTouchHelper.LEFT && viewHolderAttached != null)
+            recycler.onSwipeLeft(viewHolder.itemView.context, viewHolderAttached)
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
@@ -37,19 +42,23 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
             val holderY = viewHolder.itemView.top - recyclerView.paddingTop
             val maxScrollY = recyclerView.height - recyclerView.paddingBottom - viewHolder.itemView.top - viewHolder.itemView.height
             super.onChildDraw(c, recyclerView, viewHolder, dX, min(max(dY, -holderY.toFloat()), maxScrollY.toFloat()), actionState, isCurrentlyActive)
-        } else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE)
-            this.viewTranslate(view ?: viewHolder.itemView, dX, isCurrentlyActive, recyclerView, false, this.getUnderSwipeableView(recyclerView, viewHolder.itemView))
+        } else if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            val underViews = arrayListOf(this.getRightUnderSwipeableView(recyclerView, viewHolder.itemView), this.getLeftUnderSwipeableView(recyclerView, viewHolder.itemView))
+            this.viewTranslate(view ?: viewHolder.itemView, dX, isCurrentlyActive, recyclerView, if (dX == 0f) null else underViews.removeAt(if (dX > 0) 0 else 1), *underViews.toTypedArray())
+        }
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         return when (val view = this.getSwipeableView(recyclerView, viewHolder.itemView)) {
             null -> super.clearView(recyclerView, viewHolder)
-            else -> this.viewTranslate(view, 0f, false, recyclerView, true, this.getUnderSwipeableView(recyclerView, viewHolder.itemView))
+            else -> this.viewTranslate(view, 0f, false, recyclerView, null,
+                this.getLeftUnderSwipeableView(recyclerView, viewHolder.itemView), this.getRightUnderSwipeableView(recyclerView, viewHolder.itemView))
         }
     }
 
-    private fun viewTranslate(view: View, dX: Float, isCurrentlyActive: Boolean, recyclerView: RecyclerView, clear: Boolean, underSwipeable: View?) {
-        if (isCurrentlyActive && !clear) {
+    private fun viewTranslate(view: View, dX: Float, isCurrentlyActive: Boolean, recyclerView: RecyclerView,
+                              underSwipeVisibleView: View?, vararg underSwipeClearingView: View?) {
+        if (isCurrentlyActive && underSwipeVisibleView != null) {
             var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
             if (originalElevation == null) {
                 originalElevation = ViewCompat.getElevation(view)
@@ -57,13 +66,16 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
                 ViewCompat.setElevation(view, newElevation)
                 view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
             }
-        } else if (dX == 0f && clear) {
+        } else if (dX == 0f && underSwipeVisibleView == null) {
             val tag: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
             if (tag is Float)
                 ViewCompat.setElevation(view, tag)
             view.setTag(R.id.item_touch_helper_previous_elevation, null)
         }
-        if (underSwipeable != null) underSwipeable.visibility = if (clear || dX == 0f) View.GONE else View.VISIBLE
+        underSwipeClearingView.forEach {
+            if (it != null) it.visibility = View.GONE
+        }
+        underSwipeVisibleView?.visibility = View.VISIBLE
         view.translationX = dX
     }
 
@@ -71,8 +83,12 @@ class SentientSwipeBehaviour(private val sentientRecyclerView: SentientRecyclerV
         return itemView.findViewById((recyclerView as? SentientRecyclerView)?.swipeableViewRes ?: -1)
     }
 
-    private fun getUnderSwipeableView(recyclerView: RecyclerView, itemView: View): View? {
-        return itemView.findViewById((recyclerView as? SentientRecyclerView)?.underSwipeableViewRes ?: -1)
+    private fun getLeftUnderSwipeableView(recyclerView: RecyclerView, itemView: View): View? {
+        return itemView.findViewById((recyclerView as? SentientRecyclerView)?.leftUnderSwipeableViewRes ?: -1)
+    }
+
+    private fun getRightUnderSwipeableView(recyclerView: RecyclerView, itemView: View): View? {
+        return itemView.findViewById((recyclerView as? SentientRecyclerView)?.rightUnderSwipeableViewRes ?: -1)
     }
 
     private fun findMaxElevation(recyclerView: RecyclerView): Float {

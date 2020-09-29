@@ -1,5 +1,6 @@
 package fr.asdl.minder.note
 
+import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -45,7 +46,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
             var id: Int? = null
             var order: Int? = null
             var items: List<NotePart>? = null
-            var parentId: Int = -1
+            var parentId: Int = ROOT_ID
             loop@ while (true) {
                 when(val index = decodeElementIndex(descriptor)) {
                     descriptor.getElementIndex("title") -> title = this.decodeStringElement(descriptor, index)
