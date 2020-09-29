@@ -14,7 +14,7 @@
     <string name="trash_can_goto">Ouvrir la corbeille</string>
     <string name="trash_empty">Vider la corbeille</string>
     <string name="trash_empty_confirm">Vider la corbeille ?</string>
-    <string name="trash_empty_confirm_details">Le contenu de la corbeille ne sera pas être restauré.</string>
+    <string name="trash_empty_confirm_details">Le contenu de la corbeille ne pourra pas être restauré.</string>
     <string name="trash_delete">Supprimer ?</string>
     <string name="trash_delete_details">Etes vous sûr de vouloir supprimer cet élément ?</string>
     <string name="trash_cannot_edit">Impossible d\'éditer des notes placées dans corbeille</string>

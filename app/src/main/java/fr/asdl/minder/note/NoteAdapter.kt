@@ -73,7 +73,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
             if (content is CheckableNotePart) {
                 checkBox.isChecked = content.checked
                 checkBox.visibility = View.VISIBLE
-                if (this.note.id != TRASH_ID)
+                if (this.note.parentId != TRASH_ID)
                     checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
                 else
                     checkBox.isEnabled = false
