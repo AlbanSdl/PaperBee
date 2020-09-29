@@ -1,5 +1,6 @@
 package fr.asdl.minder.activities.fragments
 
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
@@ -74,6 +75,10 @@ class EditorFragment(private val note: Note) : MinderFragment() {
 
         override fun getLayoutId(): Int {
             return R.layout.note_part_editor_layout
+        }
+
+        override fun onSwipeRight(context: Context, content: NotePart) {
+            this.getDataHolder().remove(content)
         }
 
     }
