@@ -3,6 +3,7 @@ package fr.asdl.minder.activities.fragments
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
+import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.Notable
@@ -15,6 +16,7 @@ abstract class MinderFragment<T: Notable<*>> : Fragment() {
         const val SAVED_INSTANCE_TAG = "minder:fragNotableTagId"
     }
 
+    @CallSuper
     open fun attach(notable: T): MinderFragment<T> {
         this.notable = notable
         return this

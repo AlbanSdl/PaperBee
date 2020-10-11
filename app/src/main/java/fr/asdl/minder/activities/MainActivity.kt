@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private enum class FragmentTransition(val animIn: Int, val animOut: Int) {
-        SLIDE(R.transition.slide_right, android.R.transition.fade),
+        SLIDE(R.transition.slide_right, R.transition.slide_left),
         LOADING_FADE(android.R.transition.no_transition, android.R.transition.fade),
         EXPLODE(R.transition.folder_explode, R.transition.folder_explode)
     }

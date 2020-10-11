@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <slide xmlns:android="http://schemas.android.com/apk/res/android"
-    android:transitionOrdering="together"
-    android:slideEdge="right"
+    android:duration="@android:integer/config_shortAnimTime"
     android:interpolator="@android:interpolator/linear"
-    android:duration="@android:integer/config_shortAnimTime"/>
+    android:slideEdge="right"
+    android:transitionOrdering="together">
+    <targets><target android:excludeId="@+id/folder_toolbar" /></targets>
+</slide>
