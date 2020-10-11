@@ -4,11 +4,31 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import androidx.fragment.app.Fragment
+import fr.asdl.minder.activities.MainActivity
+import fr.asdl.minder.note.Notable
+import fr.asdl.minder.note.Note
+import fr.asdl.minder.note.NoteFolder
 
-abstract class MinderFragment : Fragment() {
+abstract class MinderFragment<T: Notable<*>> : Fragment() {
 
+    companion object {
+        const val SAVED_INSTANCE_TAG = "minder:fragNotableTagId"
+    }
+
+    open fun attach(notable: T): MinderFragment<T> {
+        this.notable = notable
+        return this
+    }
+
+    open fun restore(savedInstanceState: Bundle) {
+        val t = (this.activity as? MainActivity)?.noteManager?.findElementById(savedInstanceState.getInt(SAVED_INSTANCE_TAG))
+        if (this is FolderFragment && t is NoteFolder) this.attach(t)
+        else if (this is EditorFragment && t is Note) this.attach(t)
+    }
+
+    protected abstract var notable: T
     abstract val layoutId: Int
-    open val menuLayoutId: Int? = null
+    open var menuLayoutId: Int? = null
     open val styleId: Int? = null
     abstract fun onLayoutInflated(view: View)
 
@@ -17,6 +37,7 @@ abstract class MinderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        if (savedInstanceState != null) this.restore(savedInstanceState)
         this.setHasOptionsMenu(true)
         val fragmentInflater = if (styleId != null) inflater.cloneInContext(ContextThemeWrapper(activity, styleId!!)) else inflater
 
@@ -38,4 +59,7 @@ abstract class MinderFragment : Fragment() {
         return false
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(SAVED_INSTANCE_TAG, this.notable.id!!)
+    }
 }

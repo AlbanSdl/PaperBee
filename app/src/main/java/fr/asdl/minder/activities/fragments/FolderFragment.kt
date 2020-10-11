@@ -17,23 +17,28 @@ import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
-class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.OnClickListener {
+class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
 
+    override lateinit var notable: NoteFolder
     override val layoutId: Int = R.layout.folder_content
-    override val menuLayoutId: Int? = if (folder.id!! == TRASH_ID) R.menu.trash_menu else R.menu.folder_menu
+
+    override fun attach(notable: NoteFolder): MinderFragment<NoteFolder> {
+        this.menuLayoutId = if (notable.id!! == TRASH_ID) R.menu.trash_menu else R.menu.folder_menu
+        return super.attach(notable)
+    }
 
     override fun onLayoutInflated(view: View) {
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.folder_toolbar))
-        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(folder.id != ROOT_ID)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(notable.id != ROOT_ID)
         val title = view.findViewById<EditText>(R.id.folder_name)
-        title.setText(folder.title)
-        if (folder.id!! >= 0)
+        title.setText(notable.title)
+        if (notable.id!! >= 0)
             title.addTextChangedListener(FolderTitleListener())
         else
             title.inputType = InputType.TYPE_NULL
         val recycler = view.findViewById<SentientRecyclerView>(R.id.notes_recycler)
-        recycler.adapter = NoteAdapter(folder)
-        if (folder.id != TRASH_ID) {
+        recycler.adapter = NoteAdapter(notable)
+        if (notable.id != TRASH_ID) {
             view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this)
             view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this)
             view.findViewById<FloatingActionButton>(R.id.add_folder_selector).setOnClickListener(this)
@@ -47,10 +52,10 @@ class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.On
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
-            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(folder.noteManager?.findElementById(TRASH_ID) as NoteFolder)
+            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(notable.noteManager?.findElementById(TRASH_ID) as NoteFolder)
             R.id.empty_trash -> {
                 if (activity != null) AlertDialog.Builder(activity!!).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
-                    setPositiveButton(android.R.string.ok) { _, _ -> folder.clear() }
+                    setPositiveButton(android.R.string.ok) { _, _ -> notable.clear() }
                     setNegativeButton(android.R.string.cancel) { _, _ -> }
                 }.show()
             }
@@ -62,14 +67,14 @@ class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.On
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.add_note_selector -> {
-                val note = Note("", folder.noteManager, idAllocator = folder.idAllocator, parentId = folder.id)
-                folder.add(note)
+                val note = Note("", notable.noteManager, idAllocator = notable.idAllocator, parentId = notable.id)
+                notable.add(note)
                 note.add(NoteText(""))
                 (this.activity as MainActivity).openNotable(note)
             }
             R.id.add_folder_selector -> {
-                val fold = NoteFolder("", folder.noteManager, idAllocator = folder.idAllocator, parentId = folder.id)
-                folder.add(fold)
+                val fold = NoteFolder("", notable.noteManager, idAllocator = notable.idAllocator, parentId = notable.id)
+                notable.add(fold)
                 (this.activity as MainActivity).openNotable(fold)
             }
             R.id.add_note_button -> {
@@ -100,8 +105,8 @@ class FolderFragment(private val folder: NoteFolder) : MinderFragment(), View.On
         }
 
         override fun afterTextChanged(s: Editable?) {
-            this@FolderFragment.folder.title = s.toString()
-            this@FolderFragment.folder.save()
+            this@FolderFragment.notable.title = s.toString()
+            this@FolderFragment.notable.save()
         }
     }
 

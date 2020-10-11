@@ -18,17 +18,17 @@ import fr.asdl.minder.note.NoteManager
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var noteManager: NoteManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(null)
+        noteManager = NoteManager(this, IntAllocator())
+        noteManager.load()
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        this.loadFragment(Fragment(R.layout.loading), null)
-        Thread {
-            val noteManager = NoteManager(this, IntAllocator())
-            noteManager.load()
-            runOnUiThread {
-                this.openNotable(noteManager, false)
-            }
-        }.start()
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            this.loadFragment(Fragment(R.layout.loading), null)
+            this.openNotable(noteManager, false)
+        }
     }
 
     fun openNotable(notable: Notable<*>, vararg sharedViews: View) {
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(
-        if (notable is NoteFolder) FolderFragment(notable) else EditorFragment(notable as Note),
+        if (notable is NoteFolder) FolderFragment().attach(notable) else EditorFragment().attach(notable as Note),
         if (addToBackStack) notable.id.toString() else null,
         if (notable is NoteManager) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
         *sharedViews

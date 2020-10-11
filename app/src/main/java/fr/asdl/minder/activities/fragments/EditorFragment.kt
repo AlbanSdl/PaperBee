@@ -13,11 +13,12 @@ import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
-class EditorFragment(private val note: Note) : MinderFragment() {
+class EditorFragment : MinderFragment<Note>() {
 
     private val watchers = hashMapOf<NotePart, TextWatcher>()
     override val layoutId: Int = R.layout.note_editor
-    override val menuLayoutId: Int = R.menu.editor_menu
+    override lateinit var notable: Note
+    override var menuLayoutId: Int? = R.menu.editor_menu
     override val styleId: Int = R.style.EditorTheme
 
     override fun onLayoutInflated(view: View) {
@@ -26,20 +27,20 @@ class EditorFragment(private val note: Note) : MinderFragment() {
         (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // We add the note contents
-        (view.findViewById<EditText>(R.id.note_editor_title)).setText(note.title)
-        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(EditTextChangeWatcher(note, null))
+        (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
+        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(EditTextChangeWatcher(notable, null))
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
-        rec.adapter = NotePartEditorAdapter(note)
-        note.notify = true
+        rec.adapter = NotePartEditorAdapter(notable)
+        notable.notify = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
-            R.id.add_text_element -> note.add(NoteText("", parentId = note.id))
-            R.id.add_checkbox_element -> note.add(NoteCheckBoxable("", false, parentId = note.id))
+            R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
+            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
             else -> return false
         }
         return true
@@ -47,7 +48,7 @@ class EditorFragment(private val note: Note) : MinderFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        note.notify = false
+        notable.notify = false
     }
 
     private inner class NotePartEditorAdapter(note: Note) : NoteAdapter.NotePartAdapter(note) {
@@ -56,13 +57,13 @@ class EditorFragment(private val note: Note) : MinderFragment() {
             super.onBindViewHolder(holder, content)
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? EditText)
-                this@EditorFragment.watchers[content] = EditTextChangeWatcher(note, content)
+                this@EditorFragment.watchers[content] = EditTextChangeWatcher(notable, content)
                 textView?.addTextChangedListener(this@EditorFragment.watchers[content])
                 textView?.setText(content.content)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
-                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; note.update(content, false) }
+                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; notable.update(content, false) }
             }
         }
 
