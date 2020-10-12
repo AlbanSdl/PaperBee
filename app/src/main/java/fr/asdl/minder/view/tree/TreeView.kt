@@ -66,7 +66,7 @@ class TreeView(context: Context, attr: AttributeSet?, defStyleAttr: Int) : Scrol
             updateGroupIndicator(!node.toggleExpansion())
             this.updateDisplay(node)
         }
-        updateGroupIndicator(node.isExpanded())
+        updateGroupIndicator(!node.isExpanded())
         root.id = id(node.getId())
         (treePart.layoutParams as MarginLayoutParams).marginStart =
             context.resources.getDimension(R.dimen.padding_small).toInt() * node.getDepth()
