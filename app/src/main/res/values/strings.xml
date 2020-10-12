@@ -35,4 +35,5 @@
     <string name="trash_cannot_edit">Cannot edit notes located in trash</string>
     <string name="notable_move">Move to</string>
     <string name="folder">Folder</string>
+    <string name="expand">Expand</string>
 </resources>

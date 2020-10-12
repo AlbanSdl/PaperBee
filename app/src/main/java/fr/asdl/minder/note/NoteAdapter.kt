@@ -3,18 +3,21 @@ package fr.asdl.minder.note
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
+import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
+import fr.asdl.minder.view.tree.TreeNode
+import fr.asdl.minder.view.tree.TreeView
 
 class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(folder) {
 
@@ -113,18 +116,21 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
     }
     
     override fun onSwipeLeft(context: Context, content: Notable<*>) {
-        AlertDialog.Builder(context).setTitle(R.string.notable_move).apply {
-            val adapter = SwipeMoveDirectoryList(context, content)
-            setAdapter(adapter) { _, which ->
-                val destination = adapter.getItem(which)
-                this@NoteAdapter.folder.remove(content, false)
-                destination.folder.add(content)
-            }
+        val treeView = TreeView(context)
+        val dialog = AlertDialog.Builder(context).setTitle(R.string.notable_move).apply {
+            setView(treeView)
             setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
             setOnCancelListener {
                 this@NoteAdapter.getDataHolder().update(content)
             }
-        }.show()
+        }.create()
+        val adapter = SwipeMoveDirectoryList(content) {
+            this@NoteAdapter.folder.remove(content, false)
+            it.add(content)
+            dialog.dismiss()
+        }
+        treeView.attachData(adapter)
+        dialog.show()
     }
 
     override fun onSwipeRight(context: Context, content: Notable<*>) {
@@ -142,39 +148,29 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         }
     }
 
-    private class SwipeMoveDirectoryList(context: Context, notable: Notable<*>) : BaseAdapter() {
-        data class Directory(val name: String, val folder: NoteFolder)
-        private val directories = arrayListOf<Directory>()
-        private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private class SwipeMoveDirectoryList(private val current: Notable<*>, private val listener: (NoteFolder) -> Unit, folder: NoteFolder) :
+        TreeNode<NoteFolder>(folder) {
+
+        constructor(current: Notable<*>, listener: (NoteFolder) -> Unit):
+                this(current, listener, current.noteManager!!.findElementById(ROOT_ID) as NoteFolder)
+
         init {
-            val parent = notable.getParent()
-            fun findDirectory(folder: Notable<*>, directory: String) {
-                if (folder is NoteFolder && folder != notable) {
-                    val dir = "$directory/${folder.title}"
-                    if (folder != parent) directories.add(Directory(dir, folder))
-                    folder.getContents().forEach { findDirectory(it, dir) }
-                }
+            this.t.getContents().filterIsInstance<NoteFolder>().forEach {
+                if (it != current) this.append(SwipeMoveDirectoryList(current, this.listener, it))
             }
-            findDirectory(notable.noteManager!!, "")
-            directories.sortBy { it.name }
         }
 
-        override fun getCount(): Int {
-            return this.directories.size
+        override fun getLayoutId(): Int {
+            return R.layout.directory_view
         }
 
-        override fun getItem(position: Int): Directory {
-            return this.directories[position]
+        override fun onCreateView(view: View) {
+            view.findViewById<TextView>(R.id.directory_name).text = this.t.title
+            view.setOnClickListener { listener.invoke(this@SwipeMoveDirectoryList.t) }
         }
 
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = convertView ?: inflater.inflate(R.layout.directory_view, parent, false)
-            view.findViewById<TextView>(R.id.directory_name).text = getItem(position).name
-            return view
+        override fun allowExpand(): Boolean {
+            return true
         }
     }
 

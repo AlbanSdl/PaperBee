@@ -27,4 +27,5 @@ class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
 
     fun isAllocated(int: Int): Boolean = int in allocated
 
+    fun clear() = this.allocated.clear()
 }
