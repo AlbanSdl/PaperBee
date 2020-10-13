@@ -20,4 +20,6 @@
     <string name="trash_cannot_edit">Impossible d\'éditer des notes placées dans corbeille</string>
     <string name="notable_move">Déplacer vers</string>
     <string name="folder">Dossier</string>
+    <string name="notes_root_name">Notes</string>
+    <string name="expand">Etendre</string>
 </resources>

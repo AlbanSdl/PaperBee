@@ -6,14 +6,14 @@ import fr.asdl.minder.R
 import fr.asdl.minder.preferences.SavedDataDirectory
 import fr.asdl.minder.view.sentient.DataHolder
 
-class NoteManager(private val context: Context, idAllocator: IntAllocator) : NoteFolder(context.getString(R.string.app_name), idAllocator = idAllocator, noteManager = null, parentId = null) {
+class NoteManager(context: Context, idAllocator: IntAllocator) : NoteFolder(context.getString(R.string.notes_root_name), idAllocator = idAllocator, noteManager = null, parentId = null) {
 
     companion object {
         const val ROOT_ID = -1
         const val TRASH_ID = -2
     }
 
-    private val dataDirectory = SavedDataDirectory(this.context.getString(R.string.notes_directory_name), context)
+    private val dataDirectory = SavedDataDirectory(context.getString(R.string.notes_directory_name), context)
     private val serializer = NoteSerializer()
     private val trash = NoteFolder(context.getString(R.string.trash_can), noteManager = this, idAllocator = idAllocator, parentId = null)
 
