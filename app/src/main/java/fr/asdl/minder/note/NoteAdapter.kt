@@ -3,6 +3,7 @@ package fr.asdl.minder.note
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
@@ -115,8 +116,9 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
 
     }
     
+    @SuppressLint("InflateParams")
     override fun onSwipeLeft(context: Context, content: Notable<*>) {
-        val treeView = TreeView(context)
+        val treeView = LayoutInflater.from(context).inflate(R.layout.treeview_layout, null) as TreeView
         val dialog = AlertDialog.Builder(context).setTitle(R.string.notable_move).apply {
             setView(treeView)
             setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
@@ -165,8 +167,9 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         }
 
         override fun onCreateView(view: View) {
-            view.findViewById<TextView>(R.id.directory_name).text = this.t.title
-            view.setOnClickListener { listener.invoke(this@SwipeMoveDirectoryList.t) }
+            val textView = view.findViewById<TextView>(R.id.directory_name)
+            textView.text = this.t.title
+            textView.setOnClickListener { listener.invoke(this@SwipeMoveDirectoryList.t) }
         }
 
         override fun allowExpand(): Boolean {

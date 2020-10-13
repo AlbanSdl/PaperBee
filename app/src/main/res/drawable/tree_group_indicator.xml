@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:drawable="@drawable/ic_arrow_down" />
-    <item android:drawable="@drawable/ic_arrow_right" />
-</selector>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:autoMirrored="true">
+    <item android:id="@+id/opened" android:state_selected="true" android:animation="@anim/fab_rotate_clock" android:drawable="@drawable/ic_arrow_down" />
+    <item android:id="@+id/closed" android:drawable="@drawable/ic_arrow_right" />
+
+    <transition
+        android:fromId="@+id/closed"
+        android:toId="@+id/opened"
+        android:drawable="@drawable/anim_ic_arrow_right_rotate_clockwise" />
+
+    <transition
+        android:fromId="@id/opened"
+        android:toId="@id/closed"
+        android:drawable="@drawable/anim_ic_arrow_down_rotate_counterclockwise" />
+
+</animated-selector>
