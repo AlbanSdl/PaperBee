@@ -15,6 +15,7 @@ import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
 import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
+import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
 class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
@@ -58,6 +59,9 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                     setPositiveButton(android.R.string.ok) { _, _ -> notable.clear() }
                     setNegativeButton(android.R.string.cancel) { _, _ -> }
                 }.show()
+            }
+            R.id.set_color -> {
+                ColorPicker(activity!!, listOf(R.color.noteColorRed, R.color.noteColorGreen), null) { }
             }
             else -> return false
         }

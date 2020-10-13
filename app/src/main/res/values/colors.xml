@@ -12,4 +12,7 @@
     <color name="red">#c20d00</color>
     <color name="blankPressed">#b888</color>
     <color name="editorStatusBar">#888</color>
+
+    <color name="noteColorRed">#8800</color>
+    <color name="noteColorGreen">#8190</color>
 </resources>

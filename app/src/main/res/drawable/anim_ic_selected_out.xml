@@ -62,7 +62,7 @@
             <set>
                 <objectAnimator
                     android:propertyName="translateY"
-                    android:startOffset="400"
+                    android:startOffset="300"
                     android:duration="500"
                     android:valueFrom="0"
                     android:valueTo="20"
@@ -70,7 +70,7 @@
                     android:interpolator="@android:anim/accelerate_interpolator"/>
                 <objectAnimator
                     android:propertyName="rotation"
-                    android:startOffset="400"
+                    android:startOffset="300"
                     android:duration="500"
                     android:valueFrom="0"
                     android:valueTo="20"
@@ -84,7 +84,7 @@
             <set>
                 <objectAnimator
                     android:propertyName="translateY"
-                    android:startOffset="400"
+                    android:startOffset="300"
                     android:duration="500"
                     android:valueFrom="0"
                     android:valueTo="20"
@@ -92,7 +92,7 @@
                     android:interpolator="@android:anim/accelerate_interpolator"/>
                 <objectAnimator
                     android:propertyName="rotation"
-                    android:startOffset="400"
+                    android:startOffset="300"
                     android:duration="500"
                     android:valueFrom="0"
                     android:valueTo="20"
@@ -103,13 +103,23 @@
     </target>
     <target android:name="stroke">
         <aapt:attr name="android:animation">
-            <objectAnimator
-                android:propertyName="strokeWidth"
-                android:duration="900"
-                android:valueFrom="2"
-                android:valueTo="0"
-                android:valueType="floatType"
-                android:interpolator="@android:anim/accelerate_interpolator"/>
+            <set>
+                <objectAnimator
+                    android:propertyName="strokeWidth"
+                    android:duration="800"
+                    android:valueFrom="2"
+                    android:valueTo="0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/accelerate_interpolator"/>
+                <objectAnimator
+                    android:propertyName="trimPathEnd"
+                    android:duration="0"
+                    android:startOffset="800"
+                    android:valueFrom="1"
+                    android:valueTo="0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/accelerate_interpolator"/>
+            </set>
         </aapt:attr>
     </target>
 </animated-vector>

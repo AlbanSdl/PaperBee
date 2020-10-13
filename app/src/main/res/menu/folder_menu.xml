@@ -10,4 +10,11 @@
         android:titleCondensed="@string/trash_can_goto"
         app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/set_color"
+        android:orderInCategory="90"
+        android:title="@string/set_color"
+        android:icon="@drawable/ic_color_lens"
+        android:titleCondensed="@string/set_color"
+        app:showAsAction="ifRoom"/>
+
 </menu>

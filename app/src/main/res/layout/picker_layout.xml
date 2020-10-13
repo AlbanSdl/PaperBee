@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_small">
+
+    <view
+        android:id="@+id/color_picker_elem"
+        class="fr.asdl.minder.view.options.ColorPicker$ColorPickerView"
+        android:layout_width="@dimen/large"
+        android:layout_height="@dimen/large"
+        android:background="@drawable/ic_blank_circle_selectable"
+        android:contentDescription="@string/color_pick"
+        android:src="@drawable/ic_select_round"/>
+
+</LinearLayout>
