@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
@@ -15,7 +16,7 @@ import fr.asdl.minder.R
 
 class ColorPicker(context: Context, private val colors: List<Int>,
                   private var selectedIndex: Int?, private val callbackOnClose: Boolean,
-                  private val onSelect: (Int?) -> Unit) {
+                  @StringRes title: Int? = null, private val onSelect: (Int?) -> Unit) {
 
     private val dialog = AlertDialog.Builder(context)
 
@@ -26,8 +27,8 @@ class ColorPicker(context: Context, private val colors: List<Int>,
         recyclerView.adapter = ColorAdapter()
         val padding = context.resources.getDimension(R.dimen.padding_small).toInt()
         recyclerView.setPadding(padding, padding, padding, padding)
-        dialog.setTitle(R.string.color_change_title)
-        dialog.setNegativeButton(R.string.confirm) { dial, _ -> dial.dismiss() }
+        dialog.setTitle(title ?: R.string.color_change_title)
+        dialog.setNegativeButton(if (callbackOnClose) R.string.confirm else R.string.close) { dial, _ -> dial.dismiss() }
         dialog.setView(recyclerView)
         dialog.setOnDismissListener { if (this.callbackOnClose) onSelect(if (selectedIndex == null) null else colors[selectedIndex!!]) }
         dialog.show()
