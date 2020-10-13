@@ -10,7 +10,9 @@ import java.io.*
 import java.nio.charset.Charset
 import kotlin.collections.ArrayList
 
-class SavedDataDirectory(private var directoryName: String, private var context: Context) {
+class SavedDataDirectory(private var directoryName: String, context: Context) {
+
+    private val path = context.filesDir.absolutePath
 
     inline fun <reified T: DataHolder> saveDataAsync(dataHolder: T? = null, id: Int? = null, serializer: KSerializer<T>? = null) {
         if (dataHolder != null) {
@@ -72,7 +74,7 @@ class SavedDataDirectory(private var directoryName: String, private var context:
     }
 
     private fun getDirectoryFile(fileName: String = ""): File {
-        return File(context.filesDir.absolutePath + File.separator + this.directoryName + File.separator + fileName)
+        return File(this.path + File.separator + this.directoryName + File.separator + fileName)
     }
 
 }
