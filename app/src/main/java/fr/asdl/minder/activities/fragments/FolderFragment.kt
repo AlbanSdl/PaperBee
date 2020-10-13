@@ -61,7 +61,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                 }.show()
             }
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(R.color.noteColorRed, R.color.noteColorGreen), null) { }
+                ColorPicker(activity!!, listOf(R.color.noteColorRed, R.color.noteColorGreen), null, false) { }
             }
             else -> return false
         }

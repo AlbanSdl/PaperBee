@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import fr.asdl.minder.R
 
 class ColorPicker(context: Context, private val colors: List<Int>,
-                  private var selectedIndex: Int?, private val onSelect: (Int?) -> Unit) {
+                  private var selectedIndex: Int?, private val callbackOnClose: Boolean,
+                  private val onSelect: (Int?) -> Unit) {
 
     private val dialog = AlertDialog.Builder(context)
 
     init {
+        if (selectedIndex != null && selectedIndex!! >= colors.size) selectedIndex = null
         val recyclerView = RecyclerView(context)
         recyclerView.layoutManager = StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.VERTICAL)
         recyclerView.adapter = ColorAdapter()
@@ -27,6 +29,7 @@ class ColorPicker(context: Context, private val colors: List<Int>,
         dialog.setTitle(R.string.color_change_title)
         dialog.setNegativeButton(R.string.confirm) { dial, _ -> dial.dismiss() }
         dialog.setView(recyclerView)
+        dialog.setOnDismissListener { if (this.callbackOnClose) onSelect(if (selectedIndex == null) null else colors[selectedIndex!!]) }
         dialog.show()
     }
 
@@ -36,10 +39,10 @@ class ColorPicker(context: Context, private val colors: List<Int>,
         val pos = if (position == selectedIndex) null else position
         selectedIndex = pos
         if (pos == null) {
-            onSelect(null)
+            if (!this.callbackOnClose) onSelect(null)
             image.deselect()
         } else {
-            onSelect(colors[pos])
+            if (!this.callbackOnClose) onSelect(colors[pos])
             image.select()
         }
     }
