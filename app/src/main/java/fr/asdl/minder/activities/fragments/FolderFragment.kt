@@ -12,9 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
-import fr.asdl.minder.note.*
+import fr.asdl.minder.note.Note
+import fr.asdl.minder.note.NoteAdapter
+import fr.asdl.minder.note.NoteFolder
 import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
+import fr.asdl.minder.note.NoteText
+import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
@@ -24,7 +28,11 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
     override val layoutId: Int = R.layout.folder_content
 
     override fun attach(notable: NoteFolder): MinderFragment<NoteFolder> {
-        this.menuLayoutId = if (notable.id!! == TRASH_ID) R.menu.trash_menu else R.menu.folder_menu
+        this.menuLayoutId = when {
+            notable.id!! == TRASH_ID -> R.menu.trash_menu
+            notable.id!! == ROOT_ID -> R.menu.root_menu
+            else -> R.menu.folder_menu
+        }
         return super.attach(notable)
     }
 
@@ -61,7 +69,11 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                 }.show()
             }
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(R.color.noteColorRed, R.color.noteColorGreen), null, false) { }
+                ColorPicker(activity!!, listOf(*Color.values()), null, false) {
+                    notable.color = it
+                    this.updateBackgroundTint()
+                    notable.save()
+                }
             }
             else -> return false
         }
@@ -82,6 +94,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                 (this.activity as MainActivity).openNotable(fold)
             }
             R.id.add_note_button -> {
+                if (this.notable.id!! < 0) return
                 val addNote = activity?.findViewById<View>(R.id.add_note_selector)
                 val addFolder = activity?.findViewById<View>(R.id.add_folder_selector)
                 if (addNote?.visibility == View.GONE) {
@@ -112,6 +125,10 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
             this@FolderFragment.notable.title = s.toString()
             this@FolderFragment.notable.save()
         }
+    }
+
+    override fun getTintBackgroundView(fragmentRoot: View): View? {
+        return fragmentRoot.findViewById(R.id.notes_recycler)
     }
 
 }

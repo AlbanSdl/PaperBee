@@ -1,6 +1,7 @@
 package fr.asdl.minder.note
 
 import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
+import fr.asdl.minder.view.options.Color
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -22,6 +23,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
         element("order", Int.serializer().descriptor)
         element("items", listSerialDescriptor(NotePart::class.serializer().descriptor))
         element("parentId", Int.serializer().descriptor)
+        element("color", String.serializer().descriptor)
     }
 
     @InternalSerializationApi
@@ -34,6 +36,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
                     "order" -> this.encodeIntElement(descriptor, i, value.order)
                     "items" -> if (value is Note) this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
                     "parentId" -> if (value.parentId != null) this.encodeIntElement(descriptor, i, value.parentId!!)
+                    "color" -> if (value.color != null) this.encodeStringElement(descriptor, i, value.color!!.tag)
                 }
             this.endStructure(descriptor)
         }
@@ -47,6 +50,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
             var order: Int? = null
             var items: List<NotePart>? = null
             var parentId: Int = ROOT_ID
+            var color: Color? = null
             loop@ while (true) {
                 when(val index = decodeElementIndex(descriptor)) {
                     descriptor.getElementIndex("title") -> title = this.decodeStringElement(descriptor, index)
@@ -54,22 +58,19 @@ class NoteSerializer : KSerializer<Notable<*>> {
                     descriptor.getElementIndex("order") -> order = this.decodeIntElement(descriptor, index)
                     descriptor.getElementIndex("items") -> items = this.decodeSerializableElement(descriptor, index, ListSerializer(NotePart::class.serializer()))
                     descriptor.getElementIndex("parentId") -> parentId = this.decodeIntElement(descriptor, index)
+                    descriptor.getElementIndex("color") -> color = Color.getFromTag(this.decodeStringElement(descriptor, index))
                     CompositeDecoder.DECODE_DONE -> break@loop
                 }
             }
             this.endStructure(descriptor)
 
-            return if (items != null) {
-                val note = Note(title!!, null, LinkedList(items), null, parentId)
-                note.id = id
-                note.order = order!!
-                note
-            } else {
-                val folder = NoteFolder(title!!, null, LinkedList(), null, parentId)
-                folder.id = id
-                folder.order = order!!
-                folder
-            }
+            val notable =
+                if (items != null) Note(title!!, null, LinkedList(items), null, parentId)
+                else NoteFolder(title!!, null, LinkedList(), null, parentId)
+            notable.id = id
+            notable.order = order!!
+            notable.color = color
+            return notable
         }
     }
 }

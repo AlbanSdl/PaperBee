@@ -14,9 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import fr.asdl.minder.R
 
-class ColorPicker(context: Context, private val colors: List<Int>,
+class ColorPicker(context: Context, private val colors: List<Color>,
                   private var selectedIndex: Int?, private val callbackOnClose: Boolean,
-                  @StringRes title: Int? = null, private val onSelect: (Int?) -> Unit) {
+                  @StringRes title: Int? = null, allowClear: Boolean = true,
+                  private val onSelect: (Color?) -> Unit) {
 
     private val dialog = AlertDialog.Builder(context)
 
@@ -28,6 +29,7 @@ class ColorPicker(context: Context, private val colors: List<Int>,
         val padding = context.resources.getDimension(R.dimen.padding_small).toInt()
         recyclerView.setPadding(padding, padding, padding, padding)
         dialog.setTitle(title ?: R.string.color_change_title)
+        if (allowClear) dialog.setNeutralButton(R.string.clear_color) { dial, _ -> if (!this.callbackOnClose) {onSelect(null)}; dial.dismiss() }
         dialog.setNegativeButton(if (callbackOnClose) R.string.confirm else R.string.close) { dial, _ -> dial.dismiss() }
         dialog.setView(recyclerView)
         dialog.setOnDismissListener { if (this.callbackOnClose) onSelect(if (selectedIndex == null) null else colors[selectedIndex!!]) }
@@ -65,7 +67,7 @@ class ColorPicker(context: Context, private val colors: List<Int>,
             holder.itemView.id = id(position)
             if (position == selectedIndex) image.select()
             else image.deselect()
-            image.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.context, colors[position]))
+            image.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.context, colors[position].id))
             image.setOnClickListener { select(image, position); }
         }
 

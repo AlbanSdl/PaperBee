@@ -42,4 +42,5 @@
     <string name="color_change_title">Choose color</string>
     <string name="confirm">confirm</string>
     <string name="close">close</string>
+    <string name="clear_color">Clear color</string>
 </resources>

@@ -11,6 +11,8 @@ import androidx.appcompat.widget.Toolbar
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
+import fr.asdl.minder.view.options.Color
+import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
 class EditorFragment : MinderFragment<Note>() {
@@ -41,6 +43,13 @@ class EditorFragment : MinderFragment<Note>() {
             android.R.id.home -> activity?.onBackPressed()
             R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
             R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
+            R.id.set_color -> {
+                ColorPicker(activity!!, listOf(*Color.values()), null, false) {
+                    notable.color = it
+                    this.updateBackgroundTint()
+                    notable.save()
+                }
+            }
             else -> return false
         }
         return true
@@ -102,6 +111,10 @@ class EditorFragment : MinderFragment<Note>() {
             }
         }
 
+    }
+
+    override fun getTintBackgroundView(fragmentRoot: View): View? {
+        return fragmentRoot.findViewById(R.id.transitionBackground)
     }
 
 }

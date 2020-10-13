@@ -22,4 +22,10 @@
     <string name="folder">Dossier</string>
     <string name="notes_root_name">Notes</string>
     <string name="expand">Etendre</string>
+    <string name="color_pick">Choisir cette couleur</string>
+    <string name="set_color">Changer la couleur</string>
+    <string name="color_change_title">Choisir la couleur</string>
+    <string name="confirm">Confirmer</string>
+    <string name="close">Fermer</string>
+    <string name="clear_color">Par défaut</string>
 </resources>

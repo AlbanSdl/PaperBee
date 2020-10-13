@@ -1,6 +1,7 @@
 package fr.asdl.minder.note
 
 import fr.asdl.minder.IntAllocator
+import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.sentient.DataHolder
 import fr.asdl.minder.view.sentient.DataHolderList
 import java.util.*
@@ -17,6 +18,7 @@ abstract class Notable<T : DataHolder>(
     override var order: Int = -1
     override val contents: LinkedList<T> = content
     var notify: Boolean = false
+    var color: Color? = null
 
     override fun shouldNotify(): Boolean = notify
 
