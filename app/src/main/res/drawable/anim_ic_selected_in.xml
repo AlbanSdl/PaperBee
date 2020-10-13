@@ -1,0 +1,105 @@
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="anim_in"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <group
+                android:name="rotation"
+                android:pivotX="12"
+                android:pivotY="12">
+                <group
+                    android:name="rotation_correction"
+                    android:pivotX="12"
+                    android:pivotY="12"
+                    android:rotation="90">
+                    <path
+                        android:name="stroke"
+                        android:pathData="M 1 12 C 1.009 9.09 2.173 6.299 4.234 4.244 C 6.295 2.19 9.09 1.035 12 1.035 C 14.91 1.035 17.705 2.19 19.766 4.244 C 21.827 6.299 22.991 9.09 23 12 C 22.991 14.91 21.827 17.701 19.766 19.756 C 17.705 21.81 14.91 22.965 12 22.965 C 9.09 22.965 6.295 21.81 4.234 19.756 C 2.173 17.701 1.009 14.91 1 12 Z"
+                        android:strokeColor="@color/colorAccent"/>
+                </group>
+                <group
+                    android:name="done_correction"
+                    android:pivotX="12"
+                    android:pivotY="12"
+                    android:translateX="-0.5"
+                    android:scaleX="0"
+                    android:scaleY="0">
+                    <path
+                        android:name="done"
+                        android:pathData="M 9 16.2 L 4.8 12 L 3.4 13.4 L 9 19 L 21 7 L 19.6 5.6 L 9 16.2 Z"
+                        android:fillColor="@color/colorAccent"/>
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="stroke">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="strokeWidth"
+                    android:duration="900"
+                    android:valueFrom="0"
+                    android:valueTo="2"
+                    android:valueType="floatType"
+                    android:interpolator="@android:anim/linear_interpolator"/>
+                <objectAnimator
+                    android:propertyName="trimPathEnd"
+                    android:duration="900"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="rotation">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="rotation"
+                android:duration="900"
+                android:valueFrom="0"
+                android:valueTo="360"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="done_correction">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="scaleX"
+                    android:startOffset="300"
+                    android:duration="600"
+                    android:valueFrom="0"
+                    android:valueTo="0.8"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+                <objectAnimator
+                    android:propertyName="scaleY"
+                    android:startOffset="300"
+                    android:duration="600"
+                    android:valueFrom="0"
+                    android:valueTo="0.8"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="done">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="fillAlpha"
+                android:startOffset="300"
+                android:duration="600"
+                android:valueFrom="0.5"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_linear_in"/>
+        </aapt:attr>
+    </target>
+</animated-vector>

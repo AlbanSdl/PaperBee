@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:name="rotation"
+        android:pivotX="12"
+        android:pivotY="12">
+        <group
+            android:name="rotation_correction"
+            android:pivotX="12"
+            android:pivotY="12"
+            android:rotation="90">
+            <path
+                android:name="stroke"
+                android:pathData="M 1 12 C 1.009 9.09 2.173 6.299 4.234 4.244 C 6.295 2.19 9.09 1.035 12 1.035 C 14.91 1.035 17.705 2.19 19.766 4.244 C 21.827 6.299 22.991 9.09 23 12 C 22.991 14.91 21.827 17.701 19.766 19.756 C 17.705 21.81 14.91 22.965 12 22.965 C 9.09 22.965 6.295 21.81 4.234 19.756 C 2.173 17.701 1.009 14.91 1 12 Z"
+                android:strokeWidth="2"
+                android:strokeColor="@color/colorAccent" />
+        </group>
+        <group android:name="done">
+            <clip-path
+                android:name="mask"
+                android:pathData="M 1 12 C 1.009 9.09 2.173 6.299 4.234 4.244 C 6.295 2.19 9.09 1.035 12 1.035 C 14.91 1.035 17.705 2.19 19.766 4.244 C 21.827 6.299 22.991 9.09 23 12 C 22.991 14.91 21.827 17.701 19.766 19.756 C 17.705 21.81 14.91 22.965 12 22.965 C 9.09 22.965 6.295 21.81 4.234 19.756 C 2.173 17.701 1.009 14.91 1 12 Z" />
+            <group
+                android:name="done_correction"
+                android:pivotX="12"
+                android:pivotY="12"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:translateX="-0.5">
+                <path
+                    android:name="done_part"
+                    android:fillColor="@color/colorAccent"
+                    android:pathData="M 9 16.2 L 4.8 12 L 3.4 13.4 L 9 19 L 21 7 L 19.6 5.6 L 9 16.2 Z" />
+            </group>
+        </group>
+    </group>
+</vector>
