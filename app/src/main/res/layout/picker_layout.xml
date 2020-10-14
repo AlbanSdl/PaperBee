@@ -3,29 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clipToPadding="false"
     android:padding="@dimen/padding_small">
 
-    <ImageView
-        android:layout_width="@dimen/outline_large"
-        android:layout_height="@dimen/outline_large"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_blank_circle_shade"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_blank_circle_border"
+        android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <view
-        android:id="@+id/color_picker_elem"
-        class="fr.asdl.minder.view.options.ColorPicker$ColorPickerView"
-        android:layout_width="@dimen/large"
-        android:layout_height="@dimen/large"
-        android:background="@drawable/ic_blank_circle_selectable"
-        android:contentDescription="@string/color_pick"
-        android:src="@drawable/ic_select_round"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <view
+            android:id="@+id/color_picker_elem"
+            class="fr.asdl.minder.view.options.ColorPicker$ColorPickerView"
+            android:layout_width="@dimen/large"
+            android:layout_height="@dimen/large"
+            android:background="@drawable/ic_blank_circle_selectable"
+            android:contentDescription="@string/color_pick"
+            android:src="@drawable/ic_select_round" />
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

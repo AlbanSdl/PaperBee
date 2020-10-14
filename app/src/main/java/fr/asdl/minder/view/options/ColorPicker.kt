@@ -38,7 +38,7 @@ class ColorPicker(context: Context, private val colors: List<Color>,
 
     private fun select(image: ColorPickerView, position: Int) {
         if (selectedIndex != null)
-            (image.parent!!.parent!! as View).findViewById<View>(id(selectedIndex!!)).findViewById<ColorPickerView>(R.id.color_picker_elem).deselect()
+            (image.parent!!.parent!!.parent!! as View).findViewById<View>(id(selectedIndex!!)).findViewById<ColorPickerView>(R.id.color_picker_elem).deselect()
         val pos = if (position == selectedIndex) null else position
         selectedIndex = pos
         if (pos == null) {
