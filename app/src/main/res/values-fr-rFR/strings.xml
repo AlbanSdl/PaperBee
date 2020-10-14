@@ -23,7 +23,8 @@
     <string name="notes_root_name">Notes</string>
     <string name="expand">Etendre</string>
     <string name="color_pick">Choisir cette couleur</string>
-    <string name="set_color">Changer la couleur</string>
+    <string name="set_color_note">Couleur de la note</string>
+    <string name="set_color_folder">Couleur du dossier</string>
     <string name="color_change_title">Choisir la couleur</string>
     <string name="confirm">Confirmer</string>
     <string name="close">Fermer</string>

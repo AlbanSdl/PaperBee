@@ -17,8 +17,8 @@
         android:icon="@drawable/ic_color_lens"
         android:orderInCategory="90"
         android:tint="@color/blank"
-        android:title="@string/set_color"
-        android:titleCondensed="@string/set_color"
+        android:title="@string/set_color_folder"
+        android:titleCondensed="@string/set_color_folder"
         app:iconTint="@color/blank"
         app:showAsAction="ifRoom" />
 

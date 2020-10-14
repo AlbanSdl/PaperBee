@@ -38,7 +38,8 @@
     <string name="folder">Folder</string>
     <string name="expand">Expand</string>
     <string name="color_pick">Pick color</string>
-    <string name="set_color">Set color</string>
+    <string name="set_color_note">Note color</string>
+    <string name="set_color_folder">Folder color</string>
     <string name="color_change_title">Choose color</string>
     <string name="confirm">Confirm</string>
     <string name="close">Close</string>
