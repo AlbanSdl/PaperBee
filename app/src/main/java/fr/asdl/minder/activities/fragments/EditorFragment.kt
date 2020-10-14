@@ -44,7 +44,7 @@ class EditorFragment : MinderFragment<Note>() {
             R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
             R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(*Color.values()), null, false) {
+                ColorPicker(activity!!, listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
                     this.updateBackgroundTint()
                     notable.save()

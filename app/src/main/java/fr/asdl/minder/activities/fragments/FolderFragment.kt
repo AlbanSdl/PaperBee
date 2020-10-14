@@ -69,7 +69,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                 }.show()
             }
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(*Color.values()), null, false) {
+                ColorPicker(activity!!, listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
                     this.updateBackgroundTint()
                     notable.save()

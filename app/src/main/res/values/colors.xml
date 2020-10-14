@@ -13,6 +13,10 @@
     <color name="blankPressed">#b888</color>
     <color name="editorStatusBar">#888</color>
 
-    <color name="noteColorRed">#8800</color>
-    <color name="noteColorGreen">#8190</color>
+    <color name="noteColorRed">#F0C8C8</color>
+    <color name="noteColorGreen">#C8F0C8</color>
+    <color name="noteColorBlue">#C8E6F0</color>
+    <color name="noteColorYellow">#FAF078</color>
+    <color name="noteColorCyan">#B4F4FF</color>
+    <color name="noteColorMagenta">#CBB4FF</color>
 </resources>
