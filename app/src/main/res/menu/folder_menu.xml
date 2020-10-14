@@ -4,17 +4,22 @@
 
     <item
         android:id="@+id/goto_trash"
-        android:orderInCategory="100"
-        android:title="@string/trash_can_goto"
         android:icon="@drawable/ic_baseline_delete"
+        android:orderInCategory="100"
+        android:tint="@color/blank"
+        android:title="@string/trash_can_goto"
         android:titleCondensed="@string/trash_can_goto"
-        app:showAsAction="ifRoom"/>
+        app:iconTint="@color/blank"
+        app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/set_color"
-        android:orderInCategory="90"
-        android:title="@string/set_color"
+    <item
+        android:id="@+id/set_color"
         android:icon="@drawable/ic_color_lens"
+        android:orderInCategory="90"
+        android:tint="@color/blank"
+        android:title="@string/set_color"
         android:titleCondensed="@string/set_color"
-        app:showAsAction="ifRoom"/>
+        app:iconTint="@color/blank"
+        app:showAsAction="ifRoom" />
 
 </menu>

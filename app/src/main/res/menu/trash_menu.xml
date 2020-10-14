@@ -4,10 +4,12 @@
 
     <item
         android:id="@+id/empty_trash"
-        android:orderInCategory="100"
-        android:title="@string/trash_empty"
         android:icon="@drawable/ic_delete_sweep"
+        android:orderInCategory="100"
+        android:tint="@color/blank"
+        android:title="@string/trash_empty"
         android:titleCondensed="@string/trash_empty"
-        app:showAsAction="ifRoom"/>
+        app:iconTint="@color/blank"
+        app:showAsAction="ifRoom" />
 
 </menu>

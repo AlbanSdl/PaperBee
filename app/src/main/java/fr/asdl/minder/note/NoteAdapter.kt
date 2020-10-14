@@ -2,7 +2,6 @@ package fr.asdl.minder.note
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -11,6 +10,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import fr.asdl.minder.R
@@ -30,8 +30,8 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
 
     override fun onBindViewHolder(holder: ViewHolder, content: Notable<*>) {
         // We set the background tint if the notable has a color
-        holder.itemView.findViewById<View>(R.id.note_element).backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.context!!,
+        holder.itemView.findViewById<CardView>(R.id.note_element).setBackgroundColor(
+            ContextCompat.getColor(holder.itemView.context!!,
                 if (content.color != null) content.color!!.id else R.color.blank))
         // We set the note contents (title, etc)
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
