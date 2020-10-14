@@ -5,14 +5,14 @@ import androidx.annotation.StringRes
 import fr.asdl.minder.R
 
 enum class Color(val tag: String, @ColorRes val id: Int, @StringRes val colorName: Int) {
-    RED("noteColorRed", R.color.noteColorRed, R.string.colorRedName),
-    GREEN("noteColorGreen", R.color.noteColorGreen, R.string.colorGreenName),
-    BLUE("noteColorBlue", R.color.noteColorBlue, R.string.colorBlueName),
-    YELLOW("noteColorYellow", R.color.noteColorYellow, R.string.colorYellowName),
-    CYAN("noteColorCyan", R.color.noteColorCyan, R.string.colorCyanName),
+    ROSE("noteColorRose", R.color.noteColorRose, R.string.colorRoseName),
     MAGENTA("noteColorMagenta", R.color.noteColorMagenta, R.string.colorMagentaName),
+    BLUE("noteColorBlue", R.color.noteColorBlue, R.string.colorBlueName),
+    CYAN("noteColorCyan", R.color.noteColorCyan, R.string.colorCyanName),
+    GREEN("noteColorGreen", R.color.noteColorGreen, R.string.colorGreenName),
+    YELLOW("noteColorYellow", R.color.noteColorYellow, R.string.colorYellowName),
     ORANGE("noteColorOrange", R.color.noteColorOrange, R.string.colorOrangeName),
-    ROSE("noteColorRose", R.color.noteColorRose, R.string.colorRoseName);
+    RED("noteColorRed", R.color.noteColorRed, R.string.colorRedName);
 
     companion object {
         fun getFromTag(colorTag: String): Color? {

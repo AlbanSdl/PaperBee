@@ -6,6 +6,7 @@
     <color name="blank">#fff</color>
     <color name="semiBlank">#eee</color>
     <color name="pickerBackground">#eee</color>
+    <color name="pickerColorHighlight">#2000</color>
     <color name="blankHint">#ccc</color>
     <color name="dark">#333</color>
     <color name="almostDark">#666</color>
@@ -17,7 +18,7 @@
     <color name="noteColorRed">#FFEBEE</color>
     <color name="noteColorGreen">#E8F5E9</color>
     <color name="noteColorBlue">#E3F2FD</color>
-    <color name="noteColorYellow">#FFF9C4</color>
+    <color name="noteColorYellow">#FFFFDC</color>
     <color name="noteColorCyan">#E0F7FA</color>
     <color name="noteColorMagenta">#F3E5F5</color>
     <color name="noteColorOrange">#FBE9E7</color>
