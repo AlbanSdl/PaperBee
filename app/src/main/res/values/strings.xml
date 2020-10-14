@@ -40,7 +40,14 @@
     <string name="color_pick">Pick color</string>
     <string name="set_color">Set color</string>
     <string name="color_change_title">Choose color</string>
-    <string name="confirm">confirm</string>
-    <string name="close">close</string>
-    <string name="clear_color">Clear color</string>
+    <string name="confirm">Confirm</string>
+    <string name="close">Close</string>
+    <string name="colorRedName">Red</string>
+    <string name="colorGreenName">Green</string>
+    <string name="colorBlueName">Blue</string>
+    <string name="colorYellowName">Yellow</string>
+    <string name="colorCyanName">Cyan</string>
+    <string name="colorMagentaName">Magenta</string>
+    <string name="colorOrangeName">Orange</string>
+    <string name="colorRoseName">Rose</string>
 </resources>

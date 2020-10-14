@@ -2,6 +2,7 @@ package fr.asdl.minder.view.options
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -16,20 +17,19 @@ import fr.asdl.minder.R
 
 class ColorPicker(context: Context, private val colors: List<Color>,
                   private var selectedIndex: Int?, private val callbackOnClose: Boolean,
-                  @StringRes title: Int? = null, allowClear: Boolean = true,
-                  private val onSelect: (Color?) -> Unit) {
+                  @StringRes title: Int? = null, private val onSelect: (Color?) -> Unit) {
 
-    private val dialog = AlertDialog.Builder(context)
+    private val dialog = AlertDialog.Builder(context, R.style.ColorPickerTheme)
 
     init {
         if (selectedIndex != null && selectedIndex!! >= colors.size) selectedIndex = null
         val recyclerView = RecyclerView(context)
         recyclerView.layoutManager = StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.VERTICAL)
         recyclerView.adapter = ColorAdapter()
+        recyclerView.overScrollMode = View.OVER_SCROLL_NEVER
         val padding = context.resources.getDimension(R.dimen.padding_small).toInt()
         recyclerView.setPadding(padding, padding, padding, padding)
         dialog.setTitle(title ?: R.string.color_change_title)
-        if (allowClear) dialog.setNeutralButton(R.string.clear_color) { dial, _ -> if (!this.callbackOnClose) {onSelect(null)}; dial.dismiss() }
         dialog.setNegativeButton(if (callbackOnClose) R.string.confirm else R.string.close) { dial, _ -> dial.dismiss() }
         dialog.setView(recyclerView)
         dialog.setOnDismissListener { if (this.callbackOnClose) onSelect(if (selectedIndex == null) null else colors[selectedIndex!!]) }
@@ -67,6 +67,7 @@ class ColorPicker(context: Context, private val colors: List<Color>,
             holder.itemView.id = id(position)
             if (position == selectedIndex) image.select()
             else image.deselect()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) image.tooltipText = holder.itemView.context.getString(colors[position].colorName)
             image.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.context, colors[position].id))
             image.setOnClickListener { select(image, position); }
         }
@@ -78,8 +79,8 @@ class ColorPicker(context: Context, private val colors: List<Color>,
     }
 
     class ColorPickerView(context: Context, attributeSet: AttributeSet) : AppCompatImageView(context, attributeSet) {
-        fun select() = this.setImageState(SELECTED_STATE_SET, false)
-        fun deselect() = this.setImageState(EMPTY_STATE_SET, false)
+        fun select() = this.setImageState(SELECTED_STATE_SET, true)
+        fun deselect() = this.setImageState(EMPTY_STATE_SET, true)
     }
 
 }

@@ -1,15 +1,18 @@
 package fr.asdl.minder.view.options
 
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import fr.asdl.minder.R
 
-enum class Color(val tag: String, @ColorRes val id: Int) {
-    RED("noteColorRed", R.color.noteColorRed),
-    GREEN("noteColorGreen", R.color.noteColorGreen),
-    BLUE("noteColorBlue", R.color.noteColorBlue),
-    YELLOW("noteColorYellow", R.color.noteColorYellow),
-    CYAN("noteColorCyan", R.color.noteColorCyan),
-    MAGENTA("noteColorMagenta", R.color.noteColorMagenta);
+enum class Color(val tag: String, @ColorRes val id: Int, @StringRes val colorName: Int) {
+    RED("noteColorRed", R.color.noteColorRed, R.string.colorRedName),
+    GREEN("noteColorGreen", R.color.noteColorGreen, R.string.colorGreenName),
+    BLUE("noteColorBlue", R.color.noteColorBlue, R.string.colorBlueName),
+    YELLOW("noteColorYellow", R.color.noteColorYellow, R.string.colorYellowName),
+    CYAN("noteColorCyan", R.color.noteColorCyan, R.string.colorCyanName),
+    MAGENTA("noteColorMagenta", R.color.noteColorMagenta, R.string.colorMagentaName),
+    ORANGE("noteColorOrange", R.color.noteColorOrange, R.string.colorOrangeName),
+    ROSE("noteColorRose", R.color.noteColorRose, R.string.colorRoseName);
 
     companion object {
         fun getFromTag(colorTag: String): Color? {

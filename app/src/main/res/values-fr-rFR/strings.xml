@@ -27,5 +27,12 @@
     <string name="color_change_title">Choisir la couleur</string>
     <string name="confirm">Confirmer</string>
     <string name="close">Fermer</string>
-    <string name="clear_color">Par défaut</string>
+    <string name="colorRedName">Rouge</string>
+    <string name="colorGreenName">Vert</string>
+    <string name="colorBlueName">Bleu</string>
+    <string name="colorYellowName">Jaune</string>
+    <string name="colorCyanName">Cyan</string>
+    <string name="colorMagentaName">Magenta</string>
+    <string name="colorOrangeName">Orange</string>
+    <string name="colorRoseName">Rose</string>
 </resources>
