@@ -9,11 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import fr.asdl.minder.R
+import fr.asdl.minder.view.rounded.RoundedImageView
 
 class ColorPicker(context: Context, private val colors: List<Color>,
                   private var selectedIndex: Int?, private val callbackOnClose: Boolean,
@@ -78,7 +78,7 @@ class ColorPicker(context: Context, private val colors: List<Color>,
 
     }
 
-    class ColorPickerView(context: Context, attributeSet: AttributeSet) : AppCompatImageView(context, attributeSet) {
+    class ColorPickerView(context: Context, attributeSet: AttributeSet) : RoundedImageView(context, attributeSet) {
         fun select() = this.setImageState(SELECTED_STATE_SET, true)
         fun deselect() = this.setImageState(EMPTY_STATE_SET, true)
     }

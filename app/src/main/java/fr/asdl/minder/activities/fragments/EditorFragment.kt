@@ -28,6 +28,10 @@ class EditorFragment : MinderFragment<Note>() {
         (activity as MainActivity).setSupportActionBar(toolbar)
         (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        val editorToolbar: Toolbar = view.findViewById(R.id.editor_toolbar)
+        editorToolbar.inflateMenu(R.menu.editor_toolbar)
+        editorToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected)
+
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
         (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(EditTextChangeWatcher(notable, null))
