@@ -6,23 +6,23 @@
     android:layout_height="match_parent"
     tools:ignore="UselessParent">
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/transitionBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/blank"
         android:transitionName="@string/transition_name">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/transitionContents"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <EditText
                     android:id="@+id/note_editor_title"
@@ -36,23 +36,27 @@
 
             </androidx.appcompat.widget.Toolbar>
 
-            <androidx.appcompat.widget.Toolbar
+            <LinearLayout
                 android:id="@+id/editor_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
             <fr.asdl.minder.view.sentient.SentientRecyclerView
                 android:id="@+id/note_editor_elements"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 android:clipToPadding="false"
                 android:overScrollMode="ifContentScrolls"
                 android:padding="@dimen/padding_small"
                 android:transitionName="@string/transition_name_contents"
-                app:allowSwipe="right" />
+                app:allowSwipe="right"
+                app:layout_constraintTop_toBottomOf="@id/editor_toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>

@@ -79,6 +79,7 @@ class ColorPicker(context: Context, private val colors: List<Color>,
     }
 
     class ColorPickerView(context: Context, attributeSet: AttributeSet) : RoundedImageView(context, attributeSet) {
+        override fun doesOverrideBackground(): Boolean = false
         fun select() = this.setImageState(SELECTED_STATE_SET, true)
         fun deselect() = this.setImageState(EMPTY_STATE_SET, true)
     }

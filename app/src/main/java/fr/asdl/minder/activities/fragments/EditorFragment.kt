@@ -3,19 +3,25 @@ package fr.asdl.minder.activities.fragments
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.children
+import com.google.android.material.snackbar.Snackbar
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
 import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
+import fr.asdl.minder.view.rounded.RoundedImageView
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
-class EditorFragment : MinderFragment<Note>() {
+class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
     private val watchers = hashMapOf<NotePart, TextWatcher>()
     override val layoutId: Int = R.layout.note_editor
@@ -28,9 +34,11 @@ class EditorFragment : MinderFragment<Note>() {
         (activity as MainActivity).setSupportActionBar(toolbar)
         (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val editorToolbar: Toolbar = view.findViewById(R.id.editor_toolbar)
-        editorToolbar.inflateMenu(R.menu.editor_toolbar)
-        editorToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected)
+        val editorToolbar: LinearLayout = view.findViewById(R.id.editor_toolbar)
+        LayoutInflater.from(editorToolbar.context).inflate(R.layout.editor_toolbar, editorToolbar)
+        (editorToolbar.getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>().forEach {
+            it.setOnClickListener(this)
+        }
 
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
@@ -45,8 +53,6 @@ class EditorFragment : MinderFragment<Note>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
-            R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
-            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
             R.id.set_color -> {
                 ColorPicker(activity!!, listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
@@ -57,6 +63,14 @@ class EditorFragment : MinderFragment<Note>() {
             else -> return false
         }
         return true
+    }
+
+    override fun onClick(v: View?) {
+        if (v == null) return
+        when (v.id) {
+            R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
+            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
+        }
     }
 
     override fun onDestroy() {
@@ -93,6 +107,10 @@ class EditorFragment : MinderFragment<Note>() {
 
         override fun onSwipeRight(context: Context, content: NotePart) {
             this.getDataHolder().remove(content)
+            Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
+                .setAction(R.string.restore) {
+                    this.getDataHolder().add(content)
+                }.show()
         }
 
     }

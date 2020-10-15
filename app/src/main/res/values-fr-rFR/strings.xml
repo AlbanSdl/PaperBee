@@ -36,4 +36,8 @@
     <string name="colorMagentaName">Magenta</string>
     <string name="colorOrangeName">Orange</string>
     <string name="colorRoseName">Rose</string>
+    <string name="movePartOut">Enlever du parent</string>
+    <string name="movePartIn">Ajouter à l\'élément précédent</string>
+    <string name="note_part_deleted">Elément supprimé</string>
+    <string name="restore">Restaurer</string>
 </resources>

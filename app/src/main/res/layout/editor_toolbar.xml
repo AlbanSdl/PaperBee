@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/editor_toolbar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/padding_tiny"
+    android:paddingVertical="@dimen/padding_tiny">
+
+    <fr.asdl.minder.view.rounded.RoundedImageView
+        android:id="@+id/moveOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:src="@drawable/ic_arrow_left_alt"
+        android:tint="@color/dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tooltip="@string/movePartOut" />
+
+    <Space
+        android:id="@+id/moveOutSpace"
+        android:layout_width="@dimen/padding_small"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/moveOut"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <fr.asdl.minder.view.rounded.RoundedImageView
+        android:id="@+id/moveIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:src="@drawable/ic_arrow_right_alt"
+        android:tint="@color/dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/moveOutSpace"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tooltip="@string/movePartIn" />
+
+    <!-- This is the center of the view.
+         The views above are aligned to the start of the parent and
+         the views below are align to its end. -->
+
+    <fr.asdl.minder.view.rounded.RoundedImageView
+        android:id="@+id/add_text_element"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:src="@drawable/ic_text_fields"
+        android:tint="@color/dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/addCheckBoxSpace"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tooltip="@string/add_text_element" />
+
+    <Space
+        android:id="@+id/addCheckBoxSpace"
+        android:layout_width="@dimen/padding_small"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/add_checkbox_element"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <fr.asdl.minder.view.rounded.RoundedImageView
+        android:id="@+id/add_checkbox_element"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:src="@drawable/ic_check_box"
+        android:tint="@color/dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tooltip="@string/add_checkbox_element" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

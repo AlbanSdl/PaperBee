@@ -11,4 +11,7 @@
         <attr name="leftUnderSwipeableView" format="reference"/>
         <attr name="rightUnderSwipeableView" format="reference"/>
     </declare-styleable>
+    <declare-styleable name="RoundedImageView">
+        <attr name="tooltip" format="string" />
+    </declare-styleable>
 </resources>
