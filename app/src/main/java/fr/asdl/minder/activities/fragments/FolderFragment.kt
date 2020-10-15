@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -37,16 +38,26 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
     }
 
     override fun onLayoutInflated(view: View) {
+        // Toolbar setup
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.folder_toolbar))
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(notable.id != ROOT_ID)
+        // No note message
+        view.findViewById<TextView>(R.id.no_note).text = getString(when (notable.id) {
+            ROOT_ID -> R.string.no_note_root
+            TRASH_ID -> R.string.no_note_trash
+            else -> R.string.no_note
+        })
+        // Folder name
         val title = view.findViewById<EditText>(R.id.folder_name)
         title.setText(notable.title)
         if (notable.id!! >= 0)
             title.addTextChangedListener(FolderTitleListener())
         else
             title.inputType = InputType.TYPE_NULL
+        // Folder content
         val recycler = view.findViewById<SentientRecyclerView>(R.id.notes_recycler)
         recycler.adapter = NoteAdapter(notable)
+        // Floating action buttons
         if (notable.id != TRASH_ID) {
             view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this)
             view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this)

@@ -5,10 +5,13 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.transition.Transition
 import androidx.transition.TransitionValues
+import fr.asdl.minder.R
 
 /**
  * This transition fades Background tint
@@ -29,6 +32,12 @@ class BackgroundTint(context: Context, attributeSet: AttributeSet) : Transition(
         transitionValues.values[propName] = transitionValues.view.backgroundTintList?.defaultColor
     }
 
+    private fun getTintColor(transitionValues: TransitionValues?, context: Context): Int {
+        return transitionValues?.values?.get(propName) as Int? ?:
+            (transitionValues?.view?.background as? ColorDrawable)?.color ?:
+            ResourcesCompat.getColor(context.resources, R.color.dark, context.theme)
+    }
+
     override fun createAnimator(
         sceneRoot: ViewGroup,
         startValues: TransitionValues?,
@@ -37,17 +46,15 @@ class BackgroundTint(context: Context, attributeSet: AttributeSet) : Transition(
         if (startValues == null && endValues == null)
             return null
         val view = endValues?.view ?: startValues!!.view
-        val startBackground = startValues?.values?.get(propName) ?: 0x00ffffff
-        val endBackground = endValues?.values?.get(propName) ?: 0x00ffffff
+        val startBackground = getTintColor(startValues, view.context)
+        val endBackground = getTintColor(endValues, view.context)
         val argbEvaluator = ArgbEvaluator()
-        if (startBackground is Int && endBackground is Int) {
-            if (startBackground != endBackground) {
-                val animator = ValueAnimator.ofFloat(0f, 1f)
-                animator.addUpdateListener {
-                    view.backgroundTintList = ColorStateList.valueOf(argbEvaluator.evaluate(it.animatedFraction, startBackground, endBackground) as Int)
-                }
-                return animator
+        if (startBackground != endBackground) {
+            val animator = ValueAnimator.ofFloat(0f, 1f)
+            animator.addUpdateListener {
+                view.backgroundTintList = ColorStateList.valueOf(argbEvaluator.evaluate(it.animatedFraction, startBackground, endBackground) as Int)
             }
+            return animator
         }
         return null
     }

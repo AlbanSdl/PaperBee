@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Minder</string>
     <string name="loading">Chargement</string>
-    <string name="no_note">Cet endroit est vide…\nClique sur le bouton + pour ajouter quelque chose !</string>
+    <string name="no_note">Ce dossier est vide</string>
     <string name="delete">Supprimer</string>
     <string name="note_title">Titre</string>
     <string name="note_content">Ecris quelque chose</string>
@@ -43,4 +43,6 @@
     <string name="create_folder">Nouveau dossier</string>
     <string name="create_note">Nouvelle note</string>
     <string name="create_element">Ajouter…</string>
+    <string name="no_note_trash">Il n\'y a pas de quoi s\'affoler dans la corbeille</string>
+    <string name="no_note_root">Cet endroit est vide…\nClique sur le bouton + pour ajouter quelque chose !</string>
 </resources>
