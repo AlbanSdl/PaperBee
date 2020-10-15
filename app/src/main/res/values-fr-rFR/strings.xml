@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Minder</string>
     <string name="loading">Chargement</string>
-    <string name="no_note">Tu n\'as pas encore de notes</string>
+    <string name="no_note">Cet endroit est vide…\nClique sur le bouton + pour ajouter quelque chose !</string>
     <string name="delete">Supprimer</string>
     <string name="note_title">Titre</string>
     <string name="note_content">Ecris quelque chose</string>

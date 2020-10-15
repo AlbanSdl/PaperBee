@@ -14,7 +14,7 @@
     <string name="app_name">Minder</string>
     <string name="notes_root_name">Notes</string>
     <string name="loading">Loading</string>
-    <string name="no_note">You don\'t have any note yet</string>
+    <string name="no_note">There is nothing here…\nClick the + button to add something !</string>
     <string name="delete">Delete</string>
     <string name="note_title">Title</string>
     <string name="add_text_element">Add text element</string>
