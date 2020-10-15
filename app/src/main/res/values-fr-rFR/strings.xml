@@ -40,4 +40,7 @@
     <string name="movePartIn">Ajouter à l\'élément précédent</string>
     <string name="note_part_deleted">Elément supprimé</string>
     <string name="restore">Restaurer</string>
+    <string name="create_folder">Nouveau dossier</string>
+    <string name="create_note">Nouvelle note</string>
+    <string name="create_element">Ajouter...</string>
 </resources>

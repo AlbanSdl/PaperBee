@@ -33,7 +33,10 @@ class MainActivity : AppCompatActivity() {
 
     fun openNotable(notable: Notable<*>, vararg sharedViews: View) {
         this.openNotable(notable, true,
-            *(if (notable is NoteFolder) arrayOf(*sharedViews).plusElement(findViewById(R.id.add_note_button)) else sharedViews))
+            *(if (notable is NoteFolder) arrayOf(*sharedViews)
+                .plus(arrayOf(findViewById(R.id.add_note_button),
+                    findViewById(R.id.add_note_selector),
+                    findViewById(R.id.add_folder_selector))) else sharedViews))
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(

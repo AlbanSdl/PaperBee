@@ -15,12 +15,12 @@
     <color name="blankPressed">#b888</color>
     <color name="editorStatusBar">#888</color>
 
-    <color name="noteColorRed">#FFEBEE</color>
+    <color name="noteColorRed">#FFE6E6</color>
     <color name="noteColorGreen">#E8F5E9</color>
     <color name="noteColorBlue">#E3F2FD</color>
     <color name="noteColorYellow">#FFFFDC</color>
     <color name="noteColorCyan">#E0F7FA</color>
     <color name="noteColorMagenta">#F3E5F5</color>
-    <color name="noteColorOrange">#FBE9E7</color>
-    <color name="noteColorRose">#FCE4EC</color>
+    <color name="noteColorOrange">#FFEEDC</color>
+    <color name="noteColorRose">#FCE4F2</color>
 </resources>

@@ -15,11 +15,11 @@
     <color name="editorStatusBar">#444</color>
 
     <color name="noteColorRed">#320000</color>
-    <color name="noteColorGreen">#013200</color>
-    <color name="noteColorBlue">#001432</color>
-    <color name="noteColorYellow">#322800</color>
-    <color name="noteColorCyan">#002832</color>
-    <color name="noteColorMagenta">#1C0032</color>
-    <color name="noteColorOrange">#321400</color>
-    <color name="noteColorRose">#32001C</color>
+    <color name="noteColorGreen">#003200</color>
+    <color name="noteColorBlue">#000032</color>
+    <color name="noteColorYellow">#2D2800</color>
+    <color name="noteColorCyan">#002828</color>
+    <color name="noteColorMagenta">#230032</color>
+    <color name="noteColorOrange">#321900</color>
+    <color name="noteColorRose">#320023</color>
 </resources>

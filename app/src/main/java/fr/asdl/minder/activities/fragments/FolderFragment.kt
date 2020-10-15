@@ -94,7 +94,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
                 (this.activity as MainActivity).openNotable(fold)
             }
             R.id.add_note_button -> {
-                if (this.notable.id!! < 0) return
+                if (this.notable.id!! < -1) return
                 val addNote = activity?.findViewById<View>(R.id.add_note_selector)
                 val addFolder = activity?.findViewById<View>(R.id.add_folder_selector)
                 if (addNote?.visibility == View.GONE) {
@@ -128,7 +128,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
     }
 
     override fun getTintBackgroundView(fragmentRoot: View): View? {
-        return fragmentRoot.findViewById(R.id.notes_recycler)
+        return fragmentRoot.findViewById(R.id.folder_root_constraint)
     }
 
 }

@@ -41,17 +41,42 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
      * The directions in which swipe gesture is allowed for this [SentientRecyclerView].
      * @see [ItemTouchHelper] to see values.
      */
-    private val swipeDirection: Int = attr.getAttributeIntValue(
-        context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_swipeable),
-        0
-    )
+    private val swipeDirection: Int
+
+    /**
+     * The id of the [emptyView].
+     */
+    private val emptyViewRes: Int
+
+    /**
+     * The id of the Swipeable view as explained in the description of the [SentientRecyclerView].
+     */
+    val swipeableViewRes: Int
+
+    /**
+     * The id of the view which is under the Swipeable view swiped to the left,
+     * as explained in the description of [SentientRecyclerView].
+     */
+    val leftUnderSwipeableViewRes: Int
+
+    /**
+     * The id of the view which is under the Swipeable view swiped to the right,
+     * as explained in the description of [SentientRecyclerView].
+     */
+    val rightUnderSwipeableViewRes: Int
 
     /**
      * Called on the initialization of the SentientRecyclerView. It attaches the
      * SentientSwipeBehaviour if requested in the AttributeSet.
      */
     init {
+        val attributes = context.obtainStyledAttributes(attr, R.styleable.SentientRecyclerView)
+        swipeDirection = attributes.getInt(R.styleable.SentientRecyclerView_allowSwipe, 0)
+        emptyViewRes = attributes.getResourceId(R.styleable.SentientRecyclerView_emptyView, -1)
+        swipeableViewRes = attributes.getResourceId(R.styleable.SentientRecyclerView_swipeableView, -1)
+        leftUnderSwipeableViewRes = attributes.getResourceId(R.styleable.SentientRecyclerView_leftUnderSwipeableView, -1)
+        rightUnderSwipeableViewRes = attributes.getResourceId(R.styleable.SentientRecyclerView_rightUnderSwipeableView, -1)
+        attributes.recycle()
         if (this.layoutManager == null) this.layoutManager = SentientLinearLayoutManager(context)
         if (swipeDirection != 0) ItemTouchHelper(SentientSwipeBehaviour(swipeDirection,this)).attachToRecyclerView(this)
     }
@@ -65,40 +90,6 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
      * Whether the [emptyView] was displayed.
      */
     private var wasEmptyDisplayed = false
-
-    /**
-     * The id of the [emptyView].
-     */
-    private val emptyViewRes: Int = attr.getAttributeResourceValue(
-        context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_emptyViewId), -1
-    )
-
-    /**
-     * The id of the Swipeable view as explained in the description of the [SentientRecyclerView].
-     */
-    val swipeableViewRes: Int = attr.getAttributeResourceValue(
-        context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_swipeableViewId), -1
-    )
-
-    /**
-     * The id of the view which is under the Swipeable view swiped to the left,
-     * as explained in the description of [SentientRecyclerView].
-     */
-    val leftUnderSwipeableViewRes: Int = attr.getAttributeResourceValue(
-        context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_leftUnderSwipeableViewId), -1
-    )
-
-    /**
-     * The id of the view which is under the Swipeable view swiped to the right,
-     * as explained in the description of [SentientRecyclerView].
-     */
-    val rightUnderSwipeableViewRes: Int = attr.getAttributeResourceValue(
-        context.getString(R.string.namespace),
-        context.getString(R.string.namespaced_recycler_rightUnderSwipeableViewId), -1
-    )
 
     /**
      * An Observer that is notified every time the data set of the [RecyclerView.Adapter] changes.

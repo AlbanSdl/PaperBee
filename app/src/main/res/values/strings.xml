@@ -3,18 +3,12 @@
     <string name="preferences_file" translatable="false">fr.asdl.minder</string>
     <string name="pref_generic_name" translatable="false">generic_name</string>
     <string name="notes_directory_name" translatable="false">notes</string>
-    <string name="namespace" translatable="false">http://schemas.android.com/apk/res-auto</string>
-    <string name="namespaced_recycler_emptyViewId" translatable="false">emptyView</string>
-    <string name="namespaced_recycler_swipeableViewId" translatable="false">swipeableView</string>
-    <string name="namespaced_recycler_leftUnderSwipeableViewId" translatable="false">leftUnderSwipeableView</string>
-    <string name="namespaced_recycler_rightUnderSwipeableViewId" translatable="false">rightUnderSwipeableView</string>
-    <string name="namespaced_tooltip" translatable="false">tooltip</string>
-    <string name="namespaced_recycler_swipeable" translatable="false">allowSwipe</string>
     <string name="transition_name" translatable="false">editorTransitionOpen</string>
     <string name="transition_name_title" translatable="false">editorTransitionOpenTitle</string>
     <string name="transition_name_contents" translatable="false">editorTransitionOpenContents</string>
     <string name="transition_name_fab" translatable="false">editorTransitionOpenFAB</string>
-    <string name="note_content">Write something</string>
+    <string name="transition_name_fab_1" translatable="false">editorTransitionOpenFAB1</string>
+    <string name="transition_name_fab_2" translatable="false">editorTransitionOpenFAB2</string>
 
     <!-- Translatable Strings (displayed) -->
     <string name="app_name">Minder</string>
@@ -27,6 +21,7 @@
     <string name="add_checkbox_element">Add checkbox element</string>
     <string name="drag_action">Drag</string>
     <string name="folder_name">Folder name</string>
+    <string name="note_content">Write something</string>
     <string name="trash_can">Trash</string>
     <string name="trash_can_goto">Open trash can</string>
     <string name="trash_empty">Wipe trash can</string>
@@ -56,4 +51,7 @@
     <string name="movePartIn">Make child of above</string>
     <string name="note_part_deleted">Element deleted</string>
     <string name="restore">Restore</string>
+    <string name="create_folder">Create new folder</string>
+    <string name="create_note">Create new note</string>
+    <string name="create_element">New...</string>
 </resources>
