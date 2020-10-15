@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<transitionSet>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <changeBounds />
-    <changeTransform />
-    <changeClipBounds />
-    <changeImageTransform />
+    <transitionSet>
+        <targets>
+            <target android:excludeName="@string/transition_folder_color" />
+        </targets>
+        <changeBounds />
+        <changeTransform />
+        <changeClipBounds />
+        <changeImageTransform />
+    </transitionSet>
+
+    <transitionSet>
+        <targets>
+            <target android:targetName="@string/transition_folder_color" />
+        </targets>
+        <transition class="fr.asdl.minder.view.transition.BackgroundTint" />
+    </transitionSet>
 
 </transitionSet>

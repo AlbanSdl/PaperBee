@@ -36,7 +36,8 @@ class MainActivity : AppCompatActivity() {
             *(if (notable is NoteFolder) arrayOf(*sharedViews)
                 .plus(arrayOf(findViewById(R.id.add_note_button),
                     findViewById(R.id.add_note_selector),
-                    findViewById(R.id.add_folder_selector))) else sharedViews))
+                    findViewById(R.id.add_folder_selector),
+                    findViewById(R.id.folder_color))) else sharedViews))
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(

@@ -128,7 +128,7 @@ class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
     }
 
     override fun getTintBackgroundView(fragmentRoot: View): View? {
-        return fragmentRoot.findViewById(R.id.folder_root_constraint)
+        return fragmentRoot.findViewById(R.id.folder_color)
     }
 
 }

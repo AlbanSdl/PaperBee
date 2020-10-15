@@ -3,12 +3,13 @@
     <string name="preferences_file" translatable="false">fr.asdl.minder</string>
     <string name="pref_generic_name" translatable="false">generic_name</string>
     <string name="notes_directory_name" translatable="false">notes</string>
-    <string name="transition_name" translatable="false">editorTransitionOpen</string>
-    <string name="transition_name_title" translatable="false">editorTransitionOpenTitle</string>
-    <string name="transition_name_contents" translatable="false">editorTransitionOpenContents</string>
-    <string name="transition_name_fab" translatable="false">editorTransitionOpenFAB</string>
-    <string name="transition_name_fab_1" translatable="false">editorTransitionOpenFAB1</string>
-    <string name="transition_name_fab_2" translatable="false">editorTransitionOpenFAB2</string>
+    <string name="transition_name" translatable="false">TransitionOpenBackground</string>
+    <string name="transition_name_title" translatable="false">TransitionOpenTitle</string>
+    <string name="transition_name_contents" translatable="false">TransitionOpenContents</string>
+    <string name="transition_name_fab" translatable="false">TransitionFloatingActionButton</string>
+    <string name="transition_name_fab_1" translatable="false">TransitionFloatingActionButton1</string>
+    <string name="transition_name_fab_2" translatable="false">TransitionFloatingActionButton2</string>
+    <string name="transition_folder_color" translatable="false">TransitionFolder</string>
 
     <!-- Translatable Strings (displayed) -->
     <string name="app_name">Minder</string>
@@ -53,5 +54,5 @@
     <string name="restore">Restore</string>
     <string name="create_folder">Create new folder</string>
     <string name="create_note">Create new note</string>
-    <string name="create_element">New...</string>
+    <string name="create_element">New…</string>
 </resources>

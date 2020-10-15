@@ -42,5 +42,5 @@
     <string name="restore">Restaurer</string>
     <string name="create_folder">Nouveau dossier</string>
     <string name="create_note">Nouvelle note</string>
-    <string name="create_element">Ajouter...</string>
+    <string name="create_element">Ajouter…</string>
 </resources>
