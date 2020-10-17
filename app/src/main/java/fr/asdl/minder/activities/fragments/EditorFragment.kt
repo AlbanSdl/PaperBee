@@ -20,11 +20,9 @@ import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.rounded.RoundedImageView
 import fr.asdl.minder.view.sentient.SentientRecyclerView
-import java.util.*
 
 class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
-    private val watchers = WeakHashMap<NotePart, TextWatcher>()
     override val layoutId: Int = R.layout.note_editor
     override lateinit var notable: Note
     override var menuLayoutId: Int? = R.menu.editor_menu
@@ -45,7 +43,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
-        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(EditTextChangeWatcher(notable, null))
+        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(TitleChangeWatcher())
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
@@ -97,25 +95,24 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
     private inner class NotePartEditorAdapter(note: Note) : NoteAdapter.NotePartAdapter(note) {
 
+        private var attachedTextWatcher: EditTextChangeWatcher? = null
+        private var notePart: NotePart? = null
+
         override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
             super.onBindViewHolder(holder, content)
+            this.notePart = content
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? EditText)
-                this@EditorFragment.watchers[content] = EditTextChangeWatcher(notable, content)
-                textView?.addTextChangedListener(this@EditorFragment.watchers[content])
+                if (this.attachedTextWatcher == null) {
+                    this.attachedTextWatcher = EditTextChangeWatcher()
+                    textView?.addTextChangedListener(this.attachedTextWatcher)
+                }
                 textView?.setText(content.content)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
                 checkBox?.setOnClickListener { content.checked = checkBox.isChecked; notable.update(content, false) }
             }
-        }
-
-        override fun onViewRecycled(holder: ViewHolder) {
-            super.onViewRecycled(holder)
-            val textView = (holder.findViewById(R.id.note_text) as? EditText)
-            if (textView != null)
-                this@EditorFragment.watchers.values.forEach { textView.removeTextChangedListener(it) }
         }
 
         override fun getLayoutId(): Int {
@@ -130,23 +127,14 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
                 }.show()
         }
 
-    }
-
-    private class EditTextChangeWatcher(
-        private val note: Note?,
-        private val notePart: TextNotePart?
-    ) : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            if (note != null && notePart == null && s != null) note.title = s.toString()
-            else if (note != null && notePart != null && s != null) {
-                notePart.content = s.toString()
-                note.update(notePart as NotePart, false)
+        private inner class EditTextChangeWatcher : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (notePart is TextNotePart && s != null) {
+                    (notePart as TextNotePart).content = s.toString()
+                    notable.update(notePart as NotePart, false)
+                }
             }
         }
 
@@ -154,6 +142,15 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
     override fun getTintBackgroundView(fragmentRoot: View): View? {
         return fragmentRoot.findViewById(R.id.transitionBackground)
+    }
+
+    private inner class TitleChangeWatcher : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) {
+            notable.title = s.toString()
+            notable.save()
+        }
     }
 
 }
