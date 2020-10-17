@@ -1,0 +1,39 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="move_out_enable"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <group android:name="group">
+                <path
+                    android:name="arrow"
+                    android:fillAlpha="0.5"
+                    android:fillColor="#fff"
+                    android:pathData="M 8 13 L 20 13 L 20 11 L 8 11 L 8 8 L 4 12 L 8 16 Z" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="arrow">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="300"
+                    android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+                    android:propertyName="fillAlpha"
+                    android:valueFrom="0.5"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="300"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="pathData"
+                    android:valueFrom="M 8 11 L 8 9.5 L 8 8 L 4 12 L 6 14 L 8 16 L 8 13 L 20 13 L 20 11 L 8 11 M 3.5 4.5 L 20.5 20.5 L 21.5 19.5 L 4.5 3.5 L 3.5 4.5 L 3.5 4.5"
+                    android:valueTo="M 8 11 L 8 9.5 L 8 8 L 4 12 L 6 14 L 8 16 L 8 13 L 20 13 L 20 11 L 8 11 M 3.5 4.5 L 3.5 4.5 L 4.5 3.5 L 4.5 3.5 L 4.5 3.5 L 3.5 4.5"
+                    android:valueType="pathType" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

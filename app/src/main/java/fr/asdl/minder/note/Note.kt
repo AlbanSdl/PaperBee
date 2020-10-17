@@ -11,4 +11,8 @@ class Note(title: String,
            content: LinkedList<NotePart> = LinkedList(),
            idAllocator: IntAllocator?,
            parentId: Int?
-) : Notable<NotePart>(title, noteManager, content, idAllocator, parentId)
+) : Notable<NotePart>(title, noteManager, content, idAllocator, parentId) {
+
+    override fun shouldEnforceParentId(): Boolean = false
+
+}

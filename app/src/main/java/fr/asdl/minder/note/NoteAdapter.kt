@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
@@ -72,6 +73,8 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
     abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
 
         override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
+            (holder.itemView.layoutParams as ViewGroup.MarginLayoutParams).marginStart =
+                holder.itemView.context.resources.getDimension(R.dimen.padding_small).toInt() * content.getDepth()
             // TextNoteParts
             val textView = (holder.findViewById(R.id.note_text) as TextView)
             if (content is TextNotePart) {

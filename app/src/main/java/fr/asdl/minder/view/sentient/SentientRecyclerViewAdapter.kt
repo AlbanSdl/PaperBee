@@ -86,8 +86,8 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
      * @param pos the index of the [DataHolder] to retrieve.
      * @return the [DataHolder] contained at the given index if it exists. Returns null instead.
      */
-    private fun getHeldItem(pos: Int): T? {
-        return if (this.dataContainer.getContents().size > pos) this.dataContainer.getContents()[pos] else null
+    fun getHeldItem(pos: Int): T? {
+        return if (this.dataContainer.getContents().size > pos && pos >= 0) this.dataContainer.getContents()[pos] else null
     }
 
     /**

@@ -1,5 +1,6 @@
 package fr.asdl.minder
 
+import fr.asdl.minder.exceptions.IntAllocationException
 import java.lang.Exception
 import kotlin.collections.ArrayList
 
@@ -13,7 +14,7 @@ class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
     }
 
     fun release(int: Int) {
-        if (int !in allocated) throw Exception("Cannot release non-allocated Integer")
+        if (int !in allocated) throw IntAllocationException(int)
         this.allocated.remove(int)
     }
 

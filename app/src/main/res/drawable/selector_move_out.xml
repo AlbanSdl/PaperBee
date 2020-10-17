@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/enabled"
+        android:drawable="@drawable/ic_arrow_left_alt"
+        android:state_enabled="true" />
+    <item
+        android:id="@+id/disabled"
+        android:drawable="@drawable/ic_arrow_left_alt_disabled"
+        android:state_enabled="false" />
+
+    <transition
+        android:drawable="@drawable/anim_ic_arrow_left"
+        android:fromId="@+id/disabled"
+        android:reversible="true"
+        android:toId="@+id/enabled" />
+
+</animated-selector>

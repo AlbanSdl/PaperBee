@@ -20,14 +20,16 @@ import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.rounded.RoundedImageView
 import fr.asdl.minder.view.sentient.SentientRecyclerView
+import java.util.*
 
 class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
-    private val watchers = hashMapOf<NotePart, TextWatcher>()
+    private val watchers = WeakHashMap<NotePart, TextWatcher>()
     override val layoutId: Int = R.layout.note_editor
     override lateinit var notable: Note
     override var menuLayoutId: Int? = R.menu.editor_menu
     override val styleId: Int = R.style.EditorTheme
+    private var focusedNote: NotePart? = null
 
     override fun onLayoutInflated(view: View) {
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
@@ -39,6 +41,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         (editorToolbar.getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>().forEach {
             it.setOnClickListener(this)
         }
+        this.updateContextToolbarEnabled(editorToolbar)
 
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
@@ -46,8 +49,20 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
-        rec.adapter = NotePartEditorAdapter(notable)
+        val adapter = NotePartEditorAdapter(notable)
+        rec.adapter = adapter
+        rec.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus ->
+            this.focusedNote = if (newFocus != null) adapter.getHeldItem(rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1) else null
+            this.updateContextToolbarEnabled(rec.rootView)
+        }
         notable.notify = true
+    }
+
+    private fun updateContextToolbarEnabled(viewFrom: View) {
+        viewFrom.findViewById<RoundedImageView>(R.id.moveIn)?.isEnabled =
+            this.focusedNote != null && this.focusedNote?.hasAbove() == true
+        viewFrom.findViewById<RoundedImageView>(R.id.moveOut)?.isEnabled =
+            this.focusedNote != null && this.focusedNote?.getParentPart() != null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -68,8 +83,10 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == null) return
         when (v.id) {
-            R.id.add_text_element -> notable.add(NoteText("", parentId = notable.id))
-            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false, parentId = notable.id))
+            R.id.add_text_element -> notable.add(NoteText(""))
+            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false))
+            R.id.moveIn -> this.focusedNote?.attachToPart(this.focusedNote!!.getAbove())
+            R.id.moveOut -> this.focusedNote?.attachToPart(this.focusedNote!!.getParentPart()!!.getMixedParent()!!)
         }
     }
 

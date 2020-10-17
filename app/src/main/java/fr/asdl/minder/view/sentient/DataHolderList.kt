@@ -110,6 +110,12 @@ abstract class DataHolderList<T: DataHolder>(
     }
 
     /**
+     * Retrieves whether all the children of this [DataHolderList] should have their [parentId]
+     * set to the [id] of the current object (their parent)
+     */
+    open fun shouldEnforceParentId(): Boolean = true
+
+    /**
      * Saves the current [DataHolderList] and its hierarchy until in reaches a [save] method
      * returning true
      */
@@ -127,16 +133,17 @@ abstract class DataHolderList<T: DataHolder>(
     @Suppress("UNCHECKED_CAST")
     private fun <K: DataHolder> saveRecursively(element: K, holderList: DataHolderList<K>): Boolean {
         if (element.id == null)
-            element.id = idAllocator?.allocate()
-        else if (idAllocator?.isAllocated(element.id!!) == false) {
-            val allocated = idAllocator?.forceAllocate(element.id!!)
+            element.id = holderList.idAllocator?.allocate()
+        else if (holderList.idAllocator?.isAllocated(element.id!!) == false) {
+            val allocated = holderList.idAllocator?.forceAllocate(element.id!!)
             if (allocated != element.id!!) holderList.delete(element, element.id!!)
             element.id = allocated
         }
-        element.parentId = holderList.id
+        if (holderList.shouldEnforceParentId() || element.parentId == null)
+            element.parentId = holderList.id
         element.noteManager = noteManager
         if (element is DataHolderList<*>) {
-            element.idAllocator = idAllocator
+            element.idAllocator = holderList.idAllocator
             element.getContents().forEach { saveRecursively(it, element as DataHolderList<DataHolder>) }
         }
 
@@ -168,6 +175,7 @@ abstract class DataHolderList<T: DataHolder>(
             val oldId = element.id!!
             idAllocator?.release(element.id!!)
             element.id = null
+            element.parentId = null
             if (shouldDeleteRecursively && element is DataHolderList<*>)
                 element.clear()
             return this.delete(element, oldId)
