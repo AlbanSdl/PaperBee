@@ -43,7 +43,14 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
-        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(TitleChangeWatcher())
+        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                notable.title = s.toString()
+                notable.save()
+            }
+        })
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
@@ -83,8 +90,8 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         when (v.id) {
             R.id.add_text_element -> notable.add(NoteText(""))
             R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false))
-            R.id.moveIn -> this.focusedNote?.attachToPart(this.focusedNote!!.getAbove())
-            R.id.moveOut -> this.focusedNote?.attachToPart(this.focusedNote!!.getParentPart()!!.getMixedParent()!!)
+            R.id.moveIn -> this.focusedNote?.moveIn()
+            R.id.moveOut -> this.focusedNote?.moveOut()
         }
     }
 
@@ -119,6 +126,8 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
             return R.layout.note_part_editor_layout
         }
 
+        override fun onMoved(content: NotePart) = content.updateParentId()
+
         override fun onSwipeRight(context: Context, content: NotePart) {
             this.getDataHolder().remove(content)
             Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
@@ -142,15 +151,6 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
     override fun getTintBackgroundView(fragmentRoot: View): View? {
         return fragmentRoot.findViewById(R.id.transitionBackground)
-    }
-
-    private inner class TitleChangeWatcher : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable?) {
-            notable.title = s.toString()
-            notable.save()
-        }
     }
 
 }

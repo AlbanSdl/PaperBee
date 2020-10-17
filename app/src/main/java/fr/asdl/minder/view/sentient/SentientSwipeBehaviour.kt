@@ -20,19 +20,25 @@ import kotlin.math.min
 class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: SentientRecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, swipeDir or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
+    @Suppress("UNCHECKED_CAST")
+    private fun getAdapter(): SentientRecyclerViewAdapter<DataHolder>? {
+        return sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder>
+    }
+
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        val adapter = this.getAdapter()
+        adapter?.onMoved(adapter.getData(viewHolder.adapterPosition)!!)
         (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        val recycler = (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder>)
-        val viewHolderAttached = recycler?.getData(viewHolder.adapterPosition)
+        val adapter = this.getAdapter()
+        val viewHolderAttached = adapter?.getData(viewHolder.adapterPosition)
         if (direction == ItemTouchHelper.RIGHT && viewHolderAttached != null)
-            recycler.onSwipeRight(viewHolder.itemView.context, viewHolderAttached)
+            adapter.onSwipeRight(viewHolder.itemView.context, viewHolderAttached)
         if (direction == ItemTouchHelper.LEFT && viewHolderAttached != null)
-            recycler.onSwipeLeft(viewHolder.itemView.context, viewHolderAttached)
+            adapter.onSwipeLeft(viewHolder.itemView.context, viewHolderAttached)
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,

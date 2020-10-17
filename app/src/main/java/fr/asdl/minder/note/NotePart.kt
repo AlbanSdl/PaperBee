@@ -16,18 +16,22 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
                       @Transient override var noteManager: NoteManager? = null) : DataHolder {
 
     override fun getParent(): DataHolderList<*>? = this.getMixedParent() as? DataHolderList<*>
-    fun getMixedParent(): DataHolder? = noteManager?.findElementById(this.parentId)
+    private fun getMixedParent(): DataHolder? = noteManager?.findElementById(this.parentId)
+
+    /**
+     * Returns whether the [NotePart] with id [partId] is a parent of the current note.
+     */
+    private fun hasParent(partId: Int): Boolean {
+        if (this.parentId == partId) return true
+        return this.getParentPart()?.hasParent(partId) ?: false
+    }
 
     /**
      * Returns whether the NotePart has elements above it in the same note.
      */
     fun hasAbove(): Boolean {
-        return try {
-            val above = this.getAbove()
-            above.id != this.parentId
-        } catch (ex: NotePartAttachmentException) {
-            false
-        }
+        val id = this.getAbove()?.id
+        return id != null && id != this.parentId
     }
 
     /**
@@ -49,13 +53,64 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
     }
 
     /**
+     * Moves the NotePart in the NotePart above
+     * @throws NotePartAttachmentException if the operation cannot succeed (eg. if there is no
+     * note above or if the current NotePart is not in a note)
+     */
+    fun moveIn() {
+        this.attachToPart(this.getAbove() ?: throw NotePartAttachmentException(this, this, NotePartAttachmentException.Reason.NO_NOTE_ABOVE))
+    }
+
+    /**
+     * Moves the NotePart out of its parent if there is one (it will not be removed from the note,
+     * even if the only parent is the note)
+     * @throws NotePartAttachmentException if the operation cannot succeed (eg. if there is no
+     * parent (as a NotePart) or if the current NotePart is not in a note)
+     */
+    fun moveOut() {
+        val previousParent = this.getParentPart()!!
+        this.attachToPart(previousParent.getMixedParent()!!)
+        // We move the current NotePart after its old parent group
+        val note = getNote()!!
+        var moveTo = this.order
+        for (i in this.order + 1 until note.getContents().size) {
+            if (!note.getContents()[i].hasParent(previousParent.id!!))
+                break
+            moveTo++
+        }
+        note.move(this.order, moveTo)
+    }
+
+    /**
+     * Computes the parent of the current [NotePart] depending on the elements above and below.
+     * Indents the part depending on their lowest indentation.
+     */
+    fun updateParentId() {
+        val above = this.getAbove()
+        val below = this.getBelow()
+        val aDepth = above?.getDepth()
+        val bDepth = below?.getDepth()
+        this.parentId = if (aDepth != null && bDepth != null) {
+            // use lowest depth as a parent
+            if (aDepth > bDepth) below.parentId!! else above.parentId!!
+        } else if (aDepth != null || bDepth != null) {
+            // find the one which is not null and use the same parent
+            if (aDepth != null) above.parentId!! else below!!.parentId!!
+        } else {
+            // use note as parent
+            getNote()?.id ?: throw NotePartAttachmentException(this, this,
+                NotePartAttachmentException.Reason.NOT_IN_NOTE)
+        }
+    }
+
+    /**
      * Attaches the current note to the given NotePart. This can be only be done if the NoteParts
      * have BOTH been attached to the same Note.
      * @param notePart the [NotePart] which will be the parent of the current one.
      * @throws NotePartAttachmentException if the two NoteParts are not in the same Note or
      * if there are other items between them which are not belonging to the chosen notePart
      */
-    fun attachToPart(notePart: DataHolder) {
+    private fun attachToPart(notePart: DataHolder) {
         if (this.parentId == notePart.id) return
         val note = this.getNote()
         if (note != null) {
@@ -79,16 +134,21 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
     }
 
     /**
-     * Retrieves the note part above the current one.
-     * @throws NotePartAttachmentException if the note part is not attached to any note or
-     * if there is no note above.
+     * Retrieves the note part above the current one. Can be null
      */
-    fun getAbove(): NotePart {
-        val note = getNote() ?: throw NotePartAttachmentException(this, this,
-            NotePartAttachmentException.Reason.NO_NOTE_ABOVE)
-        if (note.getContents().size <= this.order || this.order <= 0) throw NotePartAttachmentException(this, this,
-            NotePartAttachmentException.Reason.NO_NOTE_ABOVE)
+    private fun getAbove(): NotePart? {
+        val note = getNote() ?: return null
+        if (note.getContents().size <= this.order || this.order <= 0) return null
         return note.getContents()[this.order - 1]
+    }
+
+    /**
+     * Retrieves the note part below the current one. Can be null
+     */
+    private fun getBelow(): NotePart? {
+        val note = getNote() ?: return null
+        if (note.getContents().size <= this.order + 1 || this.order < 0) return null
+        return note.getContents()[this.order + 1]
     }
 
     fun getParentPart(): NotePart? = this.getMixedParent() as? NotePart

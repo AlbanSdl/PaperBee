@@ -120,4 +120,9 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
      */
     open fun onSwipeRight(context: Context, content: T) {}
 
+    /**
+     * Called when a [ViewHolder] attached to the [content] has been moved in the [RecyclerView]
+     * @param content the [DataHolder] corresponding to the moved view
+     */
+    open fun onMoved(content: T) {}
 }
