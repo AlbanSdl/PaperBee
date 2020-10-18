@@ -135,4 +135,11 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * @return whether the decorations should be invalidated
      */
     open fun onMoved(content: T): Boolean = false
+
+    /**
+     * Called when a [ViewHolder] attached to the [content] is being dragged or stops its movement.
+     * @param content the element attached to the [ViewHolder]. Null if the element stops from being
+     * dragged.
+     */
+    open fun onMoveChange(content: T?) {}
 }

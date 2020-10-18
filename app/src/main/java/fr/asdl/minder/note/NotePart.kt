@@ -73,8 +73,8 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
         // We move the current NotePart after its old parent group
         val note = getNote()!!
         var moveTo = this.order
-        for (i in this.order + 1 until note.getContents().size) {
-            if (!note.getContents()[i].hasParent(previousParent.id!!))
+        for (i in this.order + 1 until note.getRawContents().size) {
+            if (!note.getRawContents()[i].hasParent(previousParent.id!!))
                 break
             moveTo++
         }
@@ -159,8 +159,8 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
 
     fun getParentPart(): NotePart? = this.getMixedParent() as? NotePart
 
-    private fun getChildren(): List<NotePart> {
-        return this.getNote()?.getContents()?.filter { it.parentId == this.id } ?: listOf()
+    fun getChildren(): List<NotePart> {
+        return this.getNote()?.getRawContents()?.filter { it.parentId == this.id } ?: listOf()
     }
 
 }

@@ -21,30 +21,40 @@ class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: Se
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, swipeDir or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
     @Suppress("UNCHECKED_CAST")
-    private fun getAdapter(): SentientRecyclerViewAdapter<DataHolder, *>? {
-        return sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder, *>
+    private fun asAdapter(action: (SentientRecyclerViewAdapter<DataHolder, *>) -> Unit) {
+        val adapter = sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder, *>
+        if (adapter != null) action.invoke(adapter)
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        this.getAdapter()?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
+        this.asAdapter { it.getDataHolder().move(viewHolder.adapterPosition, target.adapterPosition) }
         return true
     }
 
     override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
                          fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
-        val adapter = this.getAdapter()
-        if (adapter?.onMoved(adapter.getData(viewHolder.adapterPosition)!!) == true)
-            recyclerView.invalidateItemDecorations()
+        this.asAdapter {
+            if (it.onMoved(it.getData(viewHolder.adapterPosition)!!))
+                recyclerView.invalidateItemDecorations()
+        }
         super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
     }
 
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        this.asAdapter {
+            it.onMoveChange(if (viewHolder != null) it.getData(viewHolder.adapterPosition) else null)
+        }
+        super.onSelectedChanged(viewHolder, actionState)
+    }
+
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        val adapter = this.getAdapter()
-        val viewHolderAttached = adapter?.getData(viewHolder.adapterPosition)
-        if (direction == ItemTouchHelper.RIGHT && viewHolderAttached != null)
-            adapter.onSwipeRight(viewHolder.itemView.context, viewHolderAttached)
-        if (direction == ItemTouchHelper.LEFT && viewHolderAttached != null)
-            adapter.onSwipeLeft(viewHolder.itemView.context, viewHolderAttached)
+        this.asAdapter {
+            val viewHolderAttached = it.getData(viewHolder.adapterPosition)
+            if (direction == ItemTouchHelper.RIGHT && viewHolderAttached != null)
+                it.onSwipeRight(viewHolder.itemView.context, viewHolderAttached)
+            if (direction == ItemTouchHelper.LEFT && viewHolderAttached != null)
+                it.onSwipeLeft(viewHolder.itemView.context, viewHolderAttached)
+        }
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,

@@ -109,6 +109,8 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
     private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
 
+        private var currentlyMoving: NotePart? = null
+
         override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
             super.onBindViewHolder(holder, content)
             if (content is TextNotePart) {
@@ -133,6 +135,12 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         }
 
         override fun onMoved(content: NotePart): Boolean = content.updateParentId()
+
+        override fun onMoveChange(content: NotePart?) {
+            this@EditorFragment.notable.expand(this.currentlyMoving)
+            this.currentlyMoving = content
+            this@EditorFragment.notable.collapse(this.currentlyMoving)
+        }
 
         override fun onSwipeRight(context: Context, content: NotePart) {
             this.getDataHolder().remove(content)

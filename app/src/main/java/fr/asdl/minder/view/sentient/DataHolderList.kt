@@ -79,7 +79,7 @@ abstract class DataHolderList<T: DataHolder>(
      *
      * @return the contents of the set
      */
-    fun getContents(): List<T> = this.contents
+    open fun getContents(): List<T> = this.contents
 
     /**
      * Retrieves the parent of this [DataHolderList] by calling [findElementById] on the
@@ -123,6 +123,11 @@ abstract class DataHolderList<T: DataHolder>(
         if ((if (this.id == null) this.getParent()?.add(this) else this.getParent()?.update(this, this.shouldNotify())) == false)
             this.getParent()!!.save()
     }
+
+    /**
+     * Retrieves the order of the given element in the [DataHolderList]
+     */
+    fun getOrder(element: T): Int = this.getContents().indexOf(element)
 
     /**
      * Allocates ids and saves data for every sub elements of the element to save.
@@ -374,7 +379,7 @@ abstract class DataHolderList<T: DataHolder>(
      * @param position the index of the beginning of the modification
      * @param toPosition the index of the end of the modification (included)
      */
-    private fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
+    protected fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
         if (shouldNotify()) this.listeners[actionType]?.invoke(position, toPosition)
     }
 

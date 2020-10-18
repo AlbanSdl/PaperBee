@@ -34,7 +34,7 @@ class NoteSerializer : KSerializer<Notable<*>> {
                     "title" -> this.encodeStringElement(descriptor, i, value.title)
                     "id" -> if (value.id != null) this.encodeIntElement(descriptor, i, value.id!!)
                     "order" -> this.encodeIntElement(descriptor, i, value.order)
-                    "items" -> if (value is Note) this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getContents())
+                    "items" -> if (value is Note) this.encodeSerializableElement(descriptor, i, ListSerializer(NotePart::class.serializer()), value.getRawContents())
                     "parentId" -> if (value.parentId != null) this.encodeIntElement(descriptor, i, value.parentId!!)
                     "color" -> if (value.color != null) this.encodeStringElement(descriptor, i, value.color!!.tag)
                 }
