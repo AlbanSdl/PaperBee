@@ -33,6 +33,12 @@ abstract class DataHolderList<T: DataHolder>(
     private val listeners: HashMap<ModificationType, (Int, Int?) -> Unit> = HashMap()
 
     /**
+     * The list of all the ids of hidden elements of the [DataHolderList]
+     */
+    @Transient
+    private val filters = arrayListOf<Int>()
+
+    /**
      * Retrieves the raw content of the data set.
      * It means that the [LinkedList] that stores data mush be returned AS IS.
      * Indeed the returned [LinkedList] will be modified by the [DataHolderList]
@@ -76,10 +82,18 @@ abstract class DataHolderList<T: DataHolder>(
 
     /**
      * Retrieves a [List] with all the [DataHolder]s contained in this [DataHolderList].
+     * The hidden/filtered [DataHolder]s will also appear in this list.
      *
      * @return the contents of the set
      */
-    open fun getContents(): List<T> = this.contents
+    fun getRawContents(): List<T> = this.contents
+
+    /**
+     * Retrieves a [List] with all the visible [DataHolder]s contained in this [DataHolderList].
+     *
+     * @return the contents of the set
+     */
+    fun getContents(): List<T> = this.getRawContents().filter { it.id !in this.filters }
 
     /**
      * Retrieves the parent of this [DataHolderList] by calling [findElementById] on the
@@ -125,9 +139,25 @@ abstract class DataHolderList<T: DataHolder>(
     }
 
     /**
+     * Retrieves the real order of the given element in the [DataHolderList]
+     */
+    private fun getRawOrder(element: T): Int = this.getRawContents().indexOf(element)
+
+    /**
      * Retrieves the order of the given element in the [DataHolderList]
      */
-    fun getOrder(element: T): Int = this.getContents().indexOf(element)
+    private fun getOrder(element: T): Int = this.getContents().indexOf(element)
+
+    /**
+     * Retrieves the raw position from the visible position (ie. given by an Adapter)
+     */
+    private fun getRawPosition(visiblePosition: Int): Int {
+        return if (visiblePosition < this.getContents().size && visiblePosition >= 0)
+            if (visiblePosition > 0)
+                this.getRawOrder(this.getContents()[visiblePosition - 1]) + 1
+            else 0
+        else this.getContents().size - 1
+    }
 
     /**
      * Allocates ids and saves data for every sub elements of the element to save.
@@ -193,20 +223,19 @@ abstract class DataHolderList<T: DataHolder>(
      * any deletion.
      *
      * @param cnt the [DataHolder] to insert in the set
-     * @param position the index (0 based) to insert the [cnt] to.
+     * @param position the raw index to insert the [cnt] to.
      * @return whether data has been persistently saved
      */
     private fun add(cnt: T, position: Int): Boolean {
         if (position >= this.contents.size) {
             cnt.order = this.contents.size
             this.contents.add(cnt)
-            this.onChange(ModificationType.ADDITION, this.contents.size - 1, null)
         } else {
             cnt.order = position
             this.reIndex(position, indexDiff = 1)
             this.contents.add(position, cnt)
-            this.onChange(ModificationType.ADDITION, position, null)
         }
+        this.onChange(ModificationType.ADDITION, this.getOrder(cnt), null)
         return this.allocateAndSave(cnt)
     }
 
@@ -222,7 +251,7 @@ abstract class DataHolderList<T: DataHolder>(
         cnt.order = this.contents.size
         this.contents.add(cnt)
         val returnValue = this.allocateAndSave(cnt)
-        this.onChange(ModificationType.ADDITION, this.contents.size - 1, null)
+        this.onChange(ModificationType.ADDITION, this.getContents().size - 1, null)
         return returnValue
     }
 
@@ -230,7 +259,7 @@ abstract class DataHolderList<T: DataHolder>(
      * Updates a [DataHolder] contained in the data set.
      * The update will only be performed if the [position] is not out of bounds of the set.
      *
-     * @param position the index of the [DataHolder] in the set
+     * @param position the raw index of the [DataHolder] in the set
      * @param lambda use this lambda to apply changes to the [DataHolder]
      * @return whether data has been persistently saved
      */
@@ -258,7 +287,7 @@ abstract class DataHolderList<T: DataHolder>(
      * @return whether data has been persistently saved
      */
     fun update(cnt: T, executeListener: Boolean = true): Boolean {
-        val index = this.contents.indexOf(cnt)
+        val index = this.getOrder(cnt)
         if (index >= 0) {
             val r = this.allocateAndSave(cnt)
             if (executeListener)
@@ -289,9 +318,9 @@ abstract class DataHolderList<T: DataHolder>(
      */
     fun remove(cnt: T?, recursive: Boolean = true): Boolean {
         if (cnt == null) return false
-        val index = this.contents.indexOf(cnt)
+        val index = this.getOrder(cnt)
         if (this.contents.remove(cnt) && index >= 0) {
-            this.reIndex(index, indexDiff = -1)
+            this.reIndex(this.getRawOrder(cnt), indexDiff = -1)
             val r = this.releaseAndDelete(cnt, recursive)
             this.onChange(ModificationType.REMOVAL, index, null)
             return r
@@ -303,13 +332,14 @@ abstract class DataHolderList<T: DataHolder>(
      * Removes the [DataHolder] from the set at the given position.
      * If position is out of bound, nothing happens.
      *
-     * @param index the index (0 based) where to removed the [DataHolder] from the set.
+     * @param index the index where to remove the [DataHolder] from the set.
      * @return whether data has been persistently saved
      */
     fun remove(index: Int): Boolean {
-        if (this.contents.size > index && index >= 0) {
-            this.reIndex(index + 1, indexDiff = -1)
-            val r = this.releaseAndDelete(this.contents.removeAt(index))
+        if (this.getContents().size > index && index >= 0) {
+            val realIndex = this.getRawPosition(index)
+            this.reIndex(realIndex + 1, indexDiff = -1)
+            val r = this.releaseAndDelete(this.contents.removeAt(realIndex))
             this.onChange(ModificationType.REMOVAL, index, null)
             return r
         }
@@ -326,16 +356,18 @@ abstract class DataHolderList<T: DataHolder>(
      * @return whether data has been persistently saved
      */
     fun move(fromPos: Int, toPos: Int): Boolean {
-        if (fromPos < this.contents.size && fromPos >= 0 && fromPos != toPos) {
-            val realDestination = if (toPos < this.contents.size && toPos >= 0) toPos else (this.contents.size - 1)
-            val elem = this.contents.removeAt(fromPos)
+        if (fromPos < this.getContents().size && fromPos >= 0 && fromPos != toPos) {
+            val realDestination = this.getRawPosition(toPos)
+            val realFromPos = this.getRawPosition(fromPos)
+            val elem = this.getContents()[fromPos]
+            this.contents.remove(elem)
             elem.order = realDestination
             this.contents.add(realDestination, elem)
-            if (fromPos < realDestination)
-                this.reIndex(fromPos, realDestination - 1, -1)
-            else this.reIndex(realDestination + 1, fromPos, 1)
+            if (realFromPos < realDestination)
+                this.reIndex(realFromPos, realDestination - 1, -1)
+            else this.reIndex(realDestination + 1, realFromPos, 1)
             val r = this.allocateAndSave(elem)
-            this.onChange(ModificationType.MOVED, fromPos, realDestination)
+            this.onChange(ModificationType.MOVED, fromPos, toPos)
             return r
         }
         return false
@@ -358,9 +390,9 @@ abstract class DataHolderList<T: DataHolder>(
 
     /**
      * This method re-indexes [DataHolder] contained in the [DataHolderList] between to indexes
-     *
-     * @param fromPos the index to re-index from
-     * @param toPos the index to re-index to (inclusive)
+     * Move information on raw indexes: [getRawContents], [getRawOrder]
+     * @param fromPos the raw index to re-index from
+     * @param toPos the raw index to re-index to (inclusive)
      * @param indexDiff position change (basically +1 or -1)
      */
     private fun reIndex(fromPos: Int, toPos: Int = this.contents.size - 1, indexDiff: Int) {
@@ -379,7 +411,7 @@ abstract class DataHolderList<T: DataHolder>(
      * @param position the index of the beginning of the modification
      * @param toPosition the index of the end of the modification (included)
      */
-    protected fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
+    private fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
         if (shouldNotify()) this.listeners[actionType]?.invoke(position, toPosition)
     }
 
@@ -392,5 +424,26 @@ abstract class DataHolderList<T: DataHolder>(
      */
     fun on(actionType: ModificationType, lambda: (changePosition: Int, otherPosition: Int?) -> Unit) {
         this.listeners[actionType] = lambda
+    }
+
+    /**
+     * Hides the chosen element from the current [DataHolderList]
+     */
+    fun hide(content: T) {
+        if (content in this.getContents()) {
+            this.onChange(ModificationType.REMOVAL, this.getOrder(content), null)
+            this.filters.add(content.id!!)
+        }
+    }
+
+    /**
+     * Shows back the chosen element from the current [DataHolderList] after it has been hidden
+     * with [hide]
+     */
+    fun show(content: T) {
+        if (content.id!! in this.filters) {
+            this.filters.remove(content.id!!)
+            this.onChange(ModificationType.ADDITION, this.getOrder(content), null)
+        }
     }
 }
