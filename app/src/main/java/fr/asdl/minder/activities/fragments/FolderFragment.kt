@@ -14,7 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.Note
-import fr.asdl.minder.note.NoteAdapter
+import fr.asdl.minder.note.bindings.NoteAdapter
 import fr.asdl.minder.note.NoteFolder
 import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID

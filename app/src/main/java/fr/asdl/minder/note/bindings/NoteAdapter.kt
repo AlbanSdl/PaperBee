@@ -1,26 +1,21 @@
-package fr.asdl.minder.note
+package fr.asdl.minder.note.bindings
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Rect
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
-import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
+import fr.asdl.minder.note.*
 import fr.asdl.minder.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
-import fr.asdl.minder.view.tree.TreeNode
 import fr.asdl.minder.view.tree.TreeView
 
 class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(folder) {
@@ -41,7 +36,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         if (content.getContents().isNotEmpty() && content is Note) {
             rec.visibility = View.VISIBLE
             rec.addItemDecoration(NotePartDecoration())
-            rec.adapter = NotePartAdapterInList(content, holder.findViewById(R.id.note_element) as View)
+            rec.adapter = NotePartAdapterStatic(content, holder.findViewById(R.id.note_element) as View)
             rec.addTouchDelegation()
         } else {
             rec.visibility = View.GONE
@@ -70,60 +65,6 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
             if (view != null)
                 ViewCompat.setTransitionName(view, "${ViewCompat.getTransitionName(view)}#${content.id}")
     }
-
-    abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
-
-        override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
-            // TextNoteParts
-            val textView = (holder.findViewById(R.id.note_text) as TextView)
-            if (content is TextNotePart) {
-                textView.text = content.content
-                textView.visibility = View.VISIBLE
-            }
-            else textView.visibility = View.GONE
-            // CheckableNotePart
-            val checkBox = (holder.findViewById(R.id.note_checkbox) as CheckBox)
-            if (content is CheckableNotePart) {
-                checkBox.isChecked = content.checked
-                checkBox.visibility = View.VISIBLE
-                if (this.note.parentId != TRASH_ID)
-                    checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
-                else
-                    checkBox.isEnabled = false
-            } else {
-                checkBox.visibility = View.GONE
-                checkBox.setOnClickListener(null)
-            }
-        }
-
-    }
-
-    inner class NotePartAdapterInList(note: Note, private val clickDelegateView: View? = null) : NotePartAdapter(note) {
-
-        @SuppressLint("ClickableViewAccessibility")
-        override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
-            super.onBindViewHolder(holder, content)
-            if (clickDelegateView != null) {
-                holder.itemView.setOnTouchListener { v, e ->
-                    val rect = Rect()
-                    val rect2 = Rect()
-                    v.getGlobalVisibleRect(rect)
-                    clickDelegateView.getGlobalVisibleRect(rect2)
-                    clickDelegateView.onTouchEvent(MotionEvent.obtain(e.downTime, e.eventTime, e.action,
-                        e.x + rect.left - rect2.left,
-                        e.y + rect.top - rect2.top,
-                        e.metaState))
-                    false
-                }
-                holder.itemView.isClickable = true
-            }
-        }
-
-        override fun getLayoutId(): Int {
-            return R.layout.note_part_layout
-        }
-
-    }
     
     @SuppressLint("InflateParams")
     override fun onSwipeLeft(context: Context, content: Notable<*>) {
@@ -135,7 +76,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
                 this@NoteAdapter.getDataHolder().update(content)
             }
         }.create()
-        val adapter = SwipeMoveDirectoryList(content) {
+        val adapter = DirectoryTree(content) {
             this@NoteAdapter.folder.remove(content, false)
             it.add(content)
             dialog.dismiss()
@@ -157,46 +98,6 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
                 setOnCancelListener { this@NoteAdapter.getDataHolder().update(content) }
             }.show()
         }
-    }
-
-    private class SwipeMoveDirectoryList(private val current: Notable<*>, private val listener: (NoteFolder) -> Unit, folder: NoteFolder) :
-        TreeNode<NoteFolder>(folder) {
-
-        constructor(current: Notable<*>, listener: (NoteFolder) -> Unit):
-                this(current, listener, current.noteManager!!.findElementById(ROOT_ID) as NoteFolder)
-
-        init {
-            this.t.getContents().filterIsInstance<NoteFolder>().forEach {
-                if (it != current) this.append(SwipeMoveDirectoryList(current, this.listener, it))
-            }
-        }
-
-        override fun getLayoutId(): Int {
-            return R.layout.directory_view
-        }
-
-        override fun onCreateView(view: View) {
-            val textView = view.findViewById<TextView>(R.id.directory_name)
-            textView.text = this.t.title
-            textView.setOnClickListener { listener.invoke(this@SwipeMoveDirectoryList.t) }
-        }
-
-        override fun allowExpand(): Boolean {
-            return true
-        }
-    }
-
-    /**
-     * Indents NoteParts depending on their depth
-     */
-    class NotePartDecoration : RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            with(outRect) {
-                left = (((parent.adapter as? SentientRecyclerViewAdapter<*>)?.getHeldItem(parent.findContainingViewHolder(view)!!.adapterPosition) as? NotePart)?.getDepth() ?: 0) * parent.context.resources.getDimension(R.dimen.padding_small).toInt()
-            }
-        }
-
     }
 
 }

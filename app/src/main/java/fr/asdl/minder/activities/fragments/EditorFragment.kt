@@ -1,7 +1,6 @@
 package fr.asdl.minder.activities.fragments
 
 import android.content.Context
-import android.graphics.Rect
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,11 +12,12 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.*
+import fr.asdl.minder.note.bindings.NotePartAdapter
+import fr.asdl.minder.note.bindings.NotePartDecoration
 import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.rounded.RoundedImageView
@@ -56,7 +56,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
-        rec.addItemDecoration(NoteAdapter.NotePartDecoration())
+        rec.addItemDecoration(NotePartDecoration())
         val adapter = NotePartEditorAdapter(notable)
         rec.adapter = adapter
         rec.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus ->
@@ -103,7 +103,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         notable.notify = false
     }
 
-    private inner class NotePartEditorAdapter(note: Note) : NoteAdapter.NotePartAdapter(note) {
+    private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter(note) {
 
         private var attachedTextWatcher: EditTextChangeWatcher? = null
         private var notePart: NotePart? = null
