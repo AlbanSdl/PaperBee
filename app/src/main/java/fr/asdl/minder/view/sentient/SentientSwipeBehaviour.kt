@@ -26,10 +26,16 @@ class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: Se
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        val adapter = this.getAdapter()
-        adapter?.onMoved(adapter.getData(viewHolder.adapterPosition)!!)
-        (sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<*>)?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
+        this.getAdapter()?.getDataHolder()?.move(viewHolder.adapterPosition, target.adapterPosition)
         return true
+    }
+
+    override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                         fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
+        val adapter = this.getAdapter()
+        if (adapter?.onMoved(adapter.getData(viewHolder.adapterPosition)!!) == true)
+            recyclerView.invalidateItemDecorations()
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

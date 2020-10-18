@@ -1,6 +1,7 @@
 package fr.asdl.minder.activities.fragments
 
 import android.content.Context
+import android.graphics.Rect
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
@@ -54,6 +56,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
 
         val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
         rec.visibility = View.VISIBLE
+        rec.addItemDecoration(NoteAdapter.NotePartDecoration())
         val adapter = NotePartEditorAdapter(notable)
         rec.adapter = adapter
         rec.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus ->
@@ -126,7 +129,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
             return R.layout.note_part_editor_layout
         }
 
-        override fun onMoved(content: NotePart) = content.updateParentId()
+        override fun onMoved(content: NotePart): Boolean = content.updateParentId()
 
         override fun onSwipeRight(context: Context, content: NotePart) {
             this.getDataHolder().remove(content)

@@ -85,14 +85,19 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
      * Computes the parent of the current [NotePart] depending on the elements above and below.
      * Indents the part depending on their lowest indentation.
      */
-    fun updateParentId() {
+    fun updateParentId(): Boolean {
         val above = this.getAbove()
         val below = this.getBelow()
         val aDepth = above?.getDepth()
         val bDepth = below?.getDepth()
         this.parentId = if (aDepth != null && bDepth != null) {
-            // use lowest depth as a parent
-            if (aDepth > bDepth) below.parentId!! else above.parentId!!
+            when {
+                // We're in a group
+                below.hasParent(above.id!!) -> above.id!!
+                // We choose the lowest depth
+                aDepth > bDepth -> below.parentId!!
+                else -> above.parentId!!
+            }
         } else if (aDepth != null || bDepth != null) {
             // find the one which is not null and use the same parent
             if (aDepth != null) above.parentId!! else below!!.parentId!!
@@ -101,6 +106,7 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
             getNote()?.id ?: throw NotePartAttachmentException(this, this,
                 NotePartAttachmentException.Reason.NOT_IN_NOTE)
         }
+        return true
     }
 
     /**

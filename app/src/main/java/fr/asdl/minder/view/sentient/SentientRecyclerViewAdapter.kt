@@ -123,6 +123,7 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     /**
      * Called when a [ViewHolder] attached to the [content] has been moved in the [RecyclerView]
      * @param content the [DataHolder] corresponding to the moved view
+     * @return whether the decorations should be invalidated
      */
-    open fun onMoved(content: T) {}
+    open fun onMoved(content: T): Boolean = false
 }

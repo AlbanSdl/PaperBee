@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
@@ -14,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.NoteManager.Companion.ROOT_ID
@@ -40,6 +40,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
         if (content.getContents().isNotEmpty() && content is Note) {
             rec.visibility = View.VISIBLE
+            rec.addItemDecoration(NotePartDecoration())
             rec.adapter = NotePartAdapterInList(content, holder.findViewById(R.id.note_element) as View)
             rec.addTouchDelegation()
         } else {
@@ -73,8 +74,6 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
     abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
 
         override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
-            (holder.itemView.layoutParams as ViewGroup.MarginLayoutParams).marginStart =
-                holder.itemView.context.resources.getDimension(R.dimen.padding_small).toInt() * content.getDepth()
             // TextNoteParts
             val textView = (holder.findViewById(R.id.note_text) as TextView)
             if (content is TextNotePart) {
@@ -185,6 +184,19 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         override fun allowExpand(): Boolean {
             return true
         }
+    }
+
+    /**
+     * Indents NoteParts depending on their depth
+     */
+    class NotePartDecoration : RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            with(outRect) {
+                left = (((parent.adapter as? SentientRecyclerViewAdapter<*>)?.getHeldItem(parent.findContainingViewHolder(view)!!.adapterPosition) as? NotePart)?.getDepth() ?: 0) * parent.context.resources.getDimension(R.dimen.padding_small).toInt()
+            }
+        }
+
     }
 
 }
