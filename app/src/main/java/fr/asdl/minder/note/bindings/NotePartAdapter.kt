@@ -8,9 +8,9 @@ import fr.asdl.minder.note.*
 import fr.asdl.minder.view.sentient.SentientRecyclerViewAdapter
 
 
-abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
+abstract class NotePartAdapter<K>(private val note: Note) : SentientRecyclerViewAdapter<NotePart, K>(note) {
 
-    override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
+    override fun onBindViewHolder(holder: ViewHolder<K>, content: NotePart) {
         // TextNoteParts
         val textView = (holder.findViewById(R.id.note_text) as TextView)
         if (content is TextNotePart) {

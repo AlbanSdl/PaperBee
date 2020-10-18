@@ -21,8 +21,8 @@ class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: Se
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, swipeDir or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
     @Suppress("UNCHECKED_CAST")
-    private fun getAdapter(): SentientRecyclerViewAdapter<DataHolder>? {
-        return sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder>
+    private fun getAdapter(): SentientRecyclerViewAdapter<DataHolder, *>? {
+        return sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder, *>
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {

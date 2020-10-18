@@ -103,26 +103,29 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         notable.notify = false
     }
 
-    private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter(note) {
+    override fun getTintBackgroundView(fragmentRoot: View): View? {
+        return fragmentRoot.findViewById(R.id.transitionBackground)
+    }
 
-        private var attachedTextWatcher: EditTextChangeWatcher? = null
-        private var notePart: NotePart? = null
+    private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
 
-        override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
+        override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
             super.onBindViewHolder(holder, content)
-            this.notePart = content
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? EditText)
-                if (this.attachedTextWatcher == null) {
-                    this.attachedTextWatcher = EditTextChangeWatcher()
-                    textView?.addTextChangedListener(this.attachedTextWatcher)
-                }
+                val watcher = EditTextChangeWatcher(content)
+                holder.attach(watcher)
+                textView?.addTextChangedListener(watcher)
                 textView?.setText(content.content)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
                 checkBox?.setOnClickListener { content.checked = checkBox.isChecked; notable.update(content, false) }
             }
+        }
+
+        override fun onViewRecycled(holder: ViewHolder<EditTextChangeWatcher>) {
+            (holder.findViewById(R.id.note_text) as? EditText)?.removeTextChangedListener(holder.getAttachedData())
         }
 
         override fun getLayoutId(): Int {
@@ -139,21 +142,17 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
                 }.show()
         }
 
-        private inner class EditTextChangeWatcher : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (notePart is TextNotePart && s != null) {
-                    (notePart as TextNotePart).content = s.toString()
-                    notable.update(notePart as NotePart, false)
-                }
-            }
-        }
-
     }
 
-    override fun getTintBackgroundView(fragmentRoot: View): View? {
-        return fragmentRoot.findViewById(R.id.transitionBackground)
+    private inner class EditTextChangeWatcher(private val notePart: NotePart) : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) {
+            if (notePart is TextNotePart && s != null) {
+                (notePart as TextNotePart).content = s.toString()
+                notable.update(notePart as NotePart, false)
+            }
+        }
     }
 
 }
