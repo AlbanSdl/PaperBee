@@ -42,7 +42,8 @@ class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: Se
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         this.asAdapter {
-            it.onMoveChange(if (viewHolder != null) it.getData(viewHolder.adapterPosition) else null)
+            if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+                it.onMoveChange(if (viewHolder != null) it.getData(viewHolder.adapterPosition) else null)
         }
         super.onSelectedChanged(viewHolder, actionState)
     }

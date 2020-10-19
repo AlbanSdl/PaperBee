@@ -208,7 +208,8 @@ abstract class DataHolderList<T: DataHolder>(
             val oldId = element.id!!
             idAllocator?.release(element.id!!)
             element.id = null
-            element.parentId = null
+            if (shouldEnforceParentId())
+                element.parentId = null
             if (shouldDeleteRecursively && element is DataHolderList<*>)
                 element.clear()
             return this.delete(element, oldId)
@@ -317,8 +318,9 @@ abstract class DataHolderList<T: DataHolder>(
     fun remove(cnt: T?, recursive: Boolean = true): Boolean {
         if (cnt == null) return false
         val index = this.getOrder(cnt)
+        val rawIndex = this.getRawOrder(cnt)
         if (this.contents.remove(cnt) && index >= 0) {
-            this.reIndex(this.getRawOrder(cnt), indexDiff = -1)
+            this.reIndex(rawIndex, indexDiff = -1)
             val r = this.releaseAndDelete(cnt, recursive)
             this.onChange(ModificationType.REMOVAL, index, null)
             return r

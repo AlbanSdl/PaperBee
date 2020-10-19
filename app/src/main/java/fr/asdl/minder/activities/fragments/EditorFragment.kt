@@ -146,10 +146,20 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         }
 
         override fun onSwipeRight(context: Context, content: NotePart) {
-            this.getDataHolder().remove(content)
+            this.currentlyMoving = null
+            this.currentlyMovingInitialOrder = null
+            val removed = arrayListOf<NotePart>()
+            fun removeRec(part: NotePart) {
+                part.getChildren().forEach { removeRec(it) }
+                removed.add(part)
+                this.getDataHolder().remove(part)
+            }
+            removeRec(content)
             Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
                 .setAction(R.string.restore) {
-                    this.getDataHolder().add(content)
+                    removed.reverse()
+                    removed.forEach { this.getDataHolder().add(it) }
+                    removed.clear()
                 }.show()
         }
 
