@@ -208,8 +208,7 @@ abstract class DataHolderList<T: DataHolder>(
             val oldId = element.id!!
             idAllocator?.release(element.id!!)
             element.id = null
-            if (shouldEnforceParentId())
-                element.parentId = null
+            element.parentId = null
             if (shouldDeleteRecursively && element is DataHolderList<*>)
                 element.clear()
             return this.delete(element, oldId)
@@ -230,9 +229,8 @@ abstract class DataHolderList<T: DataHolder>(
             cnt.order = this.contents.size
             this.contents.add(cnt)
         } else {
-            cnt.order = position
-            this.reIndex(position, indexDiff = 1)
             this.contents.add(position, cnt)
+            this.reIndex(position)
         }
         this.onChange(ModificationType.ADDITION, this.getOrder(cnt), null)
         return this.allocateAndSave(cnt)
@@ -320,8 +318,8 @@ abstract class DataHolderList<T: DataHolder>(
         val index = this.getOrder(cnt)
         val rawIndex = this.getRawOrder(cnt)
         if (this.contents.remove(cnt) && index >= 0) {
-            this.reIndex(rawIndex, indexDiff = -1)
             val r = this.releaseAndDelete(cnt, recursive)
+            this.reIndex(rawIndex)
             this.onChange(ModificationType.REMOVAL, index, null)
             return r
         }
@@ -338,8 +336,8 @@ abstract class DataHolderList<T: DataHolder>(
     fun remove(index: Int): Boolean {
         if (this.getContents().size > index && index >= 0) {
             val realIndex = this.getRawPosition(index)
-            this.reIndex(realIndex + 1, indexDiff = -1)
             val r = this.releaseAndDelete(this.contents.removeAt(realIndex))
+            this.reIndex(realIndex)
             this.onChange(ModificationType.REMOVAL, index, null)
             return r
         }
@@ -364,8 +362,8 @@ abstract class DataHolderList<T: DataHolder>(
             elem.order = realDestination
             this.contents.add(realDestination, elem)
             if (realFromPos < realDestination)
-                this.reIndex(realFromPos, realDestination - 1, -1)
-            else this.reIndex(realDestination + 1, realFromPos, 1)
+                this.reIndex(realFromPos, realDestination - 1)
+            else this.reIndex(realDestination + 1, realFromPos)
             val r = this.allocateAndSave(elem)
             this.onChange(ModificationType.MOVED, fromPos, toPos)
             return r
@@ -393,13 +391,12 @@ abstract class DataHolderList<T: DataHolder>(
      * Move information on raw indexes: [getRawContents], [getRawOrder]
      * @param fromPos the raw index to re-index from
      * @param toPos the raw index to re-index to (inclusive)
-     * @param indexDiff position change (basically +1 or -1)
      */
-    private fun reIndex(fromPos: Int, toPos: Int = this.contents.size - 1, indexDiff: Int) {
+    private fun reIndex(fromPos: Int, toPos: Int = this.contents.size - 1) {
         val max = this.contents.size - 1
         for (i in fromPos..toPos) {
             if (i > max) break
-            this.contents[i].order += indexDiff
+            this.contents[i].order = i
             this.allocateAndSave(this.contents[i])
         }
     }

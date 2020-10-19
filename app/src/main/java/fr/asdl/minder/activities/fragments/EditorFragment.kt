@@ -138,27 +138,28 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         override fun onMoved(content: NotePart): Boolean = content.updateParentId()
 
         override fun onMoveChange(content: NotePart?) {
-            this@EditorFragment.notable.expand(this.currentlyMoving, if (this.currentlyMoving != null)
-                currentlyMoving!!.order - currentlyMovingInitialOrder!! else null)
+            this@EditorFragment.notable.expand(this.currentlyMoving)
+            if (this.currentlyMoving != null)
+                this@EditorFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder!!)
             this.currentlyMoving = content
-            this.currentlyMovingInitialOrder = content?.order
+            this.currentlyMovingInitialOrder = if (content != null) notable.getOrder(content) else null
             this@EditorFragment.notable.collapse(this.currentlyMoving)
         }
 
         override fun onSwipeRight(context: Context, content: NotePart) {
-            this.currentlyMoving = null
-            this.currentlyMovingInitialOrder = null
-            val removed = arrayListOf<NotePart>()
+            data class PartHierarchy(val target: NotePart, val parent: NotePart?)
+            val removed = arrayListOf<PartHierarchy>()
             fun removeRec(part: NotePart) {
                 part.getChildren().forEach { removeRec(it) }
-                removed.add(part)
+                removed.add(PartHierarchy(part, part.getParentPart()))
                 this.getDataHolder().remove(part)
             }
             removeRec(content)
             Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
                 .setAction(R.string.restore) {
                     removed.reverse()
-                    removed.forEach { this.getDataHolder().add(it) }
+                    removed.forEach { this.getDataHolder().add(it.target) }
+                    removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id }
                     removed.clear()
                 }.show()
         }

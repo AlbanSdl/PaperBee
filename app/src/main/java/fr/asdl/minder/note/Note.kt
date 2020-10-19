@@ -29,15 +29,25 @@ class Note(title: String,
     /**
      * Shows all the sub-elements contained in a NotePart
      */
-    fun expand(notePart: NotePart?, movingChildrenOf: Int? = null) {
+    fun expand(notePart: NotePart?) {
         if (notePart == null) return
         notePart.getChildren().forEach {
             this.show(it)
-            if (it != notePart && movingChildrenOf != null) {
-                val order = this.getOrder(it)
-                this.move(order, order + movingChildrenOf)
-            }
             this.expand(it)
+        }
+    }
+
+    /**
+     * Moves a part and all its children.
+     * Use this method after [expand] or ensure all children are visible (you can call [expand]
+     * before in order to assert that)
+     */
+    fun movePart(notePart: NotePart?, of: Int) {
+        if (notePart == null) return
+        notePart.getChildren().forEach {
+            val order = this.getOrder(it)
+            this.move(order, order + of)
+            movePart(it, of)
         }
     }
 
