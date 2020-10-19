@@ -110,6 +110,7 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
     private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
 
         private var currentlyMoving: NotePart? = null
+        private var currentlyMovingInitialOrder: Int? = null
 
         override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
             super.onBindViewHolder(holder, content)
@@ -137,8 +138,10 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         override fun onMoved(content: NotePart): Boolean = content.updateParentId()
 
         override fun onMoveChange(content: NotePart?) {
-            this@EditorFragment.notable.expand(this.currentlyMoving)
+            this@EditorFragment.notable.expand(this.currentlyMoving, if (this.currentlyMoving != null)
+                currentlyMoving!!.order - currentlyMovingInitialOrder!! else null)
             this.currentlyMoving = content
+            this.currentlyMovingInitialOrder = content?.order
             this@EditorFragment.notable.collapse(this.currentlyMoving)
         }
 

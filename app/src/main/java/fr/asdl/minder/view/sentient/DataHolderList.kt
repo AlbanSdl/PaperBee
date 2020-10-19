@@ -146,17 +146,15 @@ abstract class DataHolderList<T: DataHolder>(
     /**
      * Retrieves the order of the given element in the [DataHolderList]
      */
-    private fun getOrder(element: T): Int = this.getContents().indexOf(element)
+    fun getOrder(element: T): Int = this.getContents().indexOf(element)
 
     /**
      * Retrieves the raw position from the visible position (ie. given by an Adapter)
      */
     private fun getRawPosition(visiblePosition: Int): Int {
-        return if (visiblePosition < this.getContents().size && visiblePosition >= 0)
-            if (visiblePosition > 0)
-                this.getRawOrder(this.getContents()[visiblePosition - 1]) + 1
-            else 0
-        else this.getContents().size - 1
+        return if (visiblePosition < this.getContents().size - 1 && visiblePosition >= 0)
+            this.getRawOrder(this.getContents()[visiblePosition + 1]) - 1
+        else this.getRawContents().size - 1
     }
 
     /**
