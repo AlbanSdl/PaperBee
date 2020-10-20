@@ -22,4 +22,8 @@ abstract class Notable<T : DataHolder>(
 
     override fun shouldNotify(): Boolean = notify
 
+    fun isChildOf(parentId: Int): Boolean {
+        if (this.id == parentId) return true
+        return (this.getParent() as? Notable<*>)?.isChildOf(parentId) == true
+    }
 }

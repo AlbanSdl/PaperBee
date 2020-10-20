@@ -18,6 +18,8 @@ class DirectoryTree(private val current: Notable<*>, private val listener: (Note
         this.t.getContents().filterIsInstance<NoteFolder>().forEach {
             if (it != current) this.append(DirectoryTree(current, this.listener, it))
         }
+        if (current.isChildOf(folder.id!!))
+            this.toggleExpansion()
     }
 
     override fun getLayoutId(): Int {
