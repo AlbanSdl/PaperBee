@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import androidx.fragment.app.Fragment
 import androidx.transition.TransitionInflater
 import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.R
-import fr.asdl.minder.activities.fragments.EditorFragment
+import fr.asdl.minder.activities.fragments.AppFragment
+import fr.asdl.minder.activities.fragments.NoteFragment
 import fr.asdl.minder.activities.fragments.FolderFragment
+import fr.asdl.minder.activities.fragments.LayoutFragment
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.Note
 import fr.asdl.minder.note.NoteFolder
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         if (supportFragmentManager.backStackEntryCount == 0) {
-            this.loadFragment(Fragment(R.layout.loading), null)
+            this.loadFragment(LayoutFragment(R.layout.loading), null)
             this.openNotable(noteManager, false)
         }
     }
@@ -41,15 +42,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(
-        if (notable is NoteFolder) FolderFragment().attach(notable) else EditorFragment().attach(notable as Note),
+        if (notable is NoteFolder) FolderFragment().attach(notable) else NoteFragment().attach(notable as Note),
         if (addToBackStack) notable.id.toString() else null,
         if (notable is NoteManager) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
         *sharedViews
     )
 
-    private fun loadFragment(frag: Fragment, addToBackStackTag: String?,
-                             transition: FragmentTransition? = null,
-                             vararg  sharedViews: View) {
+    private fun loadFragment(frag: AppFragment, addToBackStackTag: String?,
+                     transition: FragmentTransition? = null, vararg  sharedViews: View) {
 
         if (transition != null) {
             val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)

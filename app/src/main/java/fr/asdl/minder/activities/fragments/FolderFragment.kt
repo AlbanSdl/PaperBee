@@ -23,12 +23,12 @@ import fr.asdl.minder.view.options.Color
 import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
-class FolderFragment : MinderFragment<NoteFolder>(), View.OnClickListener {
+class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
 
     override lateinit var notable: NoteFolder
     override val layoutId: Int = R.layout.folder_content
 
-    override fun attach(notable: NoteFolder): MinderFragment<NoteFolder> {
+    override fun attach(notable: NoteFolder): NotableFragment<NoteFolder> {
         this.menuLayoutId = when {
             notable.id!! == TRASH_ID -> R.menu.trash_menu
             notable.id!! == ROOT_ID -> R.menu.root_menu

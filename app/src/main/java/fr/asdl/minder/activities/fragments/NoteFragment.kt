@@ -23,7 +23,7 @@ import fr.asdl.minder.view.options.ColorPicker
 import fr.asdl.minder.view.rounded.RoundedImageView
 import fr.asdl.minder.view.sentient.SentientRecyclerView
 
-class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
+class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
 
     override val layoutId: Int = R.layout.note_editor
     override lateinit var notable: Note
@@ -138,12 +138,12 @@ class EditorFragment : MinderFragment<Note>(), View.OnClickListener {
         override fun onMoved(content: NotePart): Boolean = content.updateParentId()
 
         override fun onMoveChange(content: NotePart?) {
-            this@EditorFragment.notable.expand(this.currentlyMoving)
+            this@NoteFragment.notable.expand(this.currentlyMoving)
             if (this.currentlyMoving != null)
-                this@EditorFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder!!)
+                this@NoteFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder!!)
             this.currentlyMoving = content
             this.currentlyMovingInitialOrder = if (content != null) notable.getOrder(content) else null
-            this@EditorFragment.notable.collapse(this.currentlyMoving)
+            this@NoteFragment.notable.collapse(this.currentlyMoving)
         }
 
         override fun onSwipeRight(context: Context, content: NotePart) {
