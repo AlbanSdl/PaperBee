@@ -13,7 +13,11 @@ class SplashScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startActivity(Intent(this, MainActivity::class.java))
+        val it = Intent(this, MainActivity::class.java)
+        // Handling shortcuts
+        if (intent.extras != null)
+            it.putExtras(intent.extras!!)
+        startActivity(it)
         finish()
     }
 

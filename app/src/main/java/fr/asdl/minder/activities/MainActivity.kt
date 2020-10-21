@@ -11,10 +11,7 @@ import fr.asdl.minder.activities.fragments.AppFragment
 import fr.asdl.minder.activities.fragments.NoteFragment
 import fr.asdl.minder.activities.fragments.FolderFragment
 import fr.asdl.minder.activities.fragments.LayoutFragment
-import fr.asdl.minder.note.Notable
-import fr.asdl.minder.note.Note
-import fr.asdl.minder.note.NoteFolder
-import fr.asdl.minder.note.NoteManager
+import fr.asdl.minder.note.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +26,13 @@ class MainActivity : AppCompatActivity() {
         if (supportFragmentManager.backStackEntryCount == 0) {
             this.loadFragment(LayoutFragment(R.layout.loading), null)
             this.openNotable(noteManager, false)
+            // Handling creation shortcut
+            if (intent.extras?.containsKey("create") == true) {
+                val note = Note("", noteManager, idAllocator = noteManager.idAllocator, parentId = noteManager.id)
+                noteManager.add(note)
+                note.add(NoteText(""))
+                this.openNotable(note)
+            }
         }
     }
 

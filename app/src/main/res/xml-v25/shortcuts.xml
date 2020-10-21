@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="createNote"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_note_add"
+        android:shortcutShortLabel="@string/shortcutCreateLabelShort"
+        android:shortcutLongLabel="@string/shortcutCreateLabelLong">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="fr.asdl.minder"
+            android:targetClass="fr.asdl.minder.activities.SplashScreen">
+            <extra android:name="create" android:value="true" />
+        </intent>
+    </shortcut>
+</shortcuts>
