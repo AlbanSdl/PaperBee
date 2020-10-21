@@ -1,7 +1,6 @@
 package fr.asdl.minder
 
 import fr.asdl.minder.exceptions.IntAllocationException
-import java.lang.Exception
 import kotlin.collections.ArrayList
 
 class IntAllocator(private val allocated: ArrayList<Int> = ArrayList()) {
