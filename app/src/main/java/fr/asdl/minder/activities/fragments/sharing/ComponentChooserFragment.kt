@@ -3,6 +3,7 @@ package fr.asdl.minder.activities.fragments.sharing
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.NO_ID
+import android.view.animation.AnimationUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import fr.asdl.minder.R
@@ -22,7 +23,14 @@ class ComponentChooserFragment : ShareBaseFragment() {
 
         fun updateNextButton() {
             val size = orig?.selection?.size ?: 0
-            next.isEnabled = size > 0
+            if (next.isEnabled != size > 0) {
+                next.animation = AnimationUtils.loadAnimation(
+                    this.context,
+                    if (next.isEnabled) R.anim.scale_out else R.anim.scale_in
+                )
+                next.isEnabled = size > 0
+                next.animate()
+            }
         }
 
         fun updateChip(notable: Notable<*>, addition: Boolean) {
