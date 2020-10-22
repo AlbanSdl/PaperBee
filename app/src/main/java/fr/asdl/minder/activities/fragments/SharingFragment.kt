@@ -9,8 +9,10 @@ import androidx.transition.TransitionInflater
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.activities.fragments.sharing.ComponentChooserFragment
+import fr.asdl.minder.activities.fragments.sharing.OptionsFragment
 import fr.asdl.minder.activities.fragments.sharing.ShareBaseFragment
 import fr.asdl.minder.note.Notable
+import fr.asdl.minder.note.Note
 
 class SharingFragment : AppFragment() {
 
@@ -19,17 +21,33 @@ class SharingFragment : AppFragment() {
     }
 
     override val layoutId: Int = R.layout.share_layout
+    val selection = arrayListOf<Notable<*>>()
 
     private lateinit var openedFrom: Notable<*>
 
     fun from(from: Notable<*>) {
         this.openedFrom = from
+        if (from.id!! >= 0) {
+            if (from is Note) selection.add(from)
+            else {
+                fun rec(nt: Notable<*>) {
+                    this.selection.add(nt)
+                    nt.getRawContents().filterIsInstance<Notable<*>>().forEach { rec(it) }
+                }
+                rec(from)
+            }
+        }
+    }
+
+    fun getOpenedFrom(): Notable<*>? {
+        if (openedFrom.id!! < 0) return null
+        return this.openedFrom
     }
 
     override fun onLayoutInflated(view: View) {
         val toolbar = view.findViewById<Toolbar>(R.id.share_toolbar)
         toolbar.setTitle(R.string.share)
-        this.displayFragment(ComponentChooserFragment(), null)
+        this.displayFragment(if (this.openedFrom is Note) OptionsFragment() else ComponentChooserFragment(), null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -52,7 +70,7 @@ class SharingFragment : AppFragment() {
 
     fun getNotableId(): Int = this.openedFrom.id!!
 
-    fun displayFragment(frag: ShareBaseFragment, addToBackStackTag: String?, vararg sharedViews: View) {
+    fun displayFragment(frag: ShareBaseFragment, addToBackStackTag: String?) {
 
         val transitionInflater = TransitionInflater.from(this.context)
         val currentFragment = activity!!.supportFragmentManager.findFragmentById(R.id.share_fragment_container)
@@ -64,7 +82,7 @@ class SharingFragment : AppFragment() {
         frag.enterTransition = transitionInflater.inflateTransition(R.transition.slide_right)
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
-        arrayOf(*sharedViews).forEach {
+        (currentFragment as? ShareBaseFragment)?.getSharedViews()?.forEach {
             val targetTransitionName = (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
             transaction.addSharedElement(it, targetTransitionName)
         }

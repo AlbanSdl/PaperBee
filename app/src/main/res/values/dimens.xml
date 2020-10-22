@@ -10,7 +10,9 @@
     <dimen name="note_fading_edge_length">30dp</dimen>
     <dimen name="note_content_size">14sp</dimen>
     <dimen name="appBarTextSize">20sp</dimen>
+    <dimen name="smallText">14sp</dimen>
     <dimen name="fab_mini_size">40dp</dimen>
     <dimen name="fab_mini_margin">14dp</dimen>
     <dimen name="large">40dp</dimen>
+    <dimen name="chipGroupMaxHeight">80dp</dimen>
 </resources>

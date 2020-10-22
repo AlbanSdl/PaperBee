@@ -1,5 +1,6 @@
 package fr.asdl.minder.activities.fragments.sharing
 
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
 import fr.asdl.minder.R
@@ -40,5 +41,7 @@ abstract class ShareBaseFragment : AppFragment() {
         }
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
     }
+
+    open fun getSharedViews(): List<View> = listOf()
 
 }

@@ -5,13 +5,38 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/share_selector_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chooser"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/share_select"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/share_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="@dimen/chipGroupMaxHeight"
+        app:layout_constraintTop_toBottomOf="@id/share_selector_title">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/share_selection_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/padding_medium"
+            app:chipSpacingVertical="@dimen/padding_small"
+            app:itemSpacing="@dimen/padding_tiny" />
+
+    </ScrollView>
+
+    <fr.asdl.minder.view.tree.TreeView
+        android:id="@+id/share_selector_tree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padding_small"
+        android:paddingTop="@dimen/padding_medium"
+        app:layout_constraintTop_toBottomOf="@+id/share_selection" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/next"

@@ -60,4 +60,5 @@
     <string name="shortcutCreateLabelLong">Create a note</string>
     <string name="shortcutCreateLabelShort">New</string>
     <string name="share">Share</string>
+    <string name="share_select">Select the content you want to share</string>
 </resources>
