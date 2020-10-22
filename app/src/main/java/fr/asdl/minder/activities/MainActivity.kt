@@ -7,10 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.transition.TransitionInflater
 import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.R
-import fr.asdl.minder.activities.fragments.AppFragment
-import fr.asdl.minder.activities.fragments.NoteFragment
-import fr.asdl.minder.activities.fragments.FolderFragment
-import fr.asdl.minder.activities.fragments.LayoutFragment
+import fr.asdl.minder.activities.fragments.*
 import fr.asdl.minder.note.*
 
 
@@ -45,6 +42,14 @@ class MainActivity : AppCompatActivity() {
                     findViewById(R.id.folder_color))) else sharedViews))
     }
 
+    fun startSharing(notable: Notable<*>) {
+        if (notable.id!! < NoteManager.ROOT_ID) return
+        val fragment = SharingFragment()
+        fragment.from(notable)
+        fragment.allowEnterTransitionOverlap = true
+        this.loadFragment(fragment, "share${notable.id!!}", FragmentTransition.SLIDE_BOTTOM)
+    }
+
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(
         if (notable is NoteFolder) FolderFragment().attach(notable) else NoteFragment().attach(notable as Note),
         if (addToBackStack) notable.id.toString() else null,
@@ -53,23 +58,24 @@ class MainActivity : AppCompatActivity() {
     )
 
     private fun loadFragment(frag: AppFragment, addToBackStackTag: String?,
-                     transition: FragmentTransition? = null, vararg  sharedViews: View) {
+                             transition: FragmentTransition? = null, vararg  sharedViews: View) {
 
         if (transition != null) {
+            val transitionInflater = TransitionInflater.from(this@MainActivity)
             val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)
             if (currentFragment != null) {
                 if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                    currentFragment.sharedElementReturnTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
-                    currentFragment.exitTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animOut)
+                    currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
+                    currentFragment.exitTransition = transitionInflater.inflateTransition(transition.animOut)
                 } else {
-                    currentFragment.exitTransition = TransitionInflater.from(this@MainActivity).inflateTransition(FragmentTransition.SLIDE.animOut)
+                    currentFragment.exitTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animOut)
                 }
             }
             if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                frag.sharedElementEnterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(R.transition.note_editor_open)
-                frag.enterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(transition.animIn)
+                frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
+                frag.enterTransition = transitionInflater.inflateTransition(transition.animIn)
             } else {
-                frag.enterTransition = TransitionInflater.from(this@MainActivity).inflateTransition(FragmentTransition.SLIDE.animIn)
+                frag.enterTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animIn)
             }
         }
 
@@ -85,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     private enum class FragmentTransition(val animIn: Int, val animOut: Int) {
         SLIDE(R.transition.slide_right, R.transition.slide_left),
+        SLIDE_BOTTOM(R.transition.slide_bottom, R.transition.folder_explode),
         LOADING_FADE(android.R.transition.no_transition, android.R.transition.fade),
         EXPLODE(R.transition.folder_explode, R.transition.folder_explode)
     }

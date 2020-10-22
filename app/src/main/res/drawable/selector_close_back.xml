@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/back"
+        android:drawable="@drawable/ic_back"
+        android:state_activated="true" />
+    <item
+        android:id="@+id/close"
+        android:drawable="@drawable/ic_close"
+        android:state_activated="false" />
+
+    <transition
+        android:drawable="@drawable/anim_ic_close_to_back"
+        android:fromId="@id/close"
+        android:toId="@id/back" />
+
+    <transition
+        android:drawable="@drawable/anim_ic_back_to_close"
+        android:fromId="@id/back"
+        android:toId="@id/close" />
+
+</animated-selector>

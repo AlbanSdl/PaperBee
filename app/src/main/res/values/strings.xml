@@ -59,4 +59,5 @@
     <string name="create_element">New…</string>
     <string name="shortcutCreateLabelLong">Create a note</string>
     <string name="shortcutCreateLabelShort">New</string>
+    <string name="share">Share</string>
 </resources>

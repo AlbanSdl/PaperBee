@@ -83,6 +83,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                     notable.save()
                 }
             }
+            R.id.share_icon -> (this.activity as? MainActivity)?.startSharing(this.notable)
             else -> return false
         }
         return true
