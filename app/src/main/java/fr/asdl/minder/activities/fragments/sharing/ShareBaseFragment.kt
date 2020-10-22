@@ -9,6 +9,8 @@ import fr.asdl.minder.activities.fragments.SharingFragment
 
 abstract class ShareBaseFragment : AppFragment() {
 
+    override val shouldRetainInstance: Boolean = true
+
     protected fun getSharingFragment(): SharingFragment? {
         return this.activity?.supportFragmentManager?.findFragmentById(R.id.folder_contents) as? SharingFragment
     }

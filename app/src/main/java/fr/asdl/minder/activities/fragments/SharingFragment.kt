@@ -11,6 +11,7 @@ import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.activities.fragments.sharing.ComponentChooserFragment
 import fr.asdl.minder.activities.fragments.sharing.OptionsFragment
 import fr.asdl.minder.activities.fragments.sharing.ShareBaseFragment
+import fr.asdl.minder.activities.fragments.sharing.ShareOptions
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.Note
 
@@ -22,6 +23,7 @@ class SharingFragment : AppFragment() {
 
     override val layoutId: Int = R.layout.share_layout
     val selection = arrayListOf<Notable<*>>()
+    val shareOptions = ShareOptions()
 
     private lateinit var openedFrom: Notable<*>
 
@@ -83,8 +85,7 @@ class SharingFragment : AppFragment() {
 
         val transaction = activity!!.supportFragmentManager.beginTransaction()
         (currentFragment as? ShareBaseFragment)?.getSharedViews()?.forEach {
-            val targetTransitionName = (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
-            transaction.addSharedElement(it, targetTransitionName)
+            transaction.addSharedElement(it, ViewCompat.getTransitionName(it) ?: "")
         }
         transaction.replace(R.id.share_fragment_container, frag, addToBackStackTag)
         if (addToBackStackTag != null) transaction.addToBackStack(addToBackStackTag)

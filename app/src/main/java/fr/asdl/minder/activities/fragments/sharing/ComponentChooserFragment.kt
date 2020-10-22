@@ -17,12 +17,12 @@ class ComponentChooserFragment : ShareBaseFragment() {
     override val layoutId: Int = R.layout.share_chooser
 
     override fun onLayoutInflated(view: View) {
-        val orig = this@ComponentChooserFragment.getSharingFragment()
+        val orig = this@ComponentChooserFragment.getSharingFragment()!!
         val layoutInflater = LayoutInflater.from(this.context)
         val next = view.findViewById<View>(R.id.next)
 
         fun updateNextButton() {
-            val size = orig?.selection?.size ?: 0
+            val size = orig.selection.size
             if (next.isEnabled != size > 0) {
                 next.animation = AnimationUtils.loadAnimation(
                     this.context,
@@ -47,7 +47,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
                 chip.id = NO_ID
                 chip.setOnCloseIconClickListener {
                     chipGroup.removeView(chip)
-                    orig?.selection?.remove(notable)
+                    orig.selection.remove(notable)
                     updateNextButton()
                 }
                 chip.tag = notable
@@ -55,37 +55,37 @@ class ComponentChooserFragment : ShareBaseFragment() {
         }
 
         this.setToolBarIsClose(true)
-        if (orig != null) {
-            orig.selection.forEach {
-                updateChip(it, true)
-            }
-            view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
-                NotableTree(
-                    orig.getOpenedFrom() ?: (activity as MainActivity).noteManager
-                ) {
-                    if (it !in orig.selection) {
-                        fun addRec(notable: Notable<*>) {
-                            if (notable !in orig.selection) {
-                                orig.selection.add(notable)
-                                updateChip(notable, true)
-                            }
-                            notable.getContents().filterIsInstance<Notable<*>>()
-                                .forEach { n -> addRec(n) }
+
+        orig.selection.forEach {
+            updateChip(it, true)
+        }
+        view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
+            NotableTree(
+                orig.getOpenedFrom() ?: (activity as MainActivity).noteManager
+            ) {
+                if (it !in orig.selection) {
+                    fun addRec(notable: Notable<*>) {
+                        if (notable !in orig.selection) {
+                            orig.selection.add(notable)
+                            updateChip(notable, true)
                         }
-                        addRec(it)
-                    } else {
-                        orig.selection.remove(it)
-                        updateChip(it, false)
+                        notable.getContents().filterIsInstance<Notable<*>>()
+                            .forEach { n -> addRec(n) }
                     }
-                })
-            next.setOnClickListener {
-                orig.displayFragment(OptionsFragment(), "optionShare${orig.getNotableId()}")
-            }
+                    addRec(it)
+                } else {
+                    orig.selection.remove(it)
+                    updateChip(it, false)
+                }
+            })
+        next.setOnClickListener {
+            orig.displayFragment(OptionsFragment(), "optionShare${orig.getNotableId()}")
         }
         updateNextButton()
     }
 
     override fun getSharedViews(): List<View> {
+        if (this.view == null) return super.getSharedViews()
         return listOf(this.view!!.findViewById(R.id.next))
     }
 

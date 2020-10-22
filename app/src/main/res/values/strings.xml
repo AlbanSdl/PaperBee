@@ -67,7 +67,9 @@
     <string name="share_method_password">Choose a password</string>
     <string name="share_method_password_header">If you share content with a file you should add a password to protect your data if this file is exposed to any third party (eg. social networks, internet provider)</string>
     <string name="share_start">Start sharing</string>
-    <string name="transition_name_sharing_button">transitionShareButton</string>
+    <string name="transition_name_sharing_button" translatable="false">transitionShareButton</string>
     <string name="share_method_filename">File name</string>
     <string name="share_method_filename_header">You are about to share data with a file. Choose its name and ensure it is not already used by any file in your downloads folder.</string>
+    <string name="share_filename_required">Required</string>
+    <string name="sharing">Sharing...</string>
 </resources>
