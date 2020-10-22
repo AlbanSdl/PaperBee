@@ -1,16 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    
+    android:layout_height="match_parent">
+
     <TextView
+        android:id="@+id/share_method_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_medium"
+        android:text="@string/share_method_header"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/share_method_selector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="@id/share_method_selector_file"
+        android:paddingHorizontal="@dimen/padding_small"
+        app:layout_constraintTop_toBottomOf="@id/share_method_header">
+
+        <RadioButton
+            android:id="@+id/share_method_selector_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/share_method_file" />
+
+        <RadioButton
+            android:id="@+id/share_method_selector_nfc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/share_method_nfc" />
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/share_file_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_small"
+        app:layout_constraintTop_toBottomOf="@id/share_method_selector">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/share_method_filename_header" />
+
+        <EditText
+            android:id="@+id/share_file_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="@string/share_method_filename"
+            android:backgroundTint="@color/colorAccent"
+            android:hint="@string/share_method_filename"
+            android:inputType="text" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/share_method_password_header" />
+
+        <EditText
+            android:id="@+id/share_password_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="@string/share_method_password"
+            android:backgroundTint="@color/colorAccent"
+            android:hint="@string/share_method_password"
+            android:inputType="textPassword" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Options"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="@dimen/padding_medium"
+        android:text="@string/share_start"
+        android:textColor="@color/blank"
+        android:transitionName="@string/transition_name_sharing_button"
+        app:backgroundTint="@color/colorAccent"
+        app:icon="@drawable/ic_done"
+        app:iconTint="@color/blank"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:rippleColor="@color/blank" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

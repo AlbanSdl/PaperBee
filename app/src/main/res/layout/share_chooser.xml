@@ -45,6 +45,7 @@
         android:layout_marginBottom="@dimen/padding_medium"
         android:text="@string/confirm"
         android:textColor="@color/blank"
+        android:transitionName="@string/transition_name_sharing_button"
         app:backgroundTint="@color/colorAccent"
         app:icon="@drawable/ic_arrow_right"
         app:iconTint="@color/blank"

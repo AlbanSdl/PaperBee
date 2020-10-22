@@ -29,6 +29,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
                     if (next.isEnabled) R.anim.scale_out else R.anim.scale_in
                 )
                 next.isEnabled = size > 0
+                next.visibility = if (next.isEnabled) View.VISIBLE else View.GONE
                 next.animate()
             }
         }
@@ -81,7 +82,11 @@ class ComponentChooserFragment : ShareBaseFragment() {
                 orig.displayFragment(OptionsFragment(), "optionShare${orig.getNotableId()}")
             }
         }
-        if (orig == null || orig.selection.size == 0) updateNextButton()
+        updateNextButton()
+    }
+
+    override fun getSharedViews(): List<View> {
+        return listOf(this.view!!.findViewById(R.id.next))
     }
 
 }

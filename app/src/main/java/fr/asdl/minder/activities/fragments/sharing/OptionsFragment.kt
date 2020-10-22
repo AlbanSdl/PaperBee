@@ -12,4 +12,8 @@ class OptionsFragment : ShareBaseFragment() {
         this.setToolBarIsClose(this.getSharingFragment()?.getOpenedFrom() is Note)
     }
 
+    override fun getSharedViews(): List<View> {
+        return listOf(this.view!!.findViewById(R.id.next))
+    }
+
 }
