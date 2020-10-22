@@ -13,7 +13,11 @@
     <transition
         android:drawable="@drawable/anim_ic_arrow_rotate"
         android:fromId="@id/closed"
-        android:reversible="true"
         android:toId="@id/opened" />
+
+    <transition
+        android:drawable="@drawable/anim_ic_arrow_rotate_revert"
+        android:fromId="@id/opened"
+        android:toId="@id/closed" />
 
 </animated-selector>

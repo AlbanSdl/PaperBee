@@ -27,7 +27,7 @@ abstract class TreeNode<T>(protected val t: T) {
     }
 
     fun append(vararg item: TreeNode<T>) {
-        arrayOf(*item).forEach {
+        listOf(*item).forEach {
             if (this contains it || this == it)
                 throw Exception("Unable to append node $it in one of its children !")
             this.children.add(it)

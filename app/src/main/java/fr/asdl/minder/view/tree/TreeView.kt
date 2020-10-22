@@ -49,24 +49,20 @@ class TreeView(context: Context, attr: AttributeSet?, defStyleAttr: Int) : Scrol
         val treePart = root.findViewById(R.id.tree_linear_h) as LinearLayout
         val expandButton = treePart.findViewById<View>(R.id.tree_expand_button)
         fun updateGroupIndicator(expand: Boolean) {
-            val expandImage = expandButton.findViewById<ImageView>(R.id.tree_expand_indicator)
-            if (expand) {
-                expandImage.setImageState(EMPTY_STATE_SET, false)
+            expandButton.findViewById<ImageView>(R.id.tree_expand_indicator).isSelected = expand
+            if (!expand)
                 for (i in 0 until node.getChildCount())
                     root.removeViewInLayout(getViewHolder(node.getChildAt(i)))
-            } else {
-                expandImage.setImageState(SELECTED_STATE_SET, false)
-            }
         }
         if (!node.canExpand()) {
             expandButton.visibility = View.INVISIBLE
             expandButton.isClickable = false
         }
         else expandButton.setOnClickListener {
-            updateGroupIndicator(!node.toggleExpansion())
+            updateGroupIndicator(node.toggleExpansion())
             this.updateDisplay(node)
         }
-        updateGroupIndicator(!node.isExpanded())
+        updateGroupIndicator(node.isExpanded())
         root.id = id(node.getId())
         (treePart.layoutParams as MarginLayoutParams).marginStart =
             context.resources.getDimension(R.dimen.padding_small).toInt() * node.getDepth()
