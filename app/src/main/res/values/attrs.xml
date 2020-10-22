@@ -14,4 +14,7 @@
     <declare-styleable name="RoundedImageView">
         <attr name="tooltip" format="string" />
     </declare-styleable>
+    <declare-styleable name="DrawableState">
+        <attr name="state_changed" format="boolean" />
+    </declare-styleable>
 </resources>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/back"
         android:drawable="@drawable/ic_back"
-        android:state_activated="true" />
+        app:state_changed="true" />
     <item
         android:id="@+id/close"
         android:drawable="@drawable/ic_close"
-        android:state_activated="false" />
+        app:state_changed="false" />
 
     <transition
         android:drawable="@drawable/anim_ic_close_to_back"
