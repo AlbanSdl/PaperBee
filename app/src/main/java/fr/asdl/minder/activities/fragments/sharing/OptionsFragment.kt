@@ -40,11 +40,6 @@ class OptionsFragment : ShareBaseFragment() {
         }
 
         // Configuring file options
-        val fileNameField = view.findViewById<EditText>(R.id.share_file_name)
-        fileNameField.setText(orig.shareOptions.fileName)
-        fileNameField.addTextChangedListener(SimpleWatcher {
-            orig.shareOptions.fileName = it
-        })
         val passwordField = view.findViewById<EditText>(R.id.share_password_field)
         passwordField.setText(orig.shareOptions.password)
         passwordField.addTextChangedListener(SimpleWatcher {
@@ -53,11 +48,8 @@ class OptionsFragment : ShareBaseFragment() {
 
         // Configuring next button
         view.findViewById<View>(R.id.next).setOnClickListener {
-            if (orig.shareOptions.isCorrect()) {
-                fileNameField.error = null
+            if (orig.shareOptions.isCorrect())
                 orig.displayFragment(ShareProcessFragment(), "processShare${orig.getNotableId()}")
-            } else
-                fileNameField.error = getString(R.string.share_filename_required)
         }
     }
 

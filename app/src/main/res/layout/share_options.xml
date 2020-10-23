@@ -45,20 +45,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/share_method_filename_header" />
-
-        <EditText
-            android:id="@+id/share_file_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="@string/share_method_filename"
-            android:backgroundTint="@color/colorAccent"
-            android:hint="@string/share_method_filename"
-            android:inputType="text" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="@string/share_method_password_header" />
 
         <EditText

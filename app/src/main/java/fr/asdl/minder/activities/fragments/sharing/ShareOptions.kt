@@ -15,7 +15,6 @@ class ShareOptions {
 
     // Options for SharingMethod.FILE
     var password: String = ""
-    var fileName: String = ""
 
     /**
      * Uses the current configuration to share asynchronously the given data.
@@ -27,7 +26,7 @@ class ShareOptions {
             }
             SharingMethod.FILE -> {
                 val encryptedByteArray = this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
-                context.createFile("$fileName.mind", "application/mind", encryptedByteArray) {
+                context.createFile(context.getString(R.string.share_to_file_filename), "application/mind", encryptedByteArray) {
                     if (it.hasTried) {
                         sharingStarted = false
                         Snackbar.make(
@@ -63,7 +62,7 @@ class ShareOptions {
      * instantiated.
      */
     fun isCorrect(): Boolean {
-        return this.method == SharingMethod.NFC || this.fileName.isNotEmpty()
+        return true
     }
 
 }
