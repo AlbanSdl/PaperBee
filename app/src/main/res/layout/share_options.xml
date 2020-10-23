@@ -58,7 +58,7 @@
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <fr.asdl.minder.view.StatefulExtendedFloatingActionButton
         android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
         android:textColor="@color/blank"
         android:transitionName="@string/transition_name_sharing_button"
         app:backgroundTint="@color/colorAccent"
-        app:icon="@drawable/ic_done"
+        app:icon="@drawable/selector_arrow_done"
         app:iconTint="@color/blank"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

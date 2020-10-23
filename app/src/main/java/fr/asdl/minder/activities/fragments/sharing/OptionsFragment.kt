@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.RadioButton
 import fr.asdl.minder.R
 import fr.asdl.minder.note.Note
+import fr.asdl.minder.view.StatefulExtendedFloatingActionButton
 
 class OptionsFragment : ShareBaseFragment() {
 
@@ -47,9 +48,12 @@ class OptionsFragment : ShareBaseFragment() {
         })
 
         // Configuring next button
-        view.findViewById<View>(R.id.next).setOnClickListener {
-            if (orig.shareOptions.isCorrect())
-                orig.displayFragment(ShareProcessFragment(), "processShare${orig.getNotableId()}")
+        view.findViewById<StatefulExtendedFloatingActionButton>(R.id.next).apply {
+            this.setStateChanged(true)
+            this.setOnClickListener {
+                if (orig.shareOptions.isCorrect())
+                    orig.displayFragment(ShareProcessFragment(), "processShare${orig.getNotableId()}")
+            }
         }
     }
 

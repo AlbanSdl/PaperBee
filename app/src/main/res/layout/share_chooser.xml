@@ -20,10 +20,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxHeight="@dimen/chipGroupMaxHeight"
+        android:requiresFadingEdge="vertical"
+        android:transitionGroup="true"
         app:layout_constrainedHeight="true"
         app:layout_constraintHeight_max="@dimen/chipGroupMaxHeight"
-        app:layout_constraintTop_toBottomOf="@id/share_selector_title"
-        android:requiresFadingEdge="vertical">
+        app:layout_constraintTop_toBottomOf="@id/share_selector_title">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/share_selection_group"
@@ -44,7 +45,7 @@
         android:paddingTop="@dimen/padding_small"
         app:layout_constraintTop_toBottomOf="@+id/share_selection" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <fr.asdl.minder.view.StatefulExtendedFloatingActionButton
         android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,7 +54,7 @@
         android:textColor="@color/blank"
         android:transitionName="@string/transition_name_sharing_button"
         app:backgroundTint="@color/colorAccent"
-        app:icon="@drawable/ic_arrow_right"
+        app:icon="@drawable/selector_arrow_done"
         app:iconTint="@color/blank"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

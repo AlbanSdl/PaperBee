@@ -14,6 +14,6 @@
     <dimen name="fab_mini_size">40dp</dimen>
     <dimen name="fab_mini_margin">14dp</dimen>
     <dimen name="large">40dp</dimen>
-    <dimen name="chipGroupMaxHeight">80dp</dimen>
+    <dimen name="chipGroupMaxHeight">160dp</dimen>
     <dimen name="extendedFabHeight">48dp</dimen>
 </resources>

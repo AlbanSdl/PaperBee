@@ -10,6 +10,7 @@ import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.bindings.NotableTree
+import fr.asdl.minder.view.StatefulExtendedFloatingActionButton
 import fr.asdl.minder.view.tree.TreeView
 
 class ComponentChooserFragment : ShareBaseFragment() {
@@ -19,7 +20,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
     override fun onLayoutInflated(view: View) {
         val orig = this@ComponentChooserFragment.getSharingFragment()!!
         val layoutInflater = LayoutInflater.from(this.context)
-        val next = view.findViewById<View>(R.id.next)
+        val next = view.findViewById<StatefulExtendedFloatingActionButton>(R.id.next)
 
         fun updateNextButton() {
             val size = orig.selection.size
@@ -79,6 +80,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
                 }
             })
         next.setOnClickListener {
+            next.setStateChanged(true)
             orig.displayFragment(OptionsFragment(), "optionShare${orig.getNotableId()}")
         }
         updateNextButton()
