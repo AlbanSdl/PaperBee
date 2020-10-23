@@ -5,7 +5,7 @@ import fr.asdl.minder.R
 import fr.asdl.minder.activities.fragments.AppFragment
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.sharing.ShareProcess
-import fr.asdl.minder.sharing.files.FileCreationResult
+import fr.asdl.minder.sharing.files.FileAccessContext
 
 class ShareOptions {
 
@@ -25,16 +25,21 @@ class ShareOptions {
                 TODO()
             }
             SharingMethod.FILE -> {
-                val encryptedByteArray = this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
-                context.createFile(context.getString(R.string.share_to_file_filename), "application/mind", encryptedByteArray) {
-                    if (it.hasTried) {
-                        sharingStarted = false
+                val encryptedByteArray =
+                    this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
+                context.createFile(
+                    context.getString(R.string.share_to_file_filename),
+                    "application/mind",
+                    encryptedByteArray
+                ) {
+                    sharingStarted = false
+                    if (it.hasPerformed()) {
                         Snackbar.make(
                             context.activity!!.findViewById(R.id.main),
-                            it.str,
+                            it.getActionDetails(FileAccessContext.CREATION),
                             Snackbar.LENGTH_SHORT
                         ).show()
-                        callback.invoke(it == FileCreationResult.CREATED)
+                        callback.invoke(it.success)
                     }
                 }
             }

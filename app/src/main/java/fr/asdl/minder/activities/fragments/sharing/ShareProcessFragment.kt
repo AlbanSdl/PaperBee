@@ -4,9 +4,9 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import fr.asdl.minder.R
-import fr.asdl.minder.sharing.files.FileCreator
+import fr.asdl.minder.sharing.files.FileAccessor
 
-class ShareProcessFragment : ShareBaseFragment(), FileCreator {
+class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
 
     override val layoutId: Int = R.layout.share_process
 

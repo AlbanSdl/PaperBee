@@ -75,4 +75,6 @@
     <string name="share_to_file_failed_retry">You have to choose a valid destination to save the file</string>
     <string name="share_to_file_ready">Ready to share</string>
     <string name="share_to_file_filename">save.mind</string>
+    <string name="shared_from_file_ok">Data successfully read from file</string>
+    <string name="shared_from_file_exception">An error occurred when reading file contents</string>
 </resources>

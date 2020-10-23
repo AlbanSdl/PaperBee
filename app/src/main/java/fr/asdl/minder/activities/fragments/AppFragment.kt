@@ -8,15 +8,12 @@ import android.view.*
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import fr.asdl.minder.IntAllocator
-import fr.asdl.minder.sharing.files.FileCreationResult
-import fr.asdl.minder.sharing.files.FileCreator
-import fr.asdl.minder.sharing.files.FutureFile
-import java.io.FileOutputStream
+import fr.asdl.minder.sharing.files.*
 
-abstract class AppFragment : Fragment(), FileCreator {
+abstract class AppFragment : Fragment(), FileAccessor {
 
     private val activityResultCodes = IntAllocator()
-    private val pendingFileCreations = hashMapOf<Int, FutureFile>()
+    private val pendingFileAccesses = hashMapOf<Int, FutureFileAccess>()
     open fun restoreState(savedInstanceState: Bundle) {}
     open fun saveState(savedInstanceState: Bundle) {}
 
@@ -59,34 +56,40 @@ abstract class AppFragment : Fragment(), FileCreator {
         this.saveState(outState)
     }
 
-    final override fun createFile(fileName: String, fileType: String, content: ByteArray, callback: (FileCreationResult) -> Unit) {
+    final override fun createFile(fileName: String, fileType: String, content: ByteArray, callback: FileCreationCallBack) {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = fileType
             putExtra(Intent.EXTRA_TITLE, fileName)
         }
         val code = activityResultCodes.allocate()
-        this.pendingFileCreations[code] = FutureFile(content, callback)
+        this.pendingFileAccesses[code] = FutureFileCreation(content, callback)
+        startActivityForResult(intent, code)
+    }
+
+    final override fun readFile(fileType: String, callback: FileOpeningCallBack) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = fileType
+        }
+        val code = activityResultCodes.allocate()
+        this.pendingFileAccesses[code] = FutureFileOpening(callback)
         startActivityForResult(intent, code)
     }
 
     @CallSuper
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val futureFile = this.pendingFileCreations.remove(requestCode)
-        if (futureFile != null) {
+        val futureFileAccess = this.pendingFileAccesses.remove(requestCode)
+        if (futureFileAccess != null) {
             this.activityResultCodes.release(requestCode)
             if (resultCode == Activity.RESULT_OK) data?.data?.also { uri ->
                 try {
-                    this.activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                        FileOutputStream(it.fileDescriptor).write(futureFile.content)
-                    }
-                    futureFile.onCreated.invoke(FileCreationResult.CREATED)
+                    futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.ACCESSED, uri))
                 } catch (io: Exception) {
-                    futureFile.onCreated.invoke(FileCreationResult.ERROR)
+                    futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.ERROR))
                 }
-
             }
-            else futureFile.onCreated.invoke(FileCreationResult.NOT_OPENED)
+            else futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.CANCELLED))
         }
     }
 
