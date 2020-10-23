@@ -2,18 +2,24 @@ package fr.asdl.minder.activities.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import androidx.annotation.CallSuper
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.sharing.files.*
+import fr.asdl.minder.sharing.permissions.PermissionAccessor
+import fr.asdl.minder.sharing.permissions.PermissionRationale
 
-abstract class AppFragment : Fragment(), FileAccessor {
+abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
 
     private val activityResultCodes = IntAllocator()
     private val pendingFileAccesses = hashMapOf<Int, FutureFileAccess>()
+    private val pendingPermissionUses = hashMapOf<Int, (Boolean) -> Unit>()
     open fun restoreState(savedInstanceState: Bundle) {}
     open fun saveState(savedInstanceState: Bundle) {}
 
@@ -90,6 +96,37 @@ abstract class AppFragment : Fragment(), FileAccessor {
                 }
             }
             else futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.CANCELLED))
+        }
+    }
+
+    override fun usePermission(permission: String, callback: (Boolean) -> Unit, rationale: PermissionRationale?) {
+        val activity = activity ?: return
+        if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+            fun openPermissionRequestDialog() {
+                val code = activityResultCodes.allocate()
+                this.pendingPermissionUses[code] = callback
+                ActivityCompat.requestPermissions(activity, arrayOf(permission), code)
+            }
+            if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(activity, permission))
+                rationale.setCallback { openPermissionRequestDialog() }.display(this.context!!)
+            else
+                openPermissionRequestDialog()
+        } else {
+            callback.invoke(true)
+        }
+    }
+
+    @CallSuper
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        val permissionUse = this.pendingPermissionUses.remove(requestCode)
+        if (permissionUse != null) {
+            this.activityResultCodes.release(requestCode)
+            permissionUse.invoke(grantResults.isNotEmpty()
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         }
     }
 
