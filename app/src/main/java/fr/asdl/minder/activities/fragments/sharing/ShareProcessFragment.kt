@@ -32,6 +32,8 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
                             getString(R.string.share_to_file_failed_retry)
                 }
             }
+        } else if (orig.shareOptions.method == SharingMethod.NFC) {
+            view.findViewById<View>(R.id.share_nfc_group).visibility = View.VISIBLE
         }
     }
 }

@@ -45,4 +45,23 @@
     <string name="create_element">Ajouter…</string>
     <string name="no_note_trash">Il n\'y a pas de quoi s\'affoler dans la corbeille</string>
     <string name="no_note_root">Cet endroit est vide…\nClique sur le bouton + pour ajouter quelque chose !</string>
+    <string name="shortcutCreateLabelLong">Créer une note</string>
+    <string name="shortcutCreateLabelShort">Nouvelle note</string>
+    <string name="share">Partager</string>
+    <string name="share_select">Sélectionnez le contenu que vous voulez partager</string>
+    <string name="share_method_file">par un fichier</string>
+    <string name="share_method_nfc">par nfc</string>
+    <string name="share_method_header">Choisissez la manière de partager</string>
+    <string name="share_method_password">Choisissez un mot de passe</string>
+    <string name="share_method_password_header">Si vous partagez par le biais d\'un fichier, vous devriez ajouter un mot de passe pour protéger vos données si le dit fichier sera accessible par d\'autres personnes que son seul destinataire (ex: réseau sociaux, fournisseur internet)</string>
+    <string name="share_start">Démarrer le partage</string>
+    <string name="shared_to_file_ok">Données sauvegardées dans le fichier avec succès.</string>
+    <string name="shared_to_file_exception">Une erreur est survenue lors de la sauvegarde dans le fichier. Cela doit être un bug.</string>
+    <string name="share_to_file_choose">Choisissez un fichier</string>
+    <string name="share_to_file_failed_retry">Vous devez indiquer une destination valide</string>
+    <string name="share_to_file_ready">Prêt à partager</string>
+    <string name="share_to_file_filename">sauvegarde.mind</string>
+    <string name="shared_from_file_ok">Données importées avec succès</string>
+    <string name="shared_from_file_exception">Une erreur est survenue lors de l\'import des données</string>
+    <string name="share_nfc_not_implemented">Le partage NFC n\'a pas encoré été implémenté !</string>
 </resources>

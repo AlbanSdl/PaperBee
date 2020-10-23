@@ -22,8 +22,8 @@ android {
         applicationId "fr.asdl.minder"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 7
-        versionName "0.3.0"
+        versionCode 8
+        versionName "0.3.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
