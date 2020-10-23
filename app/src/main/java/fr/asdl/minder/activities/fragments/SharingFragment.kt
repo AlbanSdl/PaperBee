@@ -73,9 +73,8 @@ class SharingFragment : AppFragment() {
     fun getNotableId(): Int = this.openedFrom.id!!
 
     fun displayFragment(frag: ShareBaseFragment, addToBackStackTag: String?) {
-
         val transitionInflater = TransitionInflater.from(this.context)
-        val currentFragment = activity!!.supportFragmentManager.findFragmentById(R.id.share_fragment_container)
+        val currentFragment = childFragmentManager.findFragmentById(R.id.share_fragment_container)
         if (currentFragment != null) {
             currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
             currentFragment.exitTransition = transitionInflater.inflateTransition(R.transition.slide_left)
@@ -83,7 +82,7 @@ class SharingFragment : AppFragment() {
         frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
         frag.enterTransition = transitionInflater.inflateTransition(R.transition.slide_right)
 
-        val transaction = activity!!.supportFragmentManager.beginTransaction()
+        val transaction = childFragmentManager.beginTransaction()
         (currentFragment as? ShareBaseFragment)?.getSharedViews()?.forEach {
             transaction.addSharedElement(it, ViewCompat.getTransitionName(it) ?: "")
         }

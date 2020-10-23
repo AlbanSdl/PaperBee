@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val transaction = supportFragmentManager.beginTransaction()
+        transaction.setPrimaryNavigationFragment(frag)
         arrayOf(*sharedViews).forEach {
             val targetTransitionName = (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
             transaction.addSharedElement(it, targetTransitionName)

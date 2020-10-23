@@ -1,6 +1,6 @@
 package fr.asdl.minder.activities.fragments.sharing
 
-import android.content.Context
+import fr.asdl.minder.activities.fragments.AppFragment
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.sharing.ShareProcess
 
@@ -17,14 +17,17 @@ class ShareOptions {
     /**
      * Uses the current configuration to share asynchronously the given data.
      */
-    fun process(context: Context, data: List<Notable<*>>) {
+    fun process(context: AppFragment, data: List<Notable<*>>, callback: () -> Unit) {
         when (this.method) {
             SharingMethod.NFC -> {
                 TODO()
             }
             SharingMethod.FILE -> {
                 val encryptedByteArray = this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
-                TODO()
+                context.createFile("$fileName.mind", "application/mind", encryptedByteArray) {
+                    sharingStarted = false
+                    callback.invoke()
+                }
             }
         }
         sharingStarted = true

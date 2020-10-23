@@ -1,13 +1,22 @@
 package fr.asdl.minder.activities.fragments
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
+import fr.asdl.minder.IntAllocator
+import fr.asdl.minder.sharing.files.FileCreationResult
+import fr.asdl.minder.sharing.files.FileCreator
+import fr.asdl.minder.sharing.files.FutureFile
+import java.io.FileOutputStream
 
-abstract class AppFragment : Fragment() {
+abstract class AppFragment : Fragment(), FileCreator {
 
+    private val activityResultCodes = IntAllocator()
+    private val pendingFileCreations = hashMapOf<Int, FutureFile>()
     open fun restoreState(savedInstanceState: Bundle) {}
     open fun saveState(savedInstanceState: Bundle) {}
 
@@ -48,6 +57,36 @@ abstract class AppFragment : Fragment() {
 
     final override fun onSaveInstanceState(outState: Bundle) {
         this.saveState(outState)
+    }
+
+    final override fun createFile(fileName: String, fileType: String, content: ByteArray, callback: (FileCreationResult) -> Unit) {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = fileType
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
+        val code = activityResultCodes.allocate()
+        this.pendingFileCreations[code] = FutureFile(content, callback)
+        startActivityForResult(intent, code)
+    }
+
+    final override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val futureFile = this.pendingFileCreations.remove(requestCode)
+        if (futureFile != null) {
+            this.activityResultCodes.release(requestCode)
+            if (resultCode == Activity.RESULT_OK) data?.data?.also { uri ->
+                try {
+                    this.activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).write(futureFile.content)
+                    }
+                    futureFile.onCreated.invoke(FileCreationResult.CREATED)
+                } catch (io: Exception) {
+                    futureFile.onCreated.invoke(FileCreationResult.ERROR)
+                }
+
+            }
+            else futureFile.onCreated.invoke(FileCreationResult.NOT_OPENED)
+        }
     }
 
 }
