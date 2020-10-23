@@ -1,8 +1,11 @@
 package fr.asdl.minder.activities.fragments.sharing
 
+import com.google.android.material.snackbar.Snackbar
+import fr.asdl.minder.R
 import fr.asdl.minder.activities.fragments.AppFragment
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.sharing.ShareProcess
+import fr.asdl.minder.sharing.files.FileCreationResult
 
 class ShareOptions {
 
@@ -17,7 +20,7 @@ class ShareOptions {
     /**
      * Uses the current configuration to share asynchronously the given data.
      */
-    fun process(context: AppFragment, data: List<Notable<*>>, callback: () -> Unit) {
+    fun process(context: AppFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit) {
         when (this.method) {
             SharingMethod.NFC -> {
                 TODO()
@@ -25,8 +28,15 @@ class ShareOptions {
             SharingMethod.FILE -> {
                 val encryptedByteArray = this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
                 context.createFile("$fileName.mind", "application/mind", encryptedByteArray) {
-                    sharingStarted = false
-                    callback.invoke()
+                    if (it.hasTried) {
+                        sharingStarted = false
+                        Snackbar.make(
+                            context.activity!!.findViewById(R.id.main),
+                            it.str,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        callback.invoke(it == FileCreationResult.CREATED)
+                    }
                 }
             }
         }

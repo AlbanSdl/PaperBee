@@ -70,7 +70,8 @@ abstract class AppFragment : Fragment(), FileCreator {
         startActivityForResult(intent, code)
     }
 
-    final override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    @CallSuper
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val futureFile = this.pendingFileCreations.remove(requestCode)
         if (futureFile != null) {
             this.activityResultCodes.release(requestCode)

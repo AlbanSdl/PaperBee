@@ -71,5 +71,10 @@
     <string name="share_method_filename">File name</string>
     <string name="share_method_filename_header">You are about to share data with a file. Choose its name and ensure it is not already used by any file in your downloads folder.</string>
     <string name="share_filename_required">Required</string>
-    <string name="sharing">Sharing...</string>
+    <string name="shared_to_file_ok">Data successfully saved to file.</string>
+    <string name="shared_to_file_exception">An error occurred when saving data to file. This is most likely a bug.</string>
+    <string name="share_to_file_instruct">Select a file to save data to</string>
+    <string name="share_to_file_choose">Choose file</string>
+    <string name="share_to_file_failed_retry">You have to choose a valid destination to save the file</string>
+    <string name="share_to_file_ready">Ready to share</string>
 </resources>
