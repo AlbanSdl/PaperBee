@@ -65,14 +65,14 @@ class MainActivity : AppCompatActivity() {
             val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)
             if (currentFragment != null) {
                 if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                    currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
+                    currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.shared_elements_transition)
                     currentFragment.exitTransition = transitionInflater.inflateTransition(transition.animOut)
                 } else {
                     currentFragment.exitTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animOut)
                 }
             }
             if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
+                frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.shared_elements_transition)
                 frag.enterTransition = transitionInflater.inflateTransition(transition.animIn)
             } else {
                 frag.enterTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animIn)

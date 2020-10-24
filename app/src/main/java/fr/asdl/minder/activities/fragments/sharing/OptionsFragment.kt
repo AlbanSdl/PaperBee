@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.RadioButton
 import fr.asdl.minder.R
+import fr.asdl.minder.activities.fragments.SharingFragment
 import fr.asdl.minder.note.Note
 import fr.asdl.minder.view.StatefulExtendedFloatingActionButton
 
@@ -14,8 +15,8 @@ class OptionsFragment : ShareBaseFragment() {
     override val layoutId: Int = R.layout.share_options
 
     override fun onLayoutInflated(view: View) {
-        val orig = this.getSharingFragment()!!
-        this.setToolBarIsClose(this.getSharingFragment()?.getOpenedFrom() is Note)
+        val orig = this.parentFragment as SharingFragment
+        this.setToolBarIsClose(orig.getOpenedFrom() is Note)
 
         // Configuring method choice
         val selectorFile = view.findViewById<RadioButton>(R.id.share_method_selector_file)

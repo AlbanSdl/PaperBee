@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.transition.TransitionInflater
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
 import fr.asdl.minder.activities.fragments.sharing.ComponentChooserFragment
@@ -15,11 +13,13 @@ import fr.asdl.minder.activities.fragments.sharing.ShareOptions
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.Note
 
-class SharingFragment : AppFragment() {
+class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
 
     companion object {
         const val SAVED_INSTANCE_TAG = "minder:fragOpenedFromTagId"
     }
+
+    override val shouldRetainInstance: Boolean = true
 
     override val layoutId: Int = R.layout.share_layout
     val selection = arrayListOf<Notable<*>>()
@@ -47,9 +47,9 @@ class SharingFragment : AppFragment() {
     }
 
     override fun onLayoutInflated(view: View) {
-        val toolbar = view.findViewById<Toolbar>(R.id.share_toolbar)
-        toolbar.setTitle(R.string.share)
-        this.displayFragment(if (this.openedFrom is Note) OptionsFragment() else ComponentChooserFragment(), null)
+        view.findViewById<Toolbar>(R.id.share_toolbar).setTitle(R.string.share)
+        if (this.childFragmentManager.fragments.size == 0)
+            this.displayFragment(if (this.openedFrom is Note) OptionsFragment() else ComponentChooserFragment(), null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -72,23 +72,6 @@ class SharingFragment : AppFragment() {
 
     fun getNotableId(): Int = this.openedFrom.id!!
 
-    fun displayFragment(frag: ShareBaseFragment, addToBackStackTag: String?) {
-        val transitionInflater = TransitionInflater.from(this.context)
-        val currentFragment = childFragmentManager.findFragmentById(R.id.share_fragment_container)
-        if (currentFragment != null) {
-            currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
-            currentFragment.exitTransition = transitionInflater.inflateTransition(R.transition.slide_left)
-        }
-        frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.note_editor_open)
-        frag.enterTransition = transitionInflater.inflateTransition(R.transition.slide_right)
-
-        val transaction = childFragmentManager.beginTransaction()
-        (currentFragment as? ShareBaseFragment)?.getSharedViews()?.forEach {
-            transaction.addSharedElement(it, ViewCompat.getTransitionName(it) ?: "")
-        }
-        transaction.replace(R.id.share_fragment_container, frag, addToBackStackTag)
-        if (addToBackStackTag != null) transaction.addToBackStack(addToBackStackTag)
-        transaction.commit()
-    }
+    override fun getFragmentContainerId(): Int = R.id.share_fragment_container
 
 }

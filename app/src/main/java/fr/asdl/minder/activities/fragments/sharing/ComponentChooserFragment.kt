@@ -8,6 +8,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.MainActivity
+import fr.asdl.minder.activities.fragments.SharingFragment
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.bindings.NotableTree
 import fr.asdl.minder.view.StatefulExtendedFloatingActionButton
@@ -18,7 +19,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
     override val layoutId: Int = R.layout.share_chooser
 
     override fun onLayoutInflated(view: View) {
-        val orig = this@ComponentChooserFragment.getSharingFragment()!!
+        val orig = this.parentFragment as SharingFragment
         val layoutInflater = LayoutInflater.from(this.context)
         val next = view.findViewById<StatefulExtendedFloatingActionButton>(R.id.next)
 
