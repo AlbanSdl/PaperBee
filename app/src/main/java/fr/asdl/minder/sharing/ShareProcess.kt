@@ -1,5 +1,6 @@
 package fr.asdl.minder.sharing
 
+import fr.asdl.minder.exceptions.IncompatibleVersionException
 import fr.asdl.minder.note.Notable
 import fr.asdl.minder.note.NoteSerializer
 import kotlinx.serialization.json.Json
@@ -16,6 +17,7 @@ class ShareProcess : SharingFactory<Notable<*>>() {
     }
 
     override fun fromBytes(bytes: ByteArray, protocolVersion: Int): Notable<*> {
+        if (protocolVersion > this.writingProtocolVersion()) throw IncompatibleVersionException()
         return Json.decodeFromString(serializer, String(bytes, StandardCharsets.UTF_8))
     }
 
