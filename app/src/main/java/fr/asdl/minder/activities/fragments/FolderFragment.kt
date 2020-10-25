@@ -111,14 +111,18 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
                 val addFolder = activity?.findViewById<View>(R.id.add_folder_selector)
                 if (addNote?.visibility == View.GONE) {
                     addNote.visibility = View.VISIBLE
+                    addNote.isEnabled = true
                     addNote.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.scale_in))
                     addFolder?.visibility = View.VISIBLE
+                    addFolder?.isEnabled = true
                     addFolder?.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.scale_in))
                     v.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.fab_rotate_clock))
                 } else {
                     addNote?.visibility = View.GONE
+                    addNote?.isEnabled = false
                     addNote?.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.scale_out))
                     addFolder?.visibility = View.GONE
+                    addFolder?.isEnabled = false
                     addFolder?.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.scale_out))
                     v.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.fab_rotate_anticlock))
                 }

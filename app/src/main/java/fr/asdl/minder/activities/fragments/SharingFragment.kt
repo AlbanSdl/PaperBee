@@ -48,8 +48,11 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
 
     override fun onLayoutInflated(view: View) {
         view.findViewById<Toolbar>(R.id.share_toolbar).setTitle(R.string.share)
-        if (this.childFragmentManager.fragments.size == 0)
-            this.displayFragment(if (this.openedFrom is Note) OptionsFragment() else ComponentChooserFragment(), null)
+        this.displayFragment(
+            if (this.openedFrom is Note) OptionsFragment() else ComponentChooserFragment(),
+            null,
+            true
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -23,7 +23,8 @@ interface FragmentContainer<in T> where T : AppFragment, T : SubFragment {
     fun getTransition(fragment: T, backStack: String?): TransitionComponents =
         TransitionComponents()
 
-    fun displayFragment(fragment: T, addToBackStackTag: String?) {
+    fun displayFragment(fragment: T, addToBackStackTag: String?, isFromOnCreateView: Boolean = false) {
+        if (isFromOnCreateView && this.getChildFragmentManager().fragments.size != 0) return
         val transitionInflater = TransitionInflater.from(getContext() ?: return)
         val currentFragment =
             getChildFragmentManager().findFragmentById(this.getFragmentContainerId())
