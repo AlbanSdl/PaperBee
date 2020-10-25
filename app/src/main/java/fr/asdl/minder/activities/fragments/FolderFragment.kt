@@ -87,6 +87,7 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
                 }
             }
             R.id.share_icon -> (this.activity as? MainActivity)?.startSharing(this.notable)
+            R.id.share_import_icon -> (this.activity as? MainActivity)?.openImport()
             else -> return false
         }
         return true

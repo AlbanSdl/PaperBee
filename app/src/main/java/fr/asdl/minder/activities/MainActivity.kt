@@ -8,6 +8,7 @@ import androidx.transition.TransitionInflater
 import fr.asdl.minder.IntAllocator
 import fr.asdl.minder.R
 import fr.asdl.minder.activities.fragments.*
+import fr.asdl.minder.activities.fragments.sharing.SharingMethod
 import fr.asdl.minder.note.*
 
 
@@ -48,6 +49,13 @@ class MainActivity : AppCompatActivity() {
         fragment.from(notable)
         fragment.allowEnterTransitionOverlap = true
         this.loadFragment(fragment, "share${notable.id!!}", FragmentTransition.SLIDE_BOTTOM)
+    }
+
+    fun openImport(method: SharingMethod? = null) {
+        val fragment = ImportFragment()
+        if (method != null) fragment.method = method
+        fragment.allowEnterTransitionOverlap = true
+        this.loadFragment(fragment, "import", FragmentTransition.SLIDE_BOTTOM)
     }
 
     private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(

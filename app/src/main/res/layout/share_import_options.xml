@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/share_file_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_small"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/share_import_password_header" />
+
+        <EditText
+            android:id="@+id/share_password_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="@string/share_import_password"
+            android:backgroundTint="@color/colorAccent"
+            android:hint="@string/share_import_password"
+            android:inputType="textPassword" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/share_selector_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingBottom="@dimen/padding_small"
+        android:text="@string/share_import_destination"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/share_file_group" />
+
+    <TextView
+        android:id="@+id/selected_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_small"
+        android:textSize="@dimen/smallText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/share_selector_title" />
+
+    <fr.asdl.minder.view.tree.TreeView
+        android:id="@+id/share_selector_tree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/padding_small"
+        android:paddingTop="@dimen/padding_small"
+        app:layout_constraintTop_toBottomOf="@+id/selected_name" />
+
+    <fr.asdl.minder.view.StatefulExtendedFloatingActionButton
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_medium"
+        android:text="@string/confirm"
+        android:textColor="@color/blank"
+        android:transitionName="@string/transition_name_sharing_button"
+        app:backgroundTint="@color/colorAccent"
+        app:icon="@drawable/ic_done"
+        app:iconTint="@color/blank"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="@color/blank" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

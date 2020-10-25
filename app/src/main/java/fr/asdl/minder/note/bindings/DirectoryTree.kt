@@ -8,7 +8,7 @@ import fr.asdl.minder.note.NoteFolder
 import fr.asdl.minder.note.NoteManager
 import fr.asdl.minder.view.tree.TreeNode
 
-class DirectoryTree(private val current: Notable<*>, private val listener: (NoteFolder) -> Unit, folder: NoteFolder) :
+class DirectoryTree(private val current: Notable<*>?, private val listener: (NoteFolder) -> Unit, folder: NoteFolder) :
     TreeNode<NoteFolder>(folder) {
 
     constructor(current: Notable<*>, listener: (NoteFolder) -> Unit):
@@ -18,7 +18,7 @@ class DirectoryTree(private val current: Notable<*>, private val listener: (Note
         this.t.getContents().filterIsInstance<NoteFolder>().forEach {
             if (it != current) this.append(DirectoryTree(current, this.listener, it))
         }
-        if (current.isChildOf(folder.id!!))
+        if (current?.isChildOf(folder.id!!) == true)
             this.toggleExpansion()
     }
 
