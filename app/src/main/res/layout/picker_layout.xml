@@ -18,7 +18,7 @@
 
         <view
             android:id="@+id/color_picker_elem"
-            class="fr.asdl.minder.view.options.ColorPicker$ColorPickerView"
+            class="fr.asdl.paperbee.view.options.ColorPicker$ColorPickerView"
             android:layout_width="@dimen/large"
             android:layout_height="@dimen/large"
             android:background="@drawable/ic_blank_circle_selectable"

@@ -20,7 +20,7 @@
              androidx.transition.Transition and looks for android.transition.Transition
              On another hand android requires the usage of androidx for transitions and
              crashes otherwise -->
-        <transition class="fr.asdl.minder.view.transition.BackgroundTint"
+        <transition class="fr.asdl.paperbee.view.transition.BackgroundTint"
             tools:ignore="Instantiatable" />
     </transitionSet>
 

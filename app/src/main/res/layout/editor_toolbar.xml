@@ -7,7 +7,7 @@
     android:paddingHorizontal="@dimen/padding_tiny"
     android:paddingVertical="@dimen/padding_tiny">
 
-    <fr.asdl.minder.view.rounded.RoundedImageView
+    <fr.asdl.paperbee.view.rounded.RoundedImageView
         android:id="@+id/moveOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <fr.asdl.minder.view.rounded.RoundedImageView
+    <fr.asdl.paperbee.view.rounded.RoundedImageView
         android:id="@+id/moveIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
          The views above are aligned to the start of the parent and
          the views below are align to its end. -->
 
-    <fr.asdl.minder.view.rounded.RoundedImageView
+    <fr.asdl.paperbee.view.rounded.RoundedImageView
         android:id="@+id/add_text_element"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <fr.asdl.minder.view.rounded.RoundedImageView
+    <fr.asdl.paperbee.view.rounded.RoundedImageView
         android:id="@+id/add_checkbox_element"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

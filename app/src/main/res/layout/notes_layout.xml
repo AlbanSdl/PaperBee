@@ -101,7 +101,7 @@
                 app:layout_constraintStart_toEndOf="@id/note_folder_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <fr.asdl.minder.view.sentient.SentientRecyclerView
+            <fr.asdl.paperbee.view.sentient.SentientRecyclerView
                 android:id="@+id/note_elements_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

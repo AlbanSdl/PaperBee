@@ -15,12 +15,12 @@
 
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class fr.asdl.minder.**$$serializer { *; }
+-keep,includedescriptorclasses class fr.asdl.paperbee.**$$serializer { *; }
 #noinspection ShrinkerUnresolvedReference
--keepclassmembers class fr.asdl.minder.** {
+-keepclassmembers class fr.asdl.paperbee.** {
     *** Companion;
 }
 #noinspection ShrinkerUnresolvedReference
--keepclasseswithmembers class fr.asdl.minder.** {
+-keepclasseswithmembers class fr.asdl.paperbee.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

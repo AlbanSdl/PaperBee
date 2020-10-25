@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Minder</string>
+    <string name="app_name">PaperBee</string>
     <string name="loading">Chargement</string>
     <string name="no_note">Ce dossier est vide</string>
     <string name="delete">Supprimer</string>
@@ -53,15 +53,24 @@
     <string name="share_method_nfc">par nfc</string>
     <string name="share_method_header">Choisissez la manière de partager</string>
     <string name="share_method_password">Choisissez un mot de passe</string>
-    <string name="share_method_password_header">Si vous partagez par le biais d\'un fichier, vous devriez ajouter un mot de passe pour protéger vos données si le dit fichier sera accessible par d\'autres personnes que son seul destinataire (ex: réseau sociaux, fournisseur internet)</string>
+    <string name="share_method_password_header">Si vous partagez par le biais d\'un fichier, vous devriez ajouter un mot de passe pour protéger vos données si le dit fichier sera accessible par d\'autres personnes que son seul destinataire (ex: réseaux sociaux, fournisseur internet)</string>
     <string name="share_start">Démarrer le partage</string>
     <string name="shared_to_file_ok">Données sauvegardées dans le fichier avec succès.</string>
     <string name="shared_to_file_exception">Une erreur est survenue lors de la sauvegarde dans le fichier. Cela doit être un bug.</string>
     <string name="share_to_file_choose">Choisissez un fichier</string>
     <string name="share_to_file_failed_retry">Vous devez indiquer une destination valide</string>
     <string name="share_to_file_ready">Prêt à partager</string>
-    <string name="share_to_file_filename">sauvegarde.mind</string>
+    <string name="share_to_file_filename">sauvegarde.bee</string>
     <string name="shared_from_file_ok">Données importées avec succès</string>
     <string name="shared_from_file_exception">Une erreur est survenue lors de l\'import des données</string>
     <string name="share_nfc_not_implemented">Le partage NFC n\'a pas encoré été implémenté !</string>
+    <string name="share_import">Importer</string>
+    <string name="share_import_from_tile_header">Sélectionner un fichier à importer</string>
+    <string name="share_from_file_failed_retry">Fichier invalide</string>
+    <string name="share_import_destination">Choisir une destination</string>
+    <string name="share_import_password_header">Ce fichier est protégé avec un mot de passe. Ecris le ci-dessous pour le décrypter.</string>
+    <string name="share_import_password">Entre le mot de passe</string>
+    <string name="share_import_wrong_password">Mot de passe incorrect</string>
+    <string name="share_import_required_destination">Choisis d\'abord une destination</string>
+    <string name="share_import_selected">Destination: %s</string>
 </resources>

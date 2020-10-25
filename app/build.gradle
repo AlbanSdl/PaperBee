@@ -19,7 +19,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "fr.asdl.minder"
+        applicationId "fr.asdl.paperbee"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 9

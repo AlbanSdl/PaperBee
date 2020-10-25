@@ -35,7 +35,7 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <fr.asdl.minder.view.sentient.SentientRecyclerView
+    <fr.asdl.paperbee.view.sentient.SentientRecyclerView
         android:id="@+id/notes_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"

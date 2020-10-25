@@ -43,7 +43,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
-            <fr.asdl.minder.view.sentient.SentientRecyclerView
+            <fr.asdl.paperbee.view.sentient.SentientRecyclerView
                 android:id="@+id/note_editor_elements"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

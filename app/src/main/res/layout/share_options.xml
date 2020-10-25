@@ -58,7 +58,7 @@
 
     </LinearLayout>
 
-    <fr.asdl.minder.view.StatefulExtendedFloatingActionButton
+    <fr.asdl.paperbee.view.StatefulExtendedFloatingActionButton
         android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
