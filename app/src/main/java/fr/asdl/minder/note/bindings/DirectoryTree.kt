@@ -8,17 +8,19 @@ import fr.asdl.minder.note.NoteFolder
 import fr.asdl.minder.note.NoteManager
 import fr.asdl.minder.view.tree.TreeNode
 
-class DirectoryTree(private val current: Notable<*>?, private val listener: (NoteFolder) -> Unit, folder: NoteFolder) :
+class DirectoryTree(private val current: Notable<*>, private val listener: (NoteFolder) -> Unit, folder: NoteFolder,
+                    private val textSize: Float? = null
+) :
     TreeNode<NoteFolder>(folder) {
 
-    constructor(current: Notable<*>, listener: (NoteFolder) -> Unit):
-            this(current, listener, current.noteManager!!.findElementById(NoteManager.ROOT_ID) as NoteFolder)
+    constructor(current: Notable<*>, listener: (NoteFolder) -> Unit, textSize: Float? = null):
+            this(current, listener, current.noteManager!!.findElementById(NoteManager.ROOT_ID) as NoteFolder, textSize)
 
     init {
         this.t.getContents().filterIsInstance<NoteFolder>().forEach {
-            if (it != current) this.append(DirectoryTree(current, this.listener, it))
+            if (it != current) this.append(DirectoryTree(current, this.listener, it, textSize))
         }
-        if (current?.isChildOf(folder.id!!) == true)
+        if (current.isChildOf(folder.id!!))
             this.toggleExpansion()
     }
 
@@ -29,6 +31,7 @@ class DirectoryTree(private val current: Notable<*>?, private val listener: (Not
     override fun onCreateView(view: View) {
         val textView = view.findViewById<TextView>(R.id.directory_name)
         textView.text = this.t.title
+        if (textSize != null) textView.textSize = textSize
         textView.setOnClickListener { listener.invoke(this@DirectoryTree.t) }
     }
 

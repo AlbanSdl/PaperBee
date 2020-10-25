@@ -76,11 +76,11 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
                 this@NoteAdapter.getDataHolder().update(content)
             }
         }.create()
-        val adapter = DirectoryTree(content) {
+        val adapter = DirectoryTree(content, {
             this@NoteAdapter.folder.remove(content, false)
             it.add(content)
             dialog.dismiss()
-        }
+        })
         treeView.attachData(adapter)
         dialog.show()
     }

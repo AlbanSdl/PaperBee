@@ -24,10 +24,10 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
             if (orig.content == null)
                 view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
-                DirectoryTree(null, {
+                DirectoryTree((activity as MainActivity).noteManager, {
                     orig.destination = it
                     view.findViewById<TextView>(R.id.selected_name).text = getString(R.string.share_import_selected, it.title)
-                }, (activity as MainActivity).noteManager)
+                }, resources.getDimension(R.dimen.smallText) / resources.displayMetrics.scaledDensity)
             )
             view.findViewById<View>(R.id.next).setOnClickListener {
                 if (orig.destination == null) {
