@@ -10,7 +10,7 @@
         android:height="200dp"
         android:gravity="center"
         android:tileMode="repeat"
-        android:drawable="@drawable/ic_asdl"
+        android:drawable="@drawable/ic_launcher_foreground"
         tools:targetApi="m">
     </item>
 

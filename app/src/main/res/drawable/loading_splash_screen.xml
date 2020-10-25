@@ -9,7 +9,7 @@
         android:gravity="center"
         android:tileMode="repeat"
         tools:targetApi="m"
-        android:drawable="@drawable/ic_asdl">
+        android:drawable="@drawable/ic_launcher_foreground">
     </item>
 
 </layer-list>
