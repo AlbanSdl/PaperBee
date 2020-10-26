@@ -29,7 +29,7 @@ class ShareOptions {
                     this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
                 context.createFile(
                     context.getString(R.string.share_to_file_filename),
-                    "application/paperbee",
+                    null,
                     encryptedByteArray
                 ) {
                     sharingStarted = false

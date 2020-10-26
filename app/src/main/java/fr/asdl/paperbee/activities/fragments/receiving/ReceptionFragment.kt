@@ -23,7 +23,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
             }
             view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<View>(R.id.share_from_file_button).setOnClickListener {
-                orig.readFile("application/paperbee") { res, data ->
+                orig.readFile(null) { res, data ->
                     if (res.success) {
                         orig.shareData = data
                         try {

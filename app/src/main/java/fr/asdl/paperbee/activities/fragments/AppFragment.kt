@@ -62,10 +62,10 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
         this.saveState(outState)
     }
 
-    final override fun createFile(fileName: String, fileType: String, content: ByteArray, callback: FileCreationCallBack) {
+    final override fun createFile(fileName: String, fileType: String?, content: ByteArray, callback: FileCreationCallBack) {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = fileType
+            type = fileType ?: "application/octet-stream"
             putExtra(Intent.EXTRA_TITLE, fileName)
         }
         val code = activityResultCodes.allocate()
@@ -73,10 +73,10 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
         startActivityForResult(intent, code)
     }
 
-    final override fun readFile(fileType: String, callback: FileOpeningCallBack) {
+    final override fun readFile(fileType: String?, callback: FileOpeningCallBack) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = fileType
+            type = fileType ?: "application/octet-stream"
         }
         val code = activityResultCodes.allocate()
         this.pendingFileAccesses[code] = FutureFileOpening(callback)

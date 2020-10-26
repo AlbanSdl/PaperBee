@@ -4,13 +4,13 @@ interface FileAccessor {
 
     fun createFile(
         fileName: String,
-        fileType: String,
+        fileType: String?,
         content: ByteArray,
         callback: FileCreationCallBack
     )
 
     fun readFile(
-        fileType: String,
+        fileType: String?,
         callback: FileOpeningCallBack
     )
 
