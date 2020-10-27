@@ -4,14 +4,14 @@
     android:id="@+id/editor_toolbar_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="@dimen/padding_tiny"
+    android:paddingHorizontal="@dimen/appbarSpace"
     android:paddingVertical="@dimen/padding_tiny">
 
     <fr.asdl.paperbee.view.rounded.RoundedImageView
         android:id="@+id/moveOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_small"
+        android:padding="@dimen/appbarElementPadding"
         android:src="@drawable/selector_move_out"
         android:tint="@color/dark"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,7 +21,7 @@
 
     <Space
         android:id="@+id/moveOutSpace"
-        android:layout_width="@dimen/padding_small"
+        android:layout_width="@dimen/appbarSpace"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/moveOut"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +31,7 @@
         android:id="@+id/moveIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_small"
+        android:padding="@dimen/appbarElementPadding"
         android:src="@drawable/selector_move_in"
         android:tint="@color/dark"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +47,7 @@
         android:id="@+id/add_text_element"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_small"
+        android:padding="@dimen/appbarElementPadding"
         android:src="@drawable/ic_text_fields"
         android:tint="@color/dark"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +57,7 @@
 
     <Space
         android:id="@+id/addCheckBoxSpace"
-        android:layout_width="@dimen/padding_small"
+        android:layout_width="@dimen/appbarSpace"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@+id/add_checkbox_element"
         app:layout_constraintTop_toTopOf="parent"
@@ -67,7 +67,7 @@
         android:id="@+id/add_checkbox_element"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_small"
+        android:padding="@dimen/appbarElementPadding"
         android:src="@drawable/ic_check_box"
         android:tint="@color/dark"
         app:layout_constraintBottom_toBottomOf="parent"

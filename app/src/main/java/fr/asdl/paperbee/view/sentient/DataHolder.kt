@@ -9,7 +9,7 @@ import kotlinx.serialization.Transient
  */
 interface DataHolder {
     /**
-     * The id of the [DataHolder] (in his [DataHolderList])
+     * The id of the [DataHolder].
      */
     var id: Int?
     /**
