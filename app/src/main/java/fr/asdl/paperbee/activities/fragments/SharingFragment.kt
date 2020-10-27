@@ -29,7 +29,7 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
 
     fun from(from: Notable<*>) {
         this.openedFrom = from
-        if (from.id!! >= 0) {
+        if (from.id!! >= 0 && selection.size == 0) {
             if (from is Note) selection.add(from)
             else {
                 fun rec(nt: Notable<*>) {
