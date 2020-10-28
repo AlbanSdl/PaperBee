@@ -9,13 +9,15 @@ import android.view.*
 import androidx.annotation.CallSuper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import fr.asdl.paperbee.IntAllocator
+import fr.asdl.paperbee.R
 import fr.asdl.paperbee.sharing.files.*
 import fr.asdl.paperbee.sharing.permissions.PermissionAccessor
 import fr.asdl.paperbee.sharing.permissions.PermissionRationale
 
-abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
+abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, DrawerLock {
 
     private val activityResultCodes = IntAllocator()
     private val pendingFileAccesses = hashMapOf<Int, FutureFileAccess>()
@@ -47,6 +49,12 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
         val view = fragmentInflater.inflate(this.layoutId, container, false)
         this.onLayoutInflated(view)
         return view
+    }
+
+    @CallSuper
+    override fun onResume() {
+        this.updateDrawerLock()
+        super.onResume()
     }
 
     final override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -129,5 +137,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         }
     }
+
+    override fun getDrawer(): DrawerLayout? = activity?.findViewById(R.id.main)
 
 }

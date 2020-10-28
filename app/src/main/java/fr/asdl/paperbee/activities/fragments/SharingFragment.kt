@@ -63,6 +63,8 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
         return true
     }
 
+    override fun shouldLockDrawer(): Boolean = true
+
     override fun saveState(savedInstanceState: Bundle) {
         savedInstanceState.putInt(SAVED_INSTANCE_TAG, this.openedFrom.id!!)
     }

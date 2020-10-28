@@ -7,5 +7,6 @@ import fr.asdl.paperbee.activities.fragments.SubFragment
 abstract class ShareBaseFragment : AppFragment(), SubFragment {
 
     override fun getToolbarId(): Int = R.id.share_toolbar
+    override fun shouldLockDrawer(): Boolean = true
 
 }

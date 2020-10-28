@@ -104,6 +104,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         notable.notify = false
     }
 
+    override fun shouldLockDrawer(): Boolean = true
+
     override fun getTintBackgroundView(fragmentRoot: View): View? {
         return fragmentRoot.findViewById(R.id.transitionBackground)
     }

@@ -6,4 +6,6 @@ class LayoutFragment(override val layoutId: Int) : AppFragment() {
 
     override fun onLayoutInflated(view: View) {}
 
+    override fun shouldLockDrawer(): Boolean = false
+
 }

@@ -36,6 +36,8 @@ class ImportFragment : AppFragment(), FragmentContainer<ReceptionBaseFragment> {
         return true
     }
 
+    override fun shouldLockDrawer(): Boolean = true
+
     override fun getFragmentContainerId(): Int = R.id.share_fragment_container
 
 }

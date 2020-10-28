@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
@@ -92,6 +93,8 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
         }
         return true
     }
+
+    override fun shouldLockDrawer(): Boolean = false
 
     override fun onClick(v: View?) {
         when (v?.id) {
