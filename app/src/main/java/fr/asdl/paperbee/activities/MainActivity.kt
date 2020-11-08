@@ -26,7 +26,12 @@ class MainActivity : AppCompatActivity() {
             this.openNotable(noteManager, false)
             // Handling creation shortcut
             if (intent.extras?.containsKey("create") == true) {
-                val note = Note("", noteManager, idAllocator = noteManager.idAllocator, parentId = noteManager.id)
+                val note = Note(
+                    "",
+                    noteManager,
+                    idAllocator = noteManager.idAllocator,
+                    parentId = noteManager.id
+                )
                 noteManager.add(note)
                 note.add(NoteText(""))
                 this.openNotable(note)
@@ -35,12 +40,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openNotable(notable: Notable<*>, vararg sharedViews: View) {
-        this.openNotable(notable, true,
+        this.openNotable(
+            notable, true,
             *(if (notable is NoteFolder) arrayOf(*sharedViews)
-                .plus(arrayOf(findViewById(R.id.add_note_button),
-                    findViewById(R.id.add_note_selector),
-                    findViewById(R.id.add_folder_selector),
-                    findViewById(R.id.folder_color))) else sharedViews))
+                .plus(
+                    arrayOf(
+                        findViewById(R.id.add_note_button),
+                        findViewById(R.id.add_note_selector),
+                        findViewById(R.id.add_folder_selector),
+                        findViewById(R.id.folder_color)
+                    )
+                ) else sharedViews)
+        )
     }
 
     fun startSharing(notable: Notable<*>) {
@@ -58,39 +69,53 @@ class MainActivity : AppCompatActivity() {
         this.loadFragment(fragment, "import", FragmentTransition.SLIDE_BOTTOM)
     }
 
-    private fun openNotable(notable: Notable<*>, addToBackStack: Boolean, vararg  sharedViews: View) = this.loadFragment(
-        if (notable is NoteFolder) FolderFragment().attach(notable) else NoteFragment().attach(notable as Note),
+    private fun openNotable(
+        notable: Notable<*>,
+        addToBackStack: Boolean,
+        vararg sharedViews: View
+    ) = this.loadFragment(
+        if (notable is NoteFolder) FolderFragment().attach(notable) else NoteFragment().attach(
+            notable as Note
+        ),
         if (addToBackStack) notable.id.toString() else null,
         if (notable is NoteManager) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
         *sharedViews
     )
 
-    private fun loadFragment(frag: AppFragment, addToBackStackTag: String?,
-                             transition: FragmentTransition? = null, vararg  sharedViews: View) {
+    private fun loadFragment(
+        frag: AppFragment, addToBackStackTag: String?,
+        transition: FragmentTransition? = null, vararg sharedViews: View
+    ) {
 
         if (transition != null) {
             val transitionInflater = TransitionInflater.from(this@MainActivity)
             val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)
             if (currentFragment != null) {
                 if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                    currentFragment.sharedElementReturnTransition = transitionInflater.inflateTransition(R.transition.shared_elements_transition)
-                    currentFragment.exitTransition = transitionInflater.inflateTransition(transition.animOut)
+                    currentFragment.sharedElementReturnTransition =
+                        transitionInflater.inflateTransition(R.transition.shared_elements_transition)
+                    currentFragment.exitTransition =
+                        transitionInflater.inflateTransition(transition.animOut)
                 } else {
-                    currentFragment.exitTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animOut)
+                    currentFragment.exitTransition =
+                        transitionInflater.inflateTransition(FragmentTransition.SLIDE.animOut)
                 }
             }
             if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                frag.sharedElementEnterTransition = transitionInflater.inflateTransition(R.transition.shared_elements_transition)
+                frag.sharedElementEnterTransition =
+                    transitionInflater.inflateTransition(R.transition.shared_elements_transition)
                 frag.enterTransition = transitionInflater.inflateTransition(transition.animIn)
             } else {
-                frag.enterTransition = transitionInflater.inflateTransition(FragmentTransition.SLIDE.animIn)
+                frag.enterTransition =
+                    transitionInflater.inflateTransition(FragmentTransition.SLIDE.animIn)
             }
         }
 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.setPrimaryNavigationFragment(frag)
         arrayOf(*sharedViews).forEach {
-            val targetTransitionName = (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
+            val targetTransitionName =
+                (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
             transaction.addSharedElement(it, targetTransitionName)
         }
         transaction.replace(R.id.folder_contents, frag, addToBackStackTag)

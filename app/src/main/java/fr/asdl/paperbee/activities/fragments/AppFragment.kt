@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.*
 import androidx.annotation.CallSuper
 import androidx.core.app.ActivityCompat
@@ -40,11 +39,12 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         this.retainInstance = this.shouldRetainInstance
         if (savedInstanceState != null) this.restoreState(savedInstanceState)
         this.setHasOptionsMenu(true)
-        val fragmentInflater = if (styleId != null) inflater.cloneInContext(ContextThemeWrapper(activity, styleId!!)) else inflater
-
-        val statusBarColor = TypedValue()
-        fragmentInflater.context.theme.resolveAttribute(android.R.attr.statusBarColor, statusBarColor, true)
-        activity?.window?.statusBarColor = statusBarColor.data
+        val fragmentInflater = if (styleId != null) inflater.cloneInContext(
+            ContextThemeWrapper(
+                activity,
+                styleId!!
+            )
+        ) else inflater
 
         val view = fragmentInflater.inflate(this.layoutId, container, false)
         this.onLayoutInflated(view)
@@ -54,9 +54,11 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
     @CallSuper
     override fun onResume() {
         this.updateDrawerLock()
+        requireView().requestApplyInsets()
         super.onResume()
     }
 
+    @CallSuper
     final override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (this.menuLayoutId != null) inflater.inflate(this.menuLayoutId!!, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -66,11 +68,17 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         return false
     }
 
+    @CallSuper
     final override fun onSaveInstanceState(outState: Bundle) {
         this.saveState(outState)
     }
 
-    final override fun createFile(fileName: String, fileType: String?, content: ByteArray, callback: FileCreationCallBack) {
+    final override fun createFile(
+        fileName: String,
+        fileType: String?,
+        content: ByteArray,
+        callback: FileCreationCallBack
+    ) {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = fileType ?: "application/octet-stream"
@@ -98,24 +106,45 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
             this.activityResultCodes.release(requestCode)
             if (resultCode == Activity.RESULT_OK) data?.data?.also { uri ->
                 try {
-                    futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.ACCESSED, uri))
+                    futureFileAccess.onAccessed.invoke(
+                        this.activity!!,
+                        FileAccess(FileAccessResult.ACCESSED, uri)
+                    )
                 } catch (io: Exception) {
-                    futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.ERROR))
+                    futureFileAccess.onAccessed.invoke(
+                        this.activity!!,
+                        FileAccess(FileAccessResult.ERROR)
+                    )
                 }
             }
-            else futureFileAccess.onAccessed.invoke(this.activity!!, FileAccess(FileAccessResult.CANCELLED))
+            else futureFileAccess.onAccessed.invoke(
+                this.activity!!,
+                FileAccess(FileAccessResult.CANCELLED)
+            )
         }
     }
 
-    override fun usePermission(permission: String, callback: (Boolean) -> Unit, rationale: PermissionRationale?) {
+    override fun usePermission(
+        permission: String,
+        callback: (Boolean) -> Unit,
+        rationale: PermissionRationale?
+    ) {
         val activity = activity ?: return
-        if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                activity,
+                permission
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             fun openPermissionRequestDialog() {
                 val code = activityResultCodes.allocate()
                 this.pendingPermissionUses[code] = callback
                 ActivityCompat.requestPermissions(activity, arrayOf(permission), code)
             }
-            if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(activity, permission))
+            if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity,
+                    permission
+                )
+            )
                 rationale.setCallback { openPermissionRequestDialog() }.display(this.context!!)
             else
                 openPermissionRequestDialog()
@@ -133,8 +162,10 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         val permissionUse = this.pendingPermissionUses.remove(requestCode)
         if (permissionUse != null) {
             this.activityResultCodes.release(requestCode)
-            permissionUse.invoke(grantResults.isNotEmpty()
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            permissionUse.invoke(
+                grantResults.isNotEmpty()
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            )
         }
     }
 

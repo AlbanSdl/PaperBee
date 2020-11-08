@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/blank" />
 
@@ -16,7 +17,7 @@
         android:id="@+id/share_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/share_toolbar"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/share_toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
