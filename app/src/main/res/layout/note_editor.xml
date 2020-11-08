@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.Toolbar
+            <fr.asdl.paperbee.view.ActionToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                     android:inputType="text"
                     android:transitionName="@string/transition_name_title" />
 
-            </androidx.appcompat.widget.Toolbar>
+            </fr.asdl.paperbee.view.ActionToolbar>
 
             <LinearLayout
                 android:id="@+id/editor_toolbar"

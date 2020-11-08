@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <fr.asdl.paperbee.view.ActionToolbar
         android:id="@+id/folder_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:textColor="@color/blank" />
 
-    </androidx.appcompat.widget.Toolbar>
+    </fr.asdl.paperbee.view.ActionToolbar>
 
     <LinearLayout
         android:id="@+id/loadingBox"

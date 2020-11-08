@@ -12,7 +12,7 @@
         android:background="@color/semiBlank"
         android:transitionName="@string/transition_folder_color" />
 
-    <androidx.appcompat.widget.Toolbar
+    <fr.asdl.paperbee.view.ActionToolbar
         android:id="@+id/folder_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:textColorHint="@color/blankHint"
             android:textSize="@dimen/appBarTextSize" />
 
-    </androidx.appcompat.widget.Toolbar>
+    </fr.asdl.paperbee.view.ActionToolbar>
 
     <fr.asdl.paperbee.view.sentient.SentientRecyclerView
         android:id="@+id/notes_recycler"
