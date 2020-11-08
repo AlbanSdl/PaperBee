@@ -130,4 +130,9 @@ class MainActivity : AppCompatActivity() {
         EXPLODE(R.transition.folder_explode, R.transition.folder_explode)
     }
 
+    override fun onBackPressed() {
+        window.decorView.clearFocus() // we close the keyboard if displayed
+        super.onBackPressed()
+    }
+
 }
