@@ -3,7 +3,9 @@ package fr.asdl.paperbee.activities
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.transition.TransitionInflater
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
@@ -131,8 +133,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        window.decorView.clearFocus() // we close the keyboard if displayed
-        super.onBackPressed()
+        val drawer = this.findViewById<DrawerLayout>(R.id.main)
+        if (drawer.isDrawerOpen(GravityCompat.START)) drawer.closeDrawer(GravityCompat.START)
+        else {
+            window.decorView.clearFocus() // we close the keyboard if displayed
+            super.onBackPressed()
+        }
     }
 
 }

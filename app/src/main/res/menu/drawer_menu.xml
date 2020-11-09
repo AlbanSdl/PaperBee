@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/goto_trash"
+        android:checkable="true"
+        android:icon="@drawable/ic_baseline_delete"
+        android:orderInCategory="100"
+        android:title="@string/trash_can_goto"
+        android:titleCondensed="@string/trash_can_goto" />
+
+</menu>
