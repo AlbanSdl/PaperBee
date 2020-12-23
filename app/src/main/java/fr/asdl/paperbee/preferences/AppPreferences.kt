@@ -1,13 +1,13 @@
 package fr.asdl.paperbee.preferences
 
 import android.content.Context
-import android.content.ContextWrapper
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import fr.asdl.paperbee.R
 
-class AppPreferences(val context: ContextWrapper) {
+class AppPreferences(val context: Context) {
 
     companion object {
-        val GENERIC_TEST = Preference(R.string.pref_generic_name, true)
+        val APP_THEME = Preference(R.string.pref_app_theme_name, MODE_NIGHT_FOLLOW_SYSTEM)
     }
 
     inline fun <reified T> get(preference: Preference<T>): T {
@@ -27,16 +27,16 @@ class AppPreferences(val context: ContextWrapper) {
         val editor = this.context.getSharedPreferences(this.context.getString(R.string.preferences_file), Context.MODE_PRIVATE).edit()
         val prefName = this.context.getString(preference.resId)
         when (T::class) {
-            String::class -> editor.putString(prefName, value as? String ?: preference.default!! as String) as T
-            Integer::class -> editor.putInt(prefName, value as? Int ?: preference.default!! as Int) as T
-            Boolean::class -> editor.putBoolean(prefName, value as? Boolean ?: preference.default!! as Boolean) as T
-            Float::class -> editor.putFloat(prefName, preference.default as? Float ?: preference.default!! as Float) as T
-            Long::class -> editor.putLong(prefName, preference.default as? Long ?: preference.default!! as Long) as T
+            String::class -> editor.putString(prefName, value as? String ?: preference.default!! as String)
+            Integer::class -> editor.putInt(prefName, value as? Int ?: preference.default!! as Int)
+            Boolean::class -> editor.putBoolean(prefName, value as? Boolean ?: preference.default!! as Boolean)
+            Float::class -> editor.putFloat(prefName, preference.default as? Float ?: preference.default!! as Float)
+            Long::class -> editor.putLong(prefName, preference.default as? Long ?: preference.default!! as Long)
             else -> throw UnsupportedOperationException("Not yet implemented")
         }
         editor.apply()
     }
 
-    data class Preference<T>(val resId: Int, val default: T)
+    data class Preference<out T>(val resId: Int, val default: T)
 
 }

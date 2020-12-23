@@ -1,7 +1,7 @@
 <resources>
     <!-- App Resource Strings -->
     <string name="preferences_file" translatable="false">fr.asdl.paperbee</string>
-    <string name="pref_generic_name" translatable="false">generic_name</string>
+    <string name="pref_app_theme_name" translatable="false">app_theme_pref</string>
     <string name="notes_directory_name" translatable="false">notes</string>
     <string name="transition_name" translatable="false">TransitionOpenBackground</string>
     <string name="transition_name_title" translatable="false">TransitionOpenTitle</string>
@@ -86,4 +86,5 @@
     <string name="share_import_wrong_password">Wrong password</string>
     <string name="share_import_required_destination">Choose a destination first</string>
     <string name="share_import_selected">"Selected destination: %s"</string>
+    <string name="drawer_settings">Settings</string>
 </resources>
