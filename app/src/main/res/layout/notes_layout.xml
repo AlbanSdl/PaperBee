@@ -84,9 +84,9 @@
                 android:paddingEnd="@dimen/padding_small"
                 android:src="@drawable/ic_folder_open"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:tint="@color/dark"
                 tools:ignore="RtlSymmetry" />
 
@@ -109,6 +109,7 @@
                 android:fadingEdgeLength="@dimen/note_fading_edge_length"
                 android:nestedScrollingEnabled="false"
                 android:requiresFadingEdge="vertical"
+                android:scrollbars="none"
                 android:transitionGroup="true"
                 android:transitionName="@string/transition_name_contents"
                 app:allowSwipe="none"

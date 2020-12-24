@@ -1,6 +1,7 @@
 package fr.asdl.paperbee.activities.fragments
 
 import android.os.Bundle
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import fr.asdl.paperbee.R
@@ -13,14 +14,18 @@ class PreferenceContentsFragment : PreferenceFragmentCompat(), DarkThemed {
         manager.sharedPreferencesName = getString(R.string.preferences_file)
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
-        val pref = findPreference<Preference>(getString(R.string.pref_app_theme_name))
-        pref?.sharedPreferences?.edit()?.putString(
+        val appThemePref = findPreference<Preference>(getString(R.string.pref_app_theme_name))
+        appThemePref?.sharedPreferences?.edit()?.putString(
             getString(R.string.pref_app_theme_name), this.getCurrentSettings().mode.toString()
         )?.apply()
-        pref?.setOnPreferenceChangeListener { _, value ->
+        appThemePref?.setOnPreferenceChangeListener { _, value ->
             this.applyTheme(DarkThemed.Theme.fromSysVal((value as String).toInt()))
             true
         }
+
+        val licensePref = findPreference<Preference>(getString(R.string.pref_app_version))
+        val pkgInfo = requireActivity().packageManager.getPackageInfo(requireActivity().application.packageName, 0)
+        licensePref?.summary = getString(R.string.pref_app_version_summary, pkgInfo.versionName, PackageInfoCompat.getLongVersionCode(pkgInfo))
     }
 
 }

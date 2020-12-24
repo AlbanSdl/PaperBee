@@ -6,13 +6,26 @@
         app:title="@string/pref_app_appearance">
 
         <ListPreference
-            app:icon="@drawable/ic_dark_mode"
+            app:allowDividerBelow="false"
+            app:defaultValue="-1"
             app:entries="@array/pref_app_theme_options"
             app:entryValues="@array/pref_app_theme_values"
-            app:defaultValue="-1"
-            app:useSimpleSummaryProvider="true"
+            app:icon="@drawable/ic_dark_mode"
             app:key="@string/pref_app_theme_name"
-            app:title="@string/pref_app_theme_title" />
+            app:title="@string/pref_app_theme_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/pref_app_category_misc">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/pref_app_version"
+            app:persistent="false"
+            app:title="@string/pref_app_version_title" />
 
     </PreferenceCategory>
 
