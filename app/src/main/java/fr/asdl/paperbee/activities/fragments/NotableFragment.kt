@@ -2,7 +2,6 @@ package fr.asdl.paperbee.activities.fragments
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,6 @@ abstract class NotableFragment<T: Notable<*>> : AppFragment() {
 
     override fun restoreState(savedInstanceState: Bundle) {
         val t = (this.activity as? MainActivity)?.noteManager?.findElementById(savedInstanceState.getInt(SAVED_INSTANCE_TAG))
-        Log.e(javaClass.simpleName, "Restoring ?")
         if (this is FolderFragment && t is NoteFolder) this.attach(t)
         else if (this is NoteFragment && t is Note) this.attach(t)
     }

@@ -6,7 +6,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionBarStyle">@style/ActionBar</item>
-        <item name="android:textColorSecondary">@color/blank</item>
+        <item name="android:textColorSecondary">@color/almostDark</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
@@ -19,6 +19,9 @@
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/colorPrimary</item>
         <item name="titleTextStyle">@style/ActionBarTitle</item>
+        <item name="android:textColorPrimary">@color/blank</item>
+        <item name="android:textColorSecondary">@color/blank</item>
+        <item name="actionMenuTextColor">@color/blank</item>
     </style>
 
     <style name="ActionBarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">

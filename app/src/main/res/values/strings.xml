@@ -87,4 +87,12 @@
     <string name="share_import_required_destination">Choose a destination first</string>
     <string name="share_import_selected">"Selected destination: %s"</string>
     <string name="drawer_settings">Settings</string>
+    <string name="settings">Settings</string>
+    <string name="pref_app_theme_title">App theme</string>
+    <string name="pref_app_appearance">Appearance</string>
+    <string-array name="pref_app_theme_options">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow system</item>
+    </string-array>
 </resources>

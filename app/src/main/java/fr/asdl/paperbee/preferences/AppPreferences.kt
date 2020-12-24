@@ -7,7 +7,7 @@ import fr.asdl.paperbee.R
 class AppPreferences(val context: Context) {
 
     companion object {
-        val APP_THEME = Preference(R.string.pref_app_theme_name, MODE_NIGHT_FOLLOW_SYSTEM)
+        val APP_THEME = Preference(R.string.pref_app_theme_name, MODE_NIGHT_FOLLOW_SYSTEM.toString())
     }
 
     inline fun <reified T> get(preference: Preference<T>): T {

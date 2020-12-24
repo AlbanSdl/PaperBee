@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fr.asdl.paperbee.view.ActionToolbar
-        android:id="@+id/share_toolbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/folder_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -14,10 +14,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/share_fragment_container"
+        android:id="@+id/settings_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/share_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/folder_toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

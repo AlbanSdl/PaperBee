@@ -107,18 +107,18 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
             if (resultCode == Activity.RESULT_OK) data?.data?.also { uri ->
                 try {
                     futureFileAccess.onAccessed.invoke(
-                        this.activity!!,
+                        this.requireActivity(),
                         FileAccess(FileAccessResult.ACCESSED, uri)
                     )
                 } catch (io: Exception) {
                     futureFileAccess.onAccessed.invoke(
-                        this.activity!!,
+                        this.requireActivity(),
                         FileAccess(FileAccessResult.ERROR)
                     )
                 }
             }
             else futureFileAccess.onAccessed.invoke(
-                this.activity!!,
+                this.requireActivity(),
                 FileAccess(FileAccessResult.CANCELLED)
             )
         }
@@ -145,7 +145,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
                     permission
                 )
             )
-                rationale.setCallback { openPermissionRequestDialog() }.display(this.context!!)
+                rationale.setCallback { openPermissionRequestDialog() }.display(this.requireContext())
             else
                 openPermissionRequestDialog()
         } else {

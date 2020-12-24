@@ -14,6 +14,11 @@ class NoteManager(context: Context, idAllocator: IntAllocator) : NoteFolder(cont
         const val TRASH_ID = -2
     }
 
+    private var propLoaded: Boolean = false
+    var loaded: Boolean
+        get() = propLoaded
+        private set(value) { propLoaded = value }
+
     private val dataDirectory = SavedDataDirectory(context.getString(R.string.notes_directory_name), context)
     private val serializer = NoteSerializer()
     private val trash = NoteFolder(context.getString(R.string.trash_can), noteManager = this, idAllocator = idAllocator, parentId = null)
@@ -26,6 +31,7 @@ class NoteManager(context: Context, idAllocator: IntAllocator) : NoteFolder(cont
 
     fun load() {
         this.load(dataDirectory.loadData(this.serializer), this)
+        this.loaded = true
     }
 
     public override fun save(element: Notable<*>): Boolean {

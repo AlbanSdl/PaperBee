@@ -73,4 +73,13 @@
     <string name="share_import_wrong_password">Mot de passe incorrect</string>
     <string name="share_import_required_destination">Choisis d\'abord une destination</string>
     <string name="share_import_selected">Destination: %s</string>
+    <string name="drawer_settings">Paramètres</string>
+    <string name="settings">Paramètres</string>
+    <string name="pref_app_theme_title">Thème de l\'application</string>
+    <string name="pref_app_appearance">Apparence</string>
+    <string-array name="pref_app_theme_options">
+        <item>Clair</item>
+        <item>Foncé</item>
+        <item>Comme Android</item>
+    </string-array>
 </resources>

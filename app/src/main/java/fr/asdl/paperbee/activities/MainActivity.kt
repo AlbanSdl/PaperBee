@@ -1,28 +1,47 @@
 package fr.asdl.paperbee.activities
 
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.transition.TransitionInflater
+import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.*
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.note.*
+import fr.asdl.paperbee.view.DarkThemed
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DarkThemed {
+
+    companion object {
+        private lateinit var noteManager: NoteManager
+        private fun retrieveNoteManager(context: Context): NoteManager {
+            if (!::noteManager.isInitialized || !noteManager.loaded) {
+                noteManager = NoteManager(context, IntAllocator())
+                noteManager.load()
+            }
+            return noteManager
+        }
+    }
 
     lateinit var noteManager: NoteManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        noteManager = NoteManager(this, IntAllocator())
-        noteManager.load()
+        noteManager = retrieveNoteManager(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        this.findViewById<NavigationView>(R.id.nav).apply {
+            this.setNavigationItemSelectedListener { navigate(it, this) }
+        }
         if (supportFragmentManager.backStackEntryCount == 0) {
             this.loadFragment(LayoutFragment(R.layout.loading), null)
             this.openNotable(noteManager, false)
@@ -39,6 +58,20 @@ class MainActivity : AppCompatActivity() {
                 this.openNotable(note)
             }
         }
+    }
+
+    private fun navigate(it: MenuItem, navigationView: NavigationView?): Boolean {
+        if (navigationView?.checkedItem != it || navigationView.checkedItem?.isChecked == false) {
+            when(it.itemId) {
+                R.id.drawer_settings -> {
+                    val preferences = PreferenceFragmentRoot()
+                    preferences.allowEnterTransitionOverlap = true
+                    this.findViewById<DrawerLayout>(R.id.main).closeDrawers()
+                    this.loadFragment(preferences, "preferences", FragmentTransition.SLIDE_BOTTOM)
+                }
+            }
+        }
+        return false
     }
 
     fun openNotable(notable: Notable<*>, vararg sharedViews: View) {
@@ -139,6 +172,10 @@ class MainActivity : AppCompatActivity() {
             window.decorView.clearFocus() // we close the keyboard if displayed
             super.onBackPressed()
         }
+    }
+
+    override fun requireContext(): Context {
+        return this
     }
 
 }

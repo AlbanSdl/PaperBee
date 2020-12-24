@@ -74,13 +74,13 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
             android.R.id.home -> activity?.onBackPressed()
             R.id.goto_trash -> (activity as? MainActivity)?.openNotable(notable.noteManager?.findElementById(TRASH_ID) as NoteFolder)
             R.id.empty_trash -> {
-                if (activity != null) AlertDialog.Builder(activity!!).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
+                if (activity != null) AlertDialog.Builder(requireActivity()).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
                     setPositiveButton(android.R.string.ok) { _, _ -> notable.clear() }
                     setNegativeButton(android.R.string.cancel) { _, _ -> }
                 }.show()
             }
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(*Color.values()), Color.getIndex(notable.color), false) {
+                ColorPicker(requireActivity(), listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
                     this.updateBackgroundTint()
                     notable.save()
