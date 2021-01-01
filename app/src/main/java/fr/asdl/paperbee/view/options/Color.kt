@@ -15,7 +15,7 @@ enum class Color(val tag: String, @ColorRes val id: Int, @StringRes val colorNam
     RED("noteColorRed", R.color.noteColorRed, R.string.colorRedName);
 
     companion object {
-        fun getFromTag(colorTag: String): Color? {
+        fun getFromTag(colorTag: String?): Color? {
             for (i in values()) if (i.tag == colorTag) return i
             return null
         }

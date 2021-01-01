@@ -23,9 +23,9 @@ class PreferenceContentsFragment : PreferenceFragmentCompat(), DarkThemed {
             true
         }
 
-        val licensePref = findPreference<Preference>(getString(R.string.pref_app_version))
+        val versionPref = findPreference<Preference>(getString(R.string.pref_app_version))
         val pkgInfo = requireActivity().packageManager.getPackageInfo(requireActivity().application.packageName, 0)
-        licensePref?.summary = getString(R.string.pref_app_version_summary, pkgInfo.versionName, PackageInfoCompat.getLongVersionCode(pkgInfo))
+        versionPref?.summary = getString(R.string.pref_app_version_summary, pkgInfo.versionName, PackageInfoCompat.getLongVersionCode(pkgInfo))
     }
 
 }
