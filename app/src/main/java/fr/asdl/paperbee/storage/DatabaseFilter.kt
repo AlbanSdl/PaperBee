@@ -14,6 +14,11 @@ class DatabaseFilter {
         IN("IN")
     }
 
+    enum class LogicOperator {
+        OR,
+        AND
+    }
+
     class FilterEntry(
         internal val column: String,
         internal val value: String,
@@ -23,36 +28,36 @@ class DatabaseFilter {
     private var whereClause: String = ""
     private val args: ArrayList<String> = arrayListOf()
 
-    private fun assertSpacing() {
-        if (whereClause.takeLast(1) != " ")
-            whereClause += " "
-    }
-
     /**
-     * Adds multiple AND conditions with the same priority. In math it would be said all the
-     * elements given below would be put in brackets.
+     * Adds multiple conditions with the same priority. In math it would be said all the
+     * elements given below would be put in brackets. These conditions will be appended to the rest
+     * of the filter with an AND operation.
+     * @param link the operation to use between each entry, if different from AND
      */
-    fun and(vararg filterEntries: FilterEntry): DatabaseFilter {
-        this.append("AND", *filterEntries)
+    fun and(link: LogicOperator? = null, vararg filterEntries: FilterEntry): DatabaseFilter {
+        this.append(LogicOperator.AND, link, *filterEntries)
         return this
     }
 
     /**
-     * Adds multiple OR conditions with the same priority. In math it would be said all the
-     * elements given below would be put in brackets.
+     * Adds multiple conditions with the same priority. In math it would be said all the
+     * elements given below would be put in brackets. These conditions will be appended to the rest
+     * of the filter with an OR operation.
+     * @param link the operation to use between each entry, if different from OR
      */
-    fun or(vararg filterEntries: FilterEntry): DatabaseFilter {
-        this.append("OR", *filterEntries)
+    fun or(link: LogicOperator? = null, vararg filterEntries: FilterEntry): DatabaseFilter {
+        this.append(LogicOperator.OR, link, *filterEntries)
         return this
     }
 
-    private fun append(keyword: String, vararg filterEntries: FilterEntry) {
+    private fun append(keyword: LogicOperator, link: LogicOperator? = null, vararg filterEntries: FilterEntry) {
+        val usedLink = if (link == null && filterEntries.size > 1) keyword else link
         if (filterEntries.isNotEmpty()) {
-            assertSpacing()
+            if (whereClause.isNotEmpty()) whereClause += " $keyword "
             if (filterEntries.size > 1) whereClause += "( "
             for (i in filterEntries.indices) {
                 val entry = filterEntries[i]
-                if (i != 0) whereClause += " $keyword "
+                if (i != 0) whereClause += " $usedLink "
                 whereClause += "${entry.column} ${entry.operator.symbol} ?"
                 args.add(entry.value)
             }

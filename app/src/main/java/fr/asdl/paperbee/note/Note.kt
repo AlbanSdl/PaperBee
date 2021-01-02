@@ -1,19 +1,14 @@
 package fr.asdl.paperbee.note
 
-import fr.asdl.paperbee.IntAllocator
 import java.util.*
 
 /**
  * The structure of a note, containing a title and contents.
  */
-class Note(title: String,
-           noteManager: NoteManager?,
-           content: LinkedList<NotePart> = LinkedList(),
-           idAllocator: IntAllocator?,
-           parentId: Int?
-) : Notable<NotePart>(title, noteManager, content, idAllocator, parentId) {
+class Note: Notable<NotePart>() {
 
-    override fun shouldEnforceParentId(): Boolean = false
+    override val contents: LinkedList<NotePart>
+        get() = db?.findNoteContent(this.id!!) ?: LinkedList()
 
     /**
      * Hides all the sub-elements contained in a NotePart

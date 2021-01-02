@@ -24,7 +24,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
             if (orig.content == null)
                 view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
-                DirectoryTree((activity as MainActivity).noteManager, {
+                DirectoryTree((activity as MainActivity).dbProxy.acquireRoot(), {
                     orig.destination = it
                     view.findViewById<TextView>(R.id.selected_name).text = getString(R.string.share_import_selected, it.title)
                 }, resources.getDimension(R.dimen.smallText) / resources.displayMetrics.scaledDensity)
@@ -50,7 +50,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                     }
                 }
                 if (orig.content != null) {
-                    orig.destination!!.noteManager!!.import(orig.content!!, orig.destination!!)
+                    orig.destination!!.db!!.import(orig.content!!, orig.destination!!)
                     activity?.supportFragmentManager?.popBackStack(
                         orig.tag,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -64,7 +64,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
 
     override fun getSharedViews(): List<View> {
         if (this.view == null) return super.getSharedViews()
-        return listOf(this.view!!.findViewById(R.id.next))
+        return listOf(this.requireView().findViewById(R.id.next))
     }
 
 }

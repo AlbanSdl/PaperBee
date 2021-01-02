@@ -18,6 +18,8 @@ import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.note.bindings.NotePartAdapter
 import fr.asdl.paperbee.note.bindings.NotePartDecoration
+import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
+import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.rounded.RoundedImageView
@@ -50,6 +52,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 notable.title = s.toString()
+                notable.notifyDataChanged(COLUMN_NAME_PAYLOAD)
                 notable.save()
             }
         })
@@ -63,7 +66,6 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             this.focusedNote = if (newFocus != null) adapter.getHeldItem(rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1) else null
             this.updateContextToolbarEnabled(rec.rootView)
         }
-        notable.notify = true
     }
 
     private fun updateContextToolbarEnabled(viewFrom: View) {
@@ -77,9 +79,10 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
             R.id.set_color -> {
-                ColorPicker(activity!!, listOf(*Color.values()), Color.getIndex(notable.color), false) {
+                ColorPicker(requireActivity(), listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
                     this.updateBackgroundTint()
+                    notable.notifyDataChanged(COLUMN_NAME_EXTRA)
                     notable.save()
                 }
             }
@@ -97,11 +100,6 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.moveIn -> this.focusedNote?.moveIn()
             R.id.moveOut -> this.focusedNote?.moveOut()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        notable.notify = false
     }
 
     override fun shouldLockDrawer(): Boolean = true
@@ -126,7 +124,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
-                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; notable.update(content, false) }
+                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save() }
             }
         }
 
@@ -175,7 +173,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         override fun afterTextChanged(s: Editable?) {
             if (notePart is TextNotePart && s != null) {
                 (notePart as TextNotePart).content = s.toString()
-                notable.update(notePart as NotePart, false)
+                notePart.notifyDataChanged(COLUMN_NAME_PAYLOAD)
+                notePart.save()
             }
         }
     }

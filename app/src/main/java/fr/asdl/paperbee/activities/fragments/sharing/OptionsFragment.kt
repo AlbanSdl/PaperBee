@@ -60,7 +60,7 @@ class OptionsFragment : ShareBaseFragment() {
 
     override fun getSharedViews(): List<View> {
         if (this.view == null) return super.getSharedViews()
-        return listOf(this.view!!.findViewById(R.id.next))
+        return listOf(this.requireView().findViewById(R.id.next))
     }
 
     private class SimpleWatcher(private val listener: (String) -> Unit) : TextWatcher {

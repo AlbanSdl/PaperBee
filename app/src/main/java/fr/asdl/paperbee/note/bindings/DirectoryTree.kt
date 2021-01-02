@@ -5,7 +5,7 @@ import android.widget.TextView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.NoteFolder
-import fr.asdl.paperbee.note.NoteManager
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.view.tree.TreeNode
 
 class DirectoryTree(private val current: Notable<*>, private val listener: (NoteFolder) -> Unit, folder: NoteFolder,
@@ -14,7 +14,7 @@ class DirectoryTree(private val current: Notable<*>, private val listener: (Note
     TreeNode<NoteFolder>(folder) {
 
     constructor(current: Notable<*>, listener: (NoteFolder) -> Unit, textSize: Float? = null):
-            this(current, listener, current.noteManager!!.findElementById(NoteManager.ROOT_ID) as NoteFolder, textSize)
+            this(current, listener, current.db!!.findElementById(ROOT_ID) as NoteFolder, textSize)
 
     init {
         this.t.getContents().filterIsInstance<NoteFolder>().forEach {

@@ -34,7 +34,7 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
             else {
                 fun rec(nt: Notable<*>) {
                     this.selection.add(nt)
-                    nt.getRawContents().filterIsInstance<Notable<*>>().forEach { rec(it) }
+                    nt.contents.filterIsInstance<Notable<*>>().forEach { rec(it) }
                 }
                 rec(from)
             }
@@ -70,7 +70,7 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
     }
 
     override fun restoreState(savedInstanceState: Bundle) {
-        val notable = (this.activity as? MainActivity)?.noteManager?.findElementById(
+        val notable = (this.activity as? MainActivity)?.dbProxy?.findElementById(
             savedInstanceState.getInt(SAVED_INSTANCE_TAG)) as Notable<*>
         this.from(notable)
     }

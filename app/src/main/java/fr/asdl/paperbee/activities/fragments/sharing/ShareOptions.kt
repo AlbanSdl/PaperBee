@@ -35,7 +35,7 @@ class ShareOptions {
                     sharingStarted = false
                     if (it.hasPerformed()) {
                         Snackbar.make(
-                            context.activity!!.findViewById(R.id.main),
+                            context.requireActivity().findViewById(R.id.main),
                             it.getActionDetails(FileAccessContext.CREATION),
                             Snackbar.LENGTH_SHORT
                         ).show()

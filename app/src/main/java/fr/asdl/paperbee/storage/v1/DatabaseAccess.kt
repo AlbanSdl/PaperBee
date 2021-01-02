@@ -7,7 +7,7 @@ import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.*
-import fr.asdl.paperbee.storage.BaseDatabaseAccess
+import fr.asdl.paperbee.storage.DatabaseAccess
 import fr.asdl.paperbee.storage.DatabaseFilter
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ID
@@ -18,9 +18,8 @@ import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.TABLE_NAME
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
-import java.util.*
 
-class DatabaseAccess(context: Context) : BaseDatabaseAccess(context) {
+class DatabaseAccess(context: Context) : DatabaseAccess(context) {
 
     override fun querySelect(
         filter: DatabaseFilter,
@@ -69,30 +68,16 @@ class DatabaseAccess(context: Context) : BaseDatabaseAccess(context) {
         extra: String?
     ): DataHolder? {
         val holder: DataHolder? = when (NotableContract.DataHolderType.fromInt(type)) {
-            NotableContract.DataHolderType.NOTE -> Note(
+            NotableContract.DataHolderType.NOTE -> { val n = Note(); n.title = payload ?: ""; n.parentId = parentId?.toInt(); n }
+            NotableContract.DataHolderType.FOLDER -> { val f = NoteFolder(); f.title = payload ?: ""; f.parentId = parentId?.toInt(); f }
+            NotableContract.DataHolderType.TEXT -> { val t = NoteText(payload ?: ""); t.parentId = parentId?.toInt(); t}
+            NotableContract.DataHolderType.CHECKBOX -> { val c = NoteCheckBoxable(
                 payload ?: "",
-                null,
-                LinkedList(),
-                null,
-                parentId?.toInt()
-            )
-            NotableContract.DataHolderType.FOLDER -> NoteFolder(
-                payload ?: "",
-                null,
-                LinkedList(),
-                null,
-                parentId?.toInt()
-            )
-            NotableContract.DataHolderType.TEXT -> NoteText(payload ?: "", parentId?.toInt())
-            NotableContract.DataHolderType.CHECKBOX -> NoteCheckBoxable(
-                payload ?: "",
-                extra == "true",
-                parentId?.toInt()
-            )
+                extra == "true"
+            ); c.parentId = parentId?.toInt(); c }
             else -> null
         }
-        // TODO handle contents
-        holder?.id = id.toInt()
+        holder?.initializeId(id.toInt())
         holder?.order = order.toInt()
         if (holder is Notable<*>) holder.color = Color.getFromTag(extra)
         return holder

@@ -36,7 +36,7 @@ object NotableContract {
         const val TABLE_NAME = "notables"
 
         const val COLUMN_NAME_ID = "id"
-        const val COLUMN_NAME_ORDER = "order"
+        const val COLUMN_NAME_ORDER = "item_order"
         const val COLUMN_NAME_PARENT = "parent"
         const val COLUMN_NAME_TYPE = "type"
 
@@ -52,11 +52,11 @@ object NotableContract {
 
         /* List of queries executed */
         const val SQL_CREATE_ENTRIES = "CREATE TABLE $TABLE_NAME (" +
-                "$COLUMN_NAME_ID LONG PRIMARY KEY," +
-                "$COLUMN_NAME_ORDER LONG NOT NULL," +
-                "$COLUMN_NAME_PARENT LONG," +
-                "$COLUMN_NAME_TYPE INTEGER NOT NULL," +
-                "$COLUMN_NAME_PAYLOAD TEXT," +
+                "$COLUMN_NAME_ID INTEGER PRIMARY KEY, " +
+                "$COLUMN_NAME_ORDER INTEGER NOT NULL, " +
+                "$COLUMN_NAME_PARENT INTEGER, " +
+                "$COLUMN_NAME_TYPE INTEGER NOT NULL, " +
+                "$COLUMN_NAME_PAYLOAD TEXT, " +
                 "$COLUMN_NAME_EXTRA TEXT)"
 
         const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS $TABLE_NAME"

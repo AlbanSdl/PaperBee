@@ -1,8 +1,6 @@
 package fr.asdl.paperbee.activities
 
 import android.content.Context
-import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -12,31 +10,21 @@ import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.transition.TransitionInflater
 import com.google.android.material.navigation.NavigationView
-import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.*
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.note.*
+import fr.asdl.paperbee.storage.DatabaseProxy
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
+import fr.asdl.paperbee.storage.v1.DatabaseAccess
 import fr.asdl.paperbee.view.DarkThemed
 
 
 class MainActivity : AppCompatActivity(), DarkThemed {
 
-    companion object {
-        private lateinit var noteManager: NoteManager
-        private fun retrieveNoteManager(context: Context): NoteManager {
-            if (!::noteManager.isInitialized || !noteManager.loaded) {
-                noteManager = NoteManager(context, IntAllocator())
-                noteManager.load()
-            }
-            return noteManager
-        }
-    }
-
-    lateinit var noteManager: NoteManager
+    val dbProxy: DatabaseProxy<*> = DatabaseProxy(this, DatabaseAccess::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        noteManager = retrieveNoteManager(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         this.findViewById<NavigationView>(R.id.nav).apply {
@@ -44,16 +32,12 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         }
         if (supportFragmentManager.backStackEntryCount == 0) {
             this.loadFragment(LayoutFragment(R.layout.loading), null)
-            this.openNotable(noteManager, false)
+            this.openNotable(dbProxy.acquireRoot(), false)
             // Handling creation shortcut
             if (intent.extras?.containsKey("create") == true) {
-                val note = Note(
-                    "",
-                    noteManager,
-                    idAllocator = noteManager.idAllocator,
-                    parentId = noteManager.id
-                )
-                noteManager.add(note)
+                val note = Note()
+                note.parentId = ROOT_ID
+                note.db = dbProxy
                 note.add(NoteText(""))
                 this.openNotable(note)
             }
@@ -90,7 +74,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     }
 
     fun startSharing(notable: Notable<*>) {
-        if (notable.id!! < NoteManager.ROOT_ID) return
+        if (notable.id!! < ROOT_ID) return
         val fragment = SharingFragment()
         fragment.from(notable)
         fragment.allowEnterTransitionOverlap = true
@@ -113,7 +97,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
             notable as Note
         ),
         if (addToBackStack) notable.id.toString() else null,
-        if (notable is NoteManager) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
+        if (notable.id == ROOT_ID) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
         *sharedViews
     )
 

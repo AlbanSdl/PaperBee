@@ -15,7 +15,7 @@ import java.io.Closeable
  * Contains the low level functions handled differently depending on the version of the database
  * schema.
  */
-abstract class BaseDatabaseAccess(protected val context: Context) : Closeable {
+abstract class DatabaseAccess(internal val context: Context) : Closeable {
 
     private var _dbStoreW: SQLiteDatabase? = null
     private var _dbStoreR: SQLiteDatabase? = null
@@ -64,7 +64,7 @@ abstract class BaseDatabaseAccess(protected val context: Context) : Closeable {
         callback: SQLSelectionCallback
     ) {
         GlobalScope.launch {
-            callback.invoke(this@BaseDatabaseAccess.querySelect(filter, sort))
+            callback.invoke(this@DatabaseAccess.querySelect(filter, sort))
         }
     }
 
@@ -73,7 +73,7 @@ abstract class BaseDatabaseAccess(protected val context: Context) : Closeable {
      */
     fun insert(dataHolder: DataHolder, callback: SQLInsertionCallback) {
         GlobalScope.launch {
-            callback.invoke(this@BaseDatabaseAccess.queryInsert(dataHolder) >= 0)
+            callback.invoke(this@DatabaseAccess.queryInsert(dataHolder) >= 0)
         }
     }
 
@@ -87,7 +87,7 @@ abstract class BaseDatabaseAccess(protected val context: Context) : Closeable {
         callback: SQLCountedCallback
     ) {
         GlobalScope.launch {
-            callback.invoke(this@BaseDatabaseAccess.queryUpdate(holder, columnsToUpdate, filter))
+            callback.invoke(this@DatabaseAccess.queryUpdate(holder, columnsToUpdate, filter))
         }
     }
 
@@ -96,7 +96,7 @@ abstract class BaseDatabaseAccess(protected val context: Context) : Closeable {
      */
     fun delete(filter: DatabaseFilter, callback: SQLCountedCallback) {
         GlobalScope.launch {
-            callback.invoke(this@BaseDatabaseAccess.queryDelete(filter))
+            callback.invoke(this@DatabaseAccess.queryDelete(filter))
         }
     }
 

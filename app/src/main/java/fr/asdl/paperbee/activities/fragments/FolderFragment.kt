@@ -16,9 +16,11 @@ import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.note.bindings.NoteAdapter
 import fr.asdl.paperbee.note.NoteFolder
-import fr.asdl.paperbee.note.NoteManager.Companion.ROOT_ID
-import fr.asdl.paperbee.note.NoteManager.Companion.TRASH_ID
 import fr.asdl.paperbee.note.NoteText
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
+import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
+import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
@@ -72,10 +74,10 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
-            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(notable.noteManager?.findElementById(TRASH_ID) as NoteFolder)
+            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(notable.db?.acquireTrash() as NoteFolder)
             R.id.empty_trash -> {
                 if (activity != null) AlertDialog.Builder(requireActivity()).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
-                    setPositiveButton(android.R.string.ok) { _, _ -> notable.clear() }
+                    setPositiveButton(android.R.string.ok) { _, _ -> notable.clear(true) }
                     setNegativeButton(android.R.string.cancel) { _, _ -> }
                 }.show()
             }
@@ -83,6 +85,7 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
                 ColorPicker(requireActivity(), listOf(*Color.values()), Color.getIndex(notable.color), false) {
                     notable.color = it
                     this.updateBackgroundTint()
+                    notable.notifyDataChanged(COLUMN_NAME_EXTRA)
                     notable.save()
                 }
             }
@@ -98,13 +101,13 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.add_note_selector -> {
-                val note = Note("", notable.noteManager, idAllocator = notable.idAllocator, parentId = notable.id)
+                val note = Note()
                 notable.add(note)
                 note.add(NoteText(""))
                 (this.activity as MainActivity).openNotable(note)
             }
             R.id.add_folder_selector -> {
-                val fold = NoteFolder("", notable.noteManager, idAllocator = notable.idAllocator, parentId = notable.id)
+                val fold = NoteFolder()
                 notable.add(fold)
                 (this.activity as MainActivity).openNotable(fold)
             }
@@ -142,6 +145,7 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
 
         override fun afterTextChanged(s: Editable?) {
             this@FolderFragment.notable.title = s.toString()
+            this@FolderFragment.notable.notifyDataChanged(COLUMN_NAME_PAYLOAD)
             this@FolderFragment.notable.save()
         }
     }

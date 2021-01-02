@@ -5,6 +5,8 @@ import android.widget.CheckBox
 import android.widget.TextView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.*
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
+import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 
 
@@ -23,8 +25,8 @@ abstract class NotePartAdapter<K>(private val note: Note) : SentientRecyclerView
         if (content is CheckableNotePart) {
             checkBox.isChecked = content.checked
             checkBox.visibility = View.VISIBLE
-            if (this.note.parentId != NoteManager.TRASH_ID)
-                checkBox.setOnClickListener { content.checked = checkBox.isChecked; this.getDataHolder().update(content) }
+            if (this.note.parentId != TRASH_ID)
+                checkBox.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save() }
             else
                 checkBox.isEnabled = false
         } else {

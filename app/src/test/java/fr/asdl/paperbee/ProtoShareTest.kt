@@ -2,6 +2,7 @@ package fr.asdl.paperbee
 
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.sharing.ShareProcess
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -16,7 +17,9 @@ class ProtoShareTest {
     @Test
     fun share() {
         val password = "Export password"
-        val folder = NoteFolder("Name", null, idAllocator = null, parentId = -1)
+        val folder = NoteFolder()
+        folder.parentId = ROOT_ID
+        folder.title = "Name"
         val process = ShareProcess()
         val sharedData = process.encrypt(password, listOf(folder))
         val retrievedData = process.decrypt(password, sharedData)

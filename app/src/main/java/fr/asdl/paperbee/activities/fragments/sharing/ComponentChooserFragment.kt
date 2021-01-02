@@ -63,7 +63,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
         }
         view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
             NotableTree(
-                orig.getOpenedFrom() ?: (activity as MainActivity).noteManager
+                orig.getOpenedFrom() ?: (activity as MainActivity).dbProxy.acquireRoot()
             ) {
                 if (it !in orig.selection) {
                     fun addRec(notable: Notable<*>) {
@@ -89,7 +89,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
 
     override fun getSharedViews(): List<View> {
         if (this.view == null) return super.getSharedViews()
-        return listOf(this.view!!.findViewById(R.id.next))
+        return listOf(this.requireView().findViewById(R.id.next))
     }
 
 }

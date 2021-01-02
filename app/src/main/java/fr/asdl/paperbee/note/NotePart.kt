@@ -2,21 +2,15 @@ package fr.asdl.paperbee.note
 
 import fr.asdl.paperbee.exceptions.NotePartAttachmentException
 import fr.asdl.paperbee.view.sentient.DataHolder
-import fr.asdl.paperbee.view.sentient.DataHolderList
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 
 /**
  * A part of a note. This can be text, image, checkbox-indented item, or whatever extends
  * this sealed class. It must be displayable by the Note and its recycler view.
  */
-@Serializable
-sealed class NotePart(override var id: Int? = null, override var order: Int = -1,
-                      @Transient override var noteManager: NoteManager? = null) : DataHolder {
+sealed class NotePart : DataHolder() {
 
-    override fun getParent(): DataHolderList<*>? = this.getMixedParent() as? DataHolderList<*>
-    private fun getMixedParent(): DataHolder? = noteManager?.findElementById(this.parentId)
+    private fun getMixedParent(): DataHolder? = db?.findElementById(this.parentId)
 
     /**
      * Returns whether the [NotePart] with id [partId] is a parent of the current note.
@@ -48,7 +42,7 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
      * Returns the note in which the NotePart is contained.
      * Can be null if the NotePart has no been attached to any note or if it has been detached
      */
-    private fun getNote(): Note? {
+    fun getNote(): Note? {
         return this.getParent() as? Note ?: this.getParentPart()?.getNote()
     }
 
@@ -73,8 +67,8 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
         // We move the current NotePart after its old parent group
         val note = getNote()!!
         var moveTo = this.order
-        for (i in this.order + 1 until note.getRawContents().size) {
-            if (!note.getRawContents()[i].hasParent(previousParent.id!!))
+        for (i in this.order + 1 until note.contents.size) {
+            if (!note.contents[i].hasParent(previousParent.id!!))
                 break
             moveTo++
         }
@@ -132,7 +126,7 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
             }
             this.parentId = notePart.id
             fun update(nPart: NotePart) {
-                note.update(nPart)
+                note.notifyUpdated(nPart)
                 nPart.getChildren().forEach { update(it) }
             }
             update(this)
@@ -160,7 +154,7 @@ sealed class NotePart(override var id: Int? = null, override var order: Int = -1
     fun getParentPart(): NotePart? = this.getMixedParent() as? NotePart
 
     fun getChildren(): List<NotePart> {
-        return this.getNote()?.getRawContents()?.filter { it.parentId == this.id } ?: listOf()
+        return this.getNote()?.contents?.filter { it.parentId == this.id } ?: listOf()
     }
 
 }
@@ -173,11 +167,7 @@ interface CheckableNotePart {
     var checked: Boolean
 }
 
-@Serializable
-class NoteText(override var content: String,
-               override var parentId: Int? = null) : NotePart(), TextNotePart
+class NoteText(override var content: String) : NotePart(), TextNotePart
 
-@Serializable
 class NoteCheckBoxable(override var content: String,
-                       override var checked: Boolean,
-                       override var parentId: Int? = null) : NotePart(), TextNotePart, CheckableNotePart
+                       override var checked: Boolean) : NotePart(), TextNotePart, CheckableNotePart

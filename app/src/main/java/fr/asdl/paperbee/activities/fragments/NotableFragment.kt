@@ -34,11 +34,11 @@ abstract class NotableFragment<T: Notable<*>> : AppFragment() {
         if (notable.color == null)
             view.backgroundTintList = null
         else
-            view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(activity!!, notable.color!!.id))
+            view.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), notable.color!!.id))
     }
 
     override fun restoreState(savedInstanceState: Bundle) {
-        val t = (this.activity as? MainActivity)?.noteManager?.findElementById(savedInstanceState.getInt(SAVED_INSTANCE_TAG))
+        val t = (this.activity as? MainActivity)?.dbProxy?.findElementById(savedInstanceState.getInt(SAVED_INSTANCE_TAG))
         if (this is FolderFragment && t is NoteFolder) this.attach(t)
         else if (this is NoteFragment && t is Note) this.attach(t)
     }

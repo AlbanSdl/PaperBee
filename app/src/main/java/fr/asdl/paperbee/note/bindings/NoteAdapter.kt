@@ -13,7 +13,7 @@ import androidx.core.view.ViewCompat
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.*
-import fr.asdl.paperbee.note.NoteManager.Companion.TRASH_ID
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 import fr.asdl.paperbee.view.tree.TreeView
@@ -73,11 +73,11 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
             setView(treeView)
             setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
             setOnCancelListener {
-                this@NoteAdapter.getDataHolder().update(content)
+                this@NoteAdapter.getDataHolder().notifyUpdated(content)
             }
         }.create()
         val adapter = DirectoryTree(content, {
-            this@NoteAdapter.folder.remove(content, false)
+            this@NoteAdapter.folder.remove(content)
             it.add(content)
             dialog.dismiss()
         })
@@ -87,15 +87,15 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
 
     override fun onSwipeRight(context: Context, content: Notable<*>) {
         if (folder.id != TRASH_ID) {
-            val trash = this.getDataHolder().noteManager?.findElementById(TRASH_ID) as? NoteFolder
-            this.getDataHolder().remove(content, false)
+            val trash = this.getDataHolder().db?.findElementById(TRASH_ID) as? NoteFolder
+            this.getDataHolder().remove(content)
             trash?.add(content)
             if (content is NoteFolder) content.getContents().forEach { onSwipeRight(context, it) }
         } else {
             AlertDialog.Builder(context).setTitle(R.string.trash_delete).setMessage(R.string.trash_delete_details).apply {
-                setPositiveButton(android.R.string.ok) { _, _ -> this@NoteAdapter.getDataHolder().remove(content) }
+                setPositiveButton(android.R.string.ok) { _, _ -> this@NoteAdapter.getDataHolder().remove(content); content.db?.delete(content) }
                 setNegativeButton(android.R.string.cancel) { display, _ -> display.cancel() }
-                setOnCancelListener { this@NoteAdapter.getDataHolder().update(content) }
+                setOnCancelListener { this@NoteAdapter.getDataHolder().notifyUpdated(content) }
             }.show()
         }
     }

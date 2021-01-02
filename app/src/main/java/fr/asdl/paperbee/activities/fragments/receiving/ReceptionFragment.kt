@@ -43,7 +43,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
 
     override fun getSharedViews(): List<View> {
         if (this.view == null) return super.getSharedViews()
-        return listOf(this.view!!.findViewById(R.id.next))
+        return listOf(this.requireView().findViewById(R.id.next))
     }
 
 }
