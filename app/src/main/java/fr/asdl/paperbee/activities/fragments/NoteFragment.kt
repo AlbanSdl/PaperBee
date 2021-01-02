@@ -111,7 +111,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
     private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
 
         private var currentlyMoving: NotePart? = null
-        private var currentlyMovingInitialOrder: Int? = null
+        private var currentlyMovingInitialOrder: Int = 0
 
         override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
             super.onBindViewHolder(holder, content)
@@ -141,9 +141,9 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         override fun onMoveChange(content: NotePart?) {
             this@NoteFragment.notable.expand(this.currentlyMoving)
             if (this.currentlyMoving != null)
-                this@NoteFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder!!)
+                this@NoteFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder)
             this.currentlyMoving = content
-            this.currentlyMovingInitialOrder = if (content != null) notable.getOrder(content) else null
+            this.currentlyMovingInitialOrder = if (content != null) notable.getOrder(content) else 0
             this@NoteFragment.notable.collapse(this.currentlyMoving)
         }
 
@@ -154,13 +154,14 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 part.getChildren().forEach { removeRec(it) }
                 removed.add(PartHierarchy(part, part.getParentPart()))
                 this.getDataHolder().remove(part)
+                this.getDataHolder().db?.delete(part)
             }
             removeRec(content)
             Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
                 .setAction(R.string.restore) {
                     removed.reverse()
                     removed.forEach { this.getDataHolder().add(it.target) }
-                    removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id }
+                    removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id; this.getDataHolder().db?.add(it.target) }
                     removed.clear()
                 }.show()
         }

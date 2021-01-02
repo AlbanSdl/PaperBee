@@ -98,8 +98,8 @@ abstract class DataHolder {
         val updateVisuals = visualUpdate && updates.any { it != COLUMN_NAME_PARENT && it != COLUMN_NAME_ORDER }
         this._dbProxy?.update(this, updates) {
             if (it) {
-                this._dataChanged.removeAll(updates)
                 (this.db?.context as Activity).runOnUiThread {
+                    this._dataChanged.removeAll(updates)
                     if (updateVisuals) this.getParent()?.notifyUpdated(this@DataHolder)
                 }
             }

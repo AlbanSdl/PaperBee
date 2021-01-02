@@ -34,13 +34,14 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         return LinkedList(holderList.filter { it.parentId == id }.sortedBy { it.order })
     }
     fun findNoteContent(id: Int): LinkedList<NotePart> {
-        return LinkedList(holderList.filterIsInstance<NotePart>().filter { it.getNote()?.id == id })
+        return LinkedList(holderList.filterIsInstance<NotePart>().filter { it.getNote()?.id == id }.sortedBy { it.order })
     }
 
     fun add(dataHolder: DataHolder) {
         dataHolder.db = this
+        holderList.add(dataHolder)
         dbAccess.insert(dataHolder) {
-            if (it) holderList.add(dataHolder)
+            if (!it) holderList.remove(dataHolder) // insertion failed
         }
     }
 
@@ -55,8 +56,10 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
                 )
             )
         ) {
-            if (it > 0)
+            if (it > 0) {
+                if (dataHolder.id != null) idAllocator.release(dataHolder.id!!)
                 holderList.remove(dataHolder)
+            }
         }
     }
 

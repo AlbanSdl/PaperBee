@@ -30,9 +30,9 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         this.findViewById<NavigationView>(R.id.nav).apply {
             this.setNavigationItemSelectedListener { navigate(it, this) }
         }
+        this.dbProxy = DatabaseProxy(this, DatabaseAccess::class.java)
+        this.dbProxy.attachRoot()
         if (supportFragmentManager.backStackEntryCount == 0) {
-            this.dbProxy = DatabaseProxy(this, DatabaseAccess::class.java)
-            this.dbProxy.attachRoot()
             this.openNotable(dbProxy.findElementById(ROOT_ID) as NoteFolder, false)
             // Handling creation shortcut
             if (intent.extras?.containsKey("create") == true) {

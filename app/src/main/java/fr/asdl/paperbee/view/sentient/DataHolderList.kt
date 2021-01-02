@@ -96,9 +96,11 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     open fun remove(cnt: T?) {
         if (cnt == null) return
         if (cnt.parentId == this.id!!) {
+            val order = this.getOrder(cnt)
             cnt.parentId = null
+            this.reIndex(cnt.order)
+            this.onChange(ModificationType.REMOVAL, order, null)
         }
-        this.reIndex(cnt.order)
         cnt.order = -1
     }
 
@@ -115,7 +117,8 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param toPos the index to move the item to.
      */
     fun move(fromPos: Int, toPos: Int) {
-        if (fromPos < this.getContents().size && fromPos >= 0 && fromPos != toPos) {
+        if (fromPos < this.getContents().size && fromPos >= 0 && fromPos != toPos
+            && toPos >= 0 && toPos < this.getContents().size) {
             val realDestination = this.getRawPosition(toPos)
             val realFromPos = this.getRawPosition(fromPos)
             val elem = this.getContents()[fromPos]
