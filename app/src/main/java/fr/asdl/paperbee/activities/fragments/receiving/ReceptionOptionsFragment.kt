@@ -9,7 +9,9 @@ import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.activities.fragments.ImportFragment
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.exceptions.WrongPasswordException
+import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.bindings.DirectoryTree
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.view.tree.TreeView
 
 class ReceptionOptionsFragment : ReceptionBaseFragment() {
@@ -24,7 +26,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
             if (orig.content == null)
                 view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
-                DirectoryTree((activity as MainActivity).dbProxy.acquireRoot(), {
+                DirectoryTree((activity as MainActivity).dbProxy.findElementById(ROOT_ID) as NoteFolder, {
                     orig.destination = it
                     view.findViewById<TextView>(R.id.selected_name).text = getString(R.string.share_import_selected, it.title)
                 }, resources.getDimension(R.dimen.smallText) / resources.displayMetrics.scaledDensity)

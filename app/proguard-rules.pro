@@ -12,15 +12,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
--keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class fr.asdl.paperbee.**$$serializer { *; }
-#noinspection ShrinkerUnresolvedReference
--keepclassmembers class fr.asdl.paperbee.** {
-    *** Companion;
-}
-#noinspection ShrinkerUnresolvedReference
--keepclasseswithmembers class fr.asdl.paperbee.** {
-    kotlinx.serialization.KSerializer serializer(...);
-}

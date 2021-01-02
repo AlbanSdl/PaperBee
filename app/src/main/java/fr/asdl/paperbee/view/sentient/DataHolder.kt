@@ -92,10 +92,10 @@ abstract class DataHolder {
     /**
      * Saves the element in the database.
      */
-    fun save() {
-        val updates = this._dataChanged.toTypedArray()
+    fun save(visualUpdate: Boolean = true) {
+        val updates = this._dataChanged.distinct().toTypedArray()
         if (updates.isEmpty()) return
-        val updateVisuals = updates.any { it != COLUMN_NAME_PARENT && it != COLUMN_NAME_ORDER }
+        val updateVisuals = visualUpdate && updates.any { it != COLUMN_NAME_PARENT && it != COLUMN_NAME_ORDER }
         this._dbProxy?.update(this, updates) {
             if (it) {
                 this._dataChanged.removeAll(updates)

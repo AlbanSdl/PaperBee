@@ -84,7 +84,12 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         )
     }
 
-    internal fun acquireRoot(): NoteFolder {
+    internal fun attachRoot() {
+        holderList.add(this.acquireRoot())
+        holderList.add(this.acquireTrash())
+    }
+
+    private fun acquireRoot(): NoteFolder {
         val root = NoteFolder()
         root.initializeId(ROOT_ID)
         root.title = dbAccess.context.getString(R.string.notes_root_name)
@@ -92,7 +97,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         return root
     }
 
-    internal fun acquireTrash(): NoteFolder {
+    private fun acquireTrash(): NoteFolder {
         val trash = NoteFolder()
         trash.initializeId(TRASH_ID)
         trash.title = dbAccess.context.getString(R.string.trash_can)
@@ -109,7 +114,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
      * Can also be used to duplicate Notables by inserting A DEEP COPY of them in a list and calling
      * this method. You may use the ShareProcess to create an appropriate deep copy.
      */
-    fun import(notables: List<DataHolder>, destination: NoteFolder = acquireRoot()) {
+    fun import(notables: List<DataHolder>, destination: NoteFolder = this.findElementById(ROOT_ID) as NoteFolder) {
         // We define a recursive function to propagate actions to children at any depth
         // In our case, this will only take action to reach NoteParts as Notes are not
         // stored as content of NoteFolders
@@ -139,6 +144,10 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         }
         // The ids have been remapped, now we can add the elements
         notables.forEach { this.add(it) }
+    }
+
+    fun close() {
+        this.dbAccess.close()
     }
 
 }

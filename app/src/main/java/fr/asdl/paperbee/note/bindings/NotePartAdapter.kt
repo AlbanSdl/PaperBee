@@ -26,7 +26,7 @@ abstract class NotePartAdapter<K>(private val note: Note) : SentientRecyclerView
             checkBox.isChecked = content.checked
             checkBox.visibility = View.VISIBLE
             if (this.note.parentId != TRASH_ID)
-                checkBox.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save() }
+                checkBox.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save(false) }
             else
                 checkBox.isEnabled = false
         } else {

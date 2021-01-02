@@ -119,8 +119,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 val textView = (holder.findViewById(R.id.note_text) as? EditText)
                 val watcher = EditTextChangeWatcher(content)
                 holder.attach(watcher)
-                textView?.addTextChangedListener(watcher)
                 textView?.setText(content.content)
+                textView?.addTextChangedListener(watcher)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
@@ -174,7 +174,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             if (notePart is TextNotePart && s != null) {
                 (notePart as TextNotePart).content = s.toString()
                 notePart.notifyDataChanged(COLUMN_NAME_PAYLOAD)
-                notePart.save()
+                notePart.save(false)
             }
         }
     }

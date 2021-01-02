@@ -10,7 +10,9 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.activities.fragments.SharingFragment
 import fr.asdl.paperbee.note.Notable
+import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.bindings.NotableTree
+import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.view.StatefulExtendedFloatingActionButton
 import fr.asdl.paperbee.view.tree.TreeView
 
@@ -63,7 +65,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
         }
         view.findViewById<TreeView>(R.id.share_selector_tree).attachData(
             NotableTree(
-                orig.getOpenedFrom() ?: (activity as MainActivity).dbProxy.acquireRoot()
+                orig.getOpenedFrom() ?: (activity as MainActivity).dbProxy.findElementById(ROOT_ID) as NoteFolder
             ) {
                 if (it !in orig.selection) {
                     fun addRec(notable: Notable<*>) {

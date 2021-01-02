@@ -22,7 +22,7 @@ import fr.asdl.paperbee.view.DarkThemed
 
 class MainActivity : AppCompatActivity(), DarkThemed {
 
-    val dbProxy: DatabaseProxy<*> = DatabaseProxy(this, DatabaseAccess::class.java)
+    lateinit var dbProxy: DatabaseProxy<*>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +31,9 @@ class MainActivity : AppCompatActivity(), DarkThemed {
             this.setNavigationItemSelectedListener { navigate(it, this) }
         }
         if (supportFragmentManager.backStackEntryCount == 0) {
-            this.loadFragment(LayoutFragment(R.layout.loading), null)
-            this.openNotable(dbProxy.acquireRoot(), false)
+            this.dbProxy = DatabaseProxy(this, DatabaseAccess::class.java)
+            this.dbProxy.attachRoot()
+            this.openNotable(dbProxy.findElementById(ROOT_ID) as NoteFolder, false)
             // Handling creation shortcut
             if (intent.extras?.containsKey("create") == true) {
                 val note = Note()
@@ -160,6 +161,11 @@ class MainActivity : AppCompatActivity(), DarkThemed {
 
     override fun requireContext(): Context {
         return this
+    }
+
+    override fun onDestroy() {
+        this.dbProxy.close()
+        super.onDestroy()
     }
 
 }
