@@ -26,9 +26,9 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * Initializes the communication with the DataHolderList.
      */
     init {
-        this.dataContainer.on(ModificationType.ADDITION) { i: Int, _: Int? -> super.notifyItemInserted(i) }
-        this.dataContainer.on(ModificationType.REMOVAL) { i: Int, _: Int? -> super.notifyItemRemoved(i) }
-        this.dataContainer.on(ModificationType.UPDATE) { i: Int, _: Int? -> super.notifyItemChanged(i) }
+        this.dataContainer.on(ModificationType.ADDITION) { i: Int, i2: Int? -> if (i2 == null) super.notifyItemInserted(i) else super.notifyItemRangeInserted(i, i2) }
+        this.dataContainer.on(ModificationType.REMOVAL) { i: Int, i2: Int? -> if (i2 == null) super.notifyItemRemoved(i) else super.notifyItemRangeRemoved(i, i2) }
+        this.dataContainer.on(ModificationType.UPDATE) { i: Int, i2: Int? -> if (i2 == null) super.notifyItemChanged(i) else super.notifyItemRangeChanged(i, i2) }
         this.dataContainer.on(ModificationType.MOVED) { i: Int, it: Int? -> super.notifyItemMoved(i, it!!) }
         this.dataContainer.on(ModificationType.CLEAR) { _: Int, _: Int? -> super.notifyDataSetChanged() }
     }

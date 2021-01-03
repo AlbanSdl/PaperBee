@@ -32,18 +32,17 @@ class Note: Notable<NotePart>() {
         }
     }
 
-    /**
-     * Moves a part and all its children.
-     * Use this method after [expand] or ensure all children are visible (you can call [expand]
-     * before in order to assert that)
-     */
-    fun movePart(notePart: NotePart?, of: Int) {
-        if (notePart == null) return
-        notePart.getChildren().forEach {
-            val order = this.getOrder(it)
-            this.move(order, order + of)
-            movePart(it, of)
+    override fun move(fromPos: Int, toPos: Int) {
+        val part = this.getContents()[fromPos]
+        val previousOrder = part.order
+        this.moveIndices(part.order, this.getContents()[toPos].order)
+        val translationOf = part.order - previousOrder
+        fun mI(p: NotePart) {
+            if (p != part)
+                this.moveIndices(p.order, p.order + translationOf)
+            p.getChildren().forEach { mI(it) }
         }
+        mI(part)
     }
 
 }

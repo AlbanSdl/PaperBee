@@ -111,7 +111,6 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
     private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
 
         private var currentlyMoving: NotePart? = null
-        private var currentlyMovingInitialOrder: Int = 0
 
         override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
             super.onBindViewHolder(holder, content)
@@ -139,12 +138,11 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         override fun onMoved(content: NotePart): Boolean = content.updateParentId()
 
         override fun onMoveChange(content: NotePart?) {
-            this@NoteFragment.notable.expand(this.currentlyMoving)
-            if (this.currentlyMoving != null)
-                this@NoteFragment.notable.movePart(this.currentlyMoving, notable.getOrder(currentlyMoving!!) - currentlyMovingInitialOrder)
-            this.currentlyMoving = content
-            this.currentlyMovingInitialOrder = if (content != null) notable.getOrder(content) else 0
-            this@NoteFragment.notable.collapse(this.currentlyMoving)
+            if (content != null && this.currentlyMoving == null)
+                notable.collapse(content) // Collapses the NotePart
+            if (content == null && this.currentlyMoving != null)
+                notable.expand(this.currentlyMoving) // Expands the NotePart when no longer dragged
+            this.currentlyMoving = content // Updates values
         }
 
         override fun onSwipeRight(context: Context, content: NotePart) {

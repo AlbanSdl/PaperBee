@@ -1,6 +1,5 @@
 package fr.asdl.paperbee.view.sentient
 
-import android.util.Log
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -45,21 +44,16 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     fun getContents(): List<T> = this.contents.filter { it.id !in this.filters }
 
     /**
-     * Retrieves the real order of the given element in the [DataHolderList]
-     */
-    private fun getRawOrder(element: T): Int = this.contents.indexOf(element)
-
-    /**
      * Retrieves the order of the given element in the [DataHolderList]
      */
-    fun getOrder(element: T): Int = this.getContents().indexOf(element)
+    private fun getOrder(element: T): Int = this.getContents().indexOf(element)
 
     /**
      * Retrieves the raw position from the visible position (ie. given by an Adapter)
      */
     private fun getRawPosition(visiblePosition: Int): Int {
-        return if (visiblePosition < this.getContents().size - 1 && visiblePosition >= 0)
-            this.getRawOrder(this.getContents()[visiblePosition + 1]) - 1
+        return if (visiblePosition in this.getContents().indices)
+            this.contents.indexOf(this.getContents()[visiblePosition])
         else this.contents.size - 1
     }
 
@@ -112,6 +106,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     }
 
     /**
+     * USES VISIBLE INDICES: Use this method from Adapters and other Objects that use such indices
      * Moved a [DataHolder] in the data set.
      * If [fromPos] is out of bounds, nothing happens. If [toPos] is out of bounds, the item is
      * moved to the end of the set. The method re-indexes the elements of the data set.
@@ -119,18 +114,25 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param fromPos the initial index of the item.
      * @param toPos the index to move the item to.
      */
-    fun move(fromPos: Int, toPos: Int) {
-        if (fromPos < this.getContents().size && fromPos >= 0 && fromPos != toPos
-            && toPos >= 0 && toPos < this.getContents().size) {
-            val realDestination = this.getRawPosition(toPos)
-            val realFromPos = this.getRawPosition(fromPos)
-            Log.e(javaClass.simpleName, "Element move details: $realFromPos (as $fromPos) -> $realDestination (as $toPos)")
-            val elem = this.getContents()[fromPos]
-            Log.e(javaClass.simpleName, "Element order property update: ${elem.order} -> $realDestination")
-            if (realFromPos < realDestination) this.updateIndex(-1, realFromPos + 1, realDestination)
-            else this.updateIndex(1, realDestination, realFromPos - 1)
-            elem.order = realDestination
-            this.onChange(ModificationType.MOVED, fromPos, toPos)
+    open fun move(fromPos: Int, toPos: Int) {
+        val size = this.getContents().size
+        if (fromPos in 0 until size && toPos in 0 until size && fromPos != toPos)
+            this.moveIndices(this.getRawPosition(fromPos), this.getRawPosition(toPos))
+    }
+
+    /**
+     * Moves an element using indices (aka. order)
+     */
+    protected fun moveIndices(fromIndex: Int, toIndex: Int) {
+        val size = this.contents.size
+        if (fromIndex in 0 until size && toIndex in 0 until size && fromIndex != toIndex) {
+            val elem = this.contents[fromIndex]
+            val previousVisiblePosition = this.getOrder(elem)
+            if (fromIndex < toIndex) this.updateIndex(-1, fromIndex + 1, toIndex)
+            else this.updateIndex(1, toIndex, fromIndex - 1)
+            elem.order = toIndex
+            if (!this.filters.contains(elem.id))
+                this.onChange(ModificationType.MOVED, previousVisiblePosition, this.getOrder(elem))
         }
     }
 
