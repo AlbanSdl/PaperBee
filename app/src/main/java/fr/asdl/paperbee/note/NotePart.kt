@@ -67,8 +67,8 @@ sealed class NotePart : DataHolder() {
         // We move the current NotePart after its old parent group
         val note = getNote()!!
         var moveTo = this.order
-        for (i in this.order + 1 until note.contents.size) {
-            if (!note.contents[i].hasParent(previousParent.id!!))
+        for (i in this.order + 1 until note.size) {
+            if (!note[i].hasParent(previousParent.id!!))
                 break
             moveTo++
         }
@@ -115,12 +115,12 @@ sealed class NotePart : DataHolder() {
         val note = this.getNote()
         if (note != null) {
             if (notePart is NotePart) {
-                if (notePart !in note.getContents())
+                if (notePart !in note.filtered.contents)
                     throw NotePartAttachmentException(this, notePart,
                         NotePartAttachmentException.Reason.DIFFERENT_NOTE)
                 if (notePart.getDepth() > this.getDepth())
                     for (i in notePart.order + 1 until this.order)
-                        if (note.getContents()[i].parentId != notePart.id)
+                        if (note.filtered[i].parentId != notePart.id)
                             throw NotePartAttachmentException(this, notePart,
                                 NotePartAttachmentException.Reason.FOREIGN_ELEMENTS)
             }
@@ -138,8 +138,8 @@ sealed class NotePart : DataHolder() {
      */
     private fun getAbove(): NotePart? {
         val note = getNote() ?: return null
-        if (note.getContents().size <= this.order || this.order <= 0) return null
-        return note.getContents()[this.order - 1]
+        if (note.filtered.contents.size <= this.order || this.order <= 0) return null
+        return note.filtered[this.order - 1]
     }
 
     /**
@@ -147,14 +147,14 @@ sealed class NotePart : DataHolder() {
      */
     private fun getBelow(): NotePart? {
         val note = getNote() ?: return null
-        if (note.getContents().size <= this.order + 1 || this.order < 0) return null
-        return note.getContents()[this.order + 1]
+        if (note.filtered.contents.size <= this.order + 1 || this.order < 0) return null
+        return note.filtered[this.order + 1]
     }
 
     fun getParentPart(): NotePart? = this.getMixedParent() as? NotePart
 
     fun getChildren(): List<NotePart> {
-        return this.getNote()?.contents?.filter { it.parentId == this.id } ?: listOf()
+        return (this.db?.findContent(this.id!!) ?: listOf()).filterIsInstance<NotePart>()
     }
 
 }

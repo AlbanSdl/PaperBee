@@ -46,7 +46,7 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * @param index the index of the [DataHolder] to retrieve.
      */
     fun getData(index: Int): T {
-        return this.dataContainer.getContents()[index]
+        return this.dataContainer.filtered[index]
     }
 
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<K> {
@@ -68,7 +68,7 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
     abstract fun onBindViewHolder(holder: ViewHolder<K>, content: T)
 
     final override fun getItemCount(): Int {
-        return this.dataContainer.getContents().size
+        return this.dataContainer.filtered.contents.size
     }
 
     /**
@@ -87,7 +87,7 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * @return the [DataHolder] contained at the given index if it exists. Returns null instead.
      */
     fun getHeldItem(pos: Int): T? {
-        return if (this.itemCount > pos && pos >= 0) this.dataContainer.getContents()[pos] else null
+        return if (this.itemCount > pos && pos >= 0) this.dataContainer.filtered[pos] else null
     }
 
     /**

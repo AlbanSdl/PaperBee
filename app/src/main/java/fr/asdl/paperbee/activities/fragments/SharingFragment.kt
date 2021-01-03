@@ -34,7 +34,7 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
             else {
                 fun rec(nt: Notable<*>) {
                     this.selection.add(nt)
-                    nt.contents.filterIsInstance<Notable<*>>().forEach { rec(it) }
+                    nt.filtered.contents.filterIsInstance<Notable<*>>().forEach { rec(it) }
                 }
                 rec(from)
             }

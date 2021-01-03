@@ -17,7 +17,7 @@ class DirectoryTree(private val current: Notable<*>, private val listener: (Note
             this(current, listener, current.db!!.findElementById(ROOT_ID) as NoteFolder, textSize)
 
     init {
-        this.t.getContents().filterIsInstance<NoteFolder>().forEach {
+        this.t.filtered.contents.filterIsInstance<NoteFolder>().forEach {
             if (it != current) this.append(DirectoryTree(current, this.listener, it, textSize))
         }
         if (current.isChildOf(folder.id!!))

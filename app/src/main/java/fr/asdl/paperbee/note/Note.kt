@@ -33,9 +33,9 @@ class Note: Notable<NotePart>() {
     }
 
     override fun move(fromPos: Int, toPos: Int) {
-        val part = this.getContents()[fromPos]
+        val part = this.filtered[fromPos]
         val previousOrder = part.order
-        this.moveIndices(part.order, this.getContents()[toPos].order)
+        this.moveIndices(part.order, this.filtered[toPos].order)
         val translationOf = part.order - previousOrder
         fun mI(p: NotePart) {
             if (p != part)

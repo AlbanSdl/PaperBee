@@ -15,7 +15,7 @@ class NotableTree(private val current: Notable<*>, private val listener: (Notabl
             this(current, listener, current.db!!.findElementById(ROOT_ID) as NoteFolder)
 
     init {
-        this.t.contents.filterIsInstance<Notable<*>>().forEach {
+        this.t.filtered.contents.filterIsInstance<Notable<*>>().forEach {
             this.append(NotableTree(current, this.listener, it))
         }
         if (current.isChildOf(layer.id!!))

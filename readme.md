@@ -12,4 +12,4 @@ Here is a small non-exhaustive list of the features most likely to be released
 ### Database Storage versions ###
 Database storage is experimental. This is NOT compatible with the old save format within the app neither through backups. The only way to transfer your old notes is to copy paste their content to a file and copy paste from this file in new notes after updating the app. Here is the list of all known bugs related to these experimental features:
 - Imports and Exports are disabled (they have to be reworked on)
-- Deleting nested NoteParts makes the app crash (but everything is saved)
+- Deleting (nested) NoteParts produces a lot of bugs

@@ -73,7 +73,7 @@ class ComponentChooserFragment : ShareBaseFragment() {
                             orig.selection.add(notable)
                             updateChip(notable, true)
                         }
-                        notable.getContents().filterIsInstance<Notable<*>>()
+                        notable.filtered.contents.filterIsInstance<Notable<*>>()
                             .forEach { n -> addRec(n) }
                     }
                     addRec(it)

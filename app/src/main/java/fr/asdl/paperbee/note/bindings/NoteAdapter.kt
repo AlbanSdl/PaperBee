@@ -33,7 +33,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
         (holder.findViewById(R.id.note_title)!! as TextView).text = content.title
         this.setTransitionNames(holder, content)
         val rec = (holder.findViewById(R.id.note_elements_recycler) as SentientRecyclerView)
-        if (content.getContents().isNotEmpty() && content is Note) {
+        if (content.filtered.contents.isNotEmpty() && content is Note) {
             rec.visibility = View.VISIBLE
             rec.addItemDecoration(NotePartDecoration())
             rec.adapter = NotePartAdapterStatic(content, holder.findViewById(R.id.note_element) as View)
@@ -90,7 +90,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
             val trash = this.getDataHolder().db?.findElementById(TRASH_ID) as? NoteFolder
             this.getDataHolder().remove(content)
             trash?.add(content)
-            if (content is NoteFolder) content.getContents().forEach { onSwipeRight(context, it) }
+            if (content is NoteFolder) content.filtered.contents.forEach { onSwipeRight(context, it) }
         } else {
             AlertDialog.Builder(context).setTitle(R.string.trash_delete).setMessage(R.string.trash_delete_details).apply {
                 setPositiveButton(android.R.string.ok) { _, _ -> this@NoteAdapter.getDataHolder().remove(content); content.db?.delete(content) }

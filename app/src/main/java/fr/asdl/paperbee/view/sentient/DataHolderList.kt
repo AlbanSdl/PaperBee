@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.view.sentient
 
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -9,10 +10,25 @@ import kotlin.collections.HashMap
  * This structure is relying on a [LinkedList] of any type inheriting from [DataHolder], which
  * gives ids to items manages their order.
  *
- * Every change made to the data set is saved persistently using the first non-false [save]
- * method of the current [DataHolderList] and the ones of its parents.
+ * Every change made to the data set is saved persistently.
  */
 abstract class DataHolderList<T: DataHolder> : DataHolder() {
+
+    inner class FilteredDataHolderList {
+        /**
+         * Retrieves an [List] with all the visible [DataHolder]s contained in this [DataHolderList],
+         * sorted by order.
+         * Modifications committed to this list will not be propagated back to the DataHolderList.
+         */
+        val contents: List<T> get() = this@DataHolderList.contents.filter { it.id !in filters }
+
+        /**
+         * Retrieves the VISIBLE [DataHolder] contained in this [DataHolderList]
+         * with the given [order]
+         */
+        operator fun get(order: Int): T = this.contents[order]
+        fun indexOf(element: T): Int = this.contents.indexOf(element)
+    }
 
     /**
      * The listeners of the [DataHolder]. Registered by the [SentientRecyclerViewAdapter],
@@ -27,35 +43,24 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
 
     /**
      * Retrieves the raw content of the data set.
-     * It means that the [LinkedList] that stores data mush be returned AS IS.
-     * Indeed the returned [LinkedList] will be modified by the [DataHolderList]
-     *
-     * @return the RAW [LinkedList] where the [DataHolder] are actually stored.
+     * It means that the [LinkedList] that stores data mush be returned AS IS (not filtered).
+     * To get a pretty filtered list, use [filtered].
      */
     @Suppress("UNCHECKED_CAST")
-    open val contents: LinkedList<T>
+    protected open val contents: LinkedList<T>
         get() = db?.findContent(this.id!!) as? LinkedList<T> ?: LinkedList()
 
-    /**
-     * Retrieves a [List] with all the visible [DataHolder]s contained in this [DataHolderList].
-     *
-     * @return the contents of the set
-     */
-    fun getContents(): List<T> = this.contents.filter { it.id !in this.filters }
+    val size: Int get() = this.contents.size
 
     /**
-     * Retrieves the order of the given element in the [DataHolderList]
+     * Retrieves the [DataHolder] contained in this [DataHolderList] with the given [order]
      */
-    private fun getOrder(element: T): Int = this.getContents().indexOf(element)
+    operator fun get(order: Int): T = this.contents.find { it.order == order } ?: throw IndexOutOfBoundsException()
 
     /**
-     * Retrieves the raw position from the visible position (ie. given by an Adapter)
+     * Only retrieves the visible [DataHolder]s contained in this [DataHolderList].
      */
-    private fun getRawPosition(visiblePosition: Int): Int {
-        return if (visiblePosition in this.getContents().indices)
-            this.contents.indexOf(this.getContents()[visiblePosition])
-        else this.contents.size - 1
-    }
+    val filtered: FilteredDataHolderList get() = FilteredDataHolderList()
 
     /**
      * Adds a [DataHolder] in the list at the given position. It will be inserted without
@@ -66,14 +71,14 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      */
     private fun add(cnt: T, position: Int) {
         cnt.parentId = this.id!!
-        if (position >= this.contents.size || position < 0)
-            cnt.order = this.contents.size
+        if (position >= this.size || position < 0)
+            cnt.order = this.size
         else {
             this.updateIndex(1, position)
             cnt.order = position
         }
         cnt.db = this.db!!
-        this.onChange(ModificationType.ADDITION, this.getOrder(cnt), null)
+        this.onChange(ModificationType.ADDITION, this.filtered.indexOf(cnt), null)
     }
 
     /**
@@ -93,16 +98,16 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     open fun remove(cnt: T?) {
         if (cnt == null) return
         if (cnt.parentId == this.id!!) {
-            val order = this.getOrder(cnt)
+            val order = this.filtered.indexOf(cnt)
             cnt.parentId = null
-            this.updateIndex(-1, cnt.order + 1)
+            this.updateIndex(-1, cnt.order)
             this.onChange(ModificationType.REMOVAL, order, null)
         }
         cnt.order = -1
     }
 
     fun notifyUpdated(cnt: T) {
-        this.onChange(ModificationType.UPDATE, getContents().indexOf(cnt), null)
+        this.onChange(ModificationType.UPDATE, filtered.indexOf(cnt), null)
     }
 
     /**
@@ -115,24 +120,24 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param toPos the index to move the item to.
      */
     open fun move(fromPos: Int, toPos: Int) {
-        val size = this.getContents().size
+        val size = this.filtered.contents.size
         if (fromPos in 0 until size && toPos in 0 until size && fromPos != toPos)
-            this.moveIndices(this.getRawPosition(fromPos), this.getRawPosition(toPos))
+            this.moveIndices(this.filtered[fromPos].order, this.filtered[toPos].order)
     }
 
     /**
      * Moves an element using indices (aka. order)
      */
     protected fun moveIndices(fromIndex: Int, toIndex: Int) {
-        val size = this.contents.size
+        val size = this.size
         if (fromIndex in 0 until size && toIndex in 0 until size && fromIndex != toIndex) {
-            val elem = this.contents[fromIndex]
-            val previousVisiblePosition = this.getOrder(elem)
+            val elem = this[fromIndex]
+            val previousVisiblePosition = this.filtered.indexOf(elem)
             if (fromIndex < toIndex) this.updateIndex(-1, fromIndex + 1, toIndex)
             else this.updateIndex(1, toIndex, fromIndex - 1)
             elem.order = toIndex
             if (!this.filters.contains(elem.id))
-                this.onChange(ModificationType.MOVED, previousVisiblePosition, this.getOrder(elem))
+                this.onChange(ModificationType.MOVED, previousVisiblePosition, this.filtered.indexOf(elem))
         }
     }
 
@@ -151,11 +156,11 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * [toIndex] (inclusive) in this DataHolderList. The indices you use as [fromIndex] and
      * [toIndex] are considered as the order of the elements.
      */
-    private fun updateIndex(difference: Int, fromIndex: Int, toIndex: Int = this.contents.size - 1) {
-        val maxIndex = this.contents.size - 1
+    private fun updateIndex(difference: Int, fromIndex: Int, toIndex: Int = this.size - 1) {
+        val maxIndex = this.size - 1
         for (i in fromIndex..toIndex) {
             if (i > maxIndex) break
-            this.contents[i].order += difference
+            this[i].order += difference
         }
     }
 
@@ -185,8 +190,8 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * Hides the chosen element from the current [DataHolderList]
      */
     fun hide(content: T) {
-        if (content in this.getContents()) {
-            this.onChange(ModificationType.REMOVAL, this.getOrder(content), null)
+        if (content in this.filtered.contents) {
+            this.onChange(ModificationType.REMOVAL, this.filtered.indexOf(content), null)
             this.filters.add(content.id!!)
         }
     }
@@ -198,7 +203,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     fun show(content: T) {
         if (content.id!! in this.filters) {
             this.filters.remove(content.id!!)
-            this.onChange(ModificationType.ADDITION, this.getOrder(content), null)
+            this.onChange(ModificationType.ADDITION, this.filtered.indexOf(content), null)
         }
     }
 }
