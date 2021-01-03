@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.view.sentient
 
+import android.util.Log
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -73,8 +74,10 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
         cnt.parentId = this.id!!
         if (position >= this.contents.size || position < 0)
             cnt.order = this.contents.size
-        else
-            this.reIndex(position)
+        else {
+            this.updateIndex(1, position)
+            cnt.order = position
+        }
         cnt.db = this.db!!
         this.onChange(ModificationType.ADDITION, this.getOrder(cnt), null)
     }
@@ -98,7 +101,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
         if (cnt.parentId == this.id!!) {
             val order = this.getOrder(cnt)
             cnt.parentId = null
-            this.reIndex(cnt.order)
+            this.updateIndex(-1, cnt.order + 1)
             this.onChange(ModificationType.REMOVAL, order, null)
         }
         cnt.order = -1
@@ -121,11 +124,12 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
             && toPos >= 0 && toPos < this.getContents().size) {
             val realDestination = this.getRawPosition(toPos)
             val realFromPos = this.getRawPosition(fromPos)
+            Log.e(javaClass.simpleName, "Element move details: $realFromPos (as $fromPos) -> $realDestination (as $toPos)")
             val elem = this.getContents()[fromPos]
+            Log.e(javaClass.simpleName, "Element order property update: ${elem.order} -> $realDestination")
+            if (realFromPos < realDestination) this.updateIndex(-1, realFromPos + 1, realDestination)
+            else this.updateIndex(1, realDestination, realFromPos - 1)
             elem.order = realDestination
-            if (realFromPos < realDestination)
-                this.reIndex(realFromPos, realDestination - 1)
-            else this.reIndex(realDestination + 1, realFromPos)
             this.onChange(ModificationType.MOVED, fromPos, toPos)
         }
     }
@@ -141,16 +145,15 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     }
 
     /**
-     * This method re-indexes [DataHolder] contained in the [DataHolderList] between to indexes
-     * Move information on raw indexes: [contents], [getRawOrder]
-     * @param fromPos the raw index to re-index from
-     * @param toPos the raw index to re-index to (inclusive)
+     * Adds a number to the indices of all elements contained between index [fromIndex] and
+     * [toIndex] (inclusive) in this DataHolderList. The indices you use as [fromIndex] and
+     * [toIndex] are considered as the order of the elements.
      */
-    private fun reIndex(fromPos: Int, toPos: Int = this.contents.size - 1) {
-        val max = this.contents.size - 1
-        for (i in fromPos..toPos) {
-            if (i > max) break
-            this.contents[i].order = i
+    private fun updateIndex(difference: Int, fromIndex: Int, toIndex: Int = this.contents.size - 1) {
+        val maxIndex = this.contents.size - 1
+        for (i in fromIndex..toIndex) {
+            if (i > maxIndex) break
+            this.contents[i].order += difference
         }
     }
 
