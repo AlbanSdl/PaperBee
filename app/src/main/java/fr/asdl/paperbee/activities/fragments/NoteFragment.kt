@@ -146,20 +146,21 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         }
 
         override fun onSwipeRight(context: Context, content: NotePart) {
-            data class PartHierarchy(val target: NotePart, val parent: NotePart?)
+            data class PartHierarchy(val target: NotePart, val parent: NotePart?, val order: Int)
             val removed = arrayListOf<PartHierarchy>()
             fun removeRec(part: NotePart) {
                 part.getChildren().forEach { removeRec(it) }
-                removed.add(PartHierarchy(part, part.getParentPart()))
+                removed.add(PartHierarchy(part, part.getParentPart(), part.order))
                 this.getDataHolder().remove(part)
                 this.getDataHolder().db?.delete(part)
             }
             removeRec(content)
             Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
                 .setAction(R.string.restore) {
+                    notable.db!!.reMapIds(removed.map { it.target })
                     removed.reverse()
-                    removed.forEach { this.getDataHolder().add(it.target) }
-                    removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id; this.getDataHolder().db?.add(it.target) }
+                    removed.forEach { this.getDataHolder().db?.add(it.target); this.getDataHolder().add(it.target, it.order) }
+                    removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id }
                     removed.clear()
                 }.show()
         }

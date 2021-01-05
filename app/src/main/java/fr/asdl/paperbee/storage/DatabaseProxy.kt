@@ -3,6 +3,7 @@ package fr.asdl.paperbee.storage
 import android.content.Context
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ID
@@ -55,10 +56,12 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
                     DatabaseFilter.Operator.EQUALS
                 )
             )
-        ) {
+        ) { it ->
             if (it > 0) {
                 if (dataHolder.id != null) idAllocator.release(dataHolder.id!!)
                 holderList.remove(dataHolder)
+                if (dataHolder is DataHolderList<*>) this.findContent(dataHolder.id).forEach { delete(it) }
+                dataHolder.db = null // if the item is reinserted it will update its id
             }
         }
     }
@@ -117,41 +120,32 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
      * Can also be used to duplicate Notables by inserting A DEEP COPY of them in a list and calling
      * this method. You may use the ShareProcess to create an appropriate deep copy.
      */
-    @Deprecated("Has to be reviewed and updated with full support of Database structure.")
     fun import(notables: List<DataHolder>, destination: NoteFolder = this.findElementById(ROOT_ID) as NoteFolder) {
-        // We define a recursive function to propagate actions to children at any depth
-        // In our case, this will only take action to reach NoteParts as Notes are not
-        // stored as content of NoteFolders
-        fun runRecursively(holder: DataHolder, execute: (DataHolder) -> Unit) {
-            execute(holder)
-            if (holder is DataHolderList<*>)
-                holder.filtered.contents.forEach { runRecursively(it, execute) }
-        }
-        // We have to remap the ids of all components: Notables and NoteParts, updating the
-        // parentIds too.
-        val mappedIds = hashMapOf<Int, Int>()
-        notables.forEach { notable ->
-            runRecursively(notable) {
-                mappedIds[it.id!!] = -1
-            }
-        }
-        mappedIds.keys.forEach {
-            mappedIds[it] = this.idAllocator.forceAllocate(it)
-        }
-        notables.forEach { notable ->
-            runRecursively(notable) {
-                it.initializeId(mappedIds[it.id!!]!!)
-                it.parentId = if (it.parentId in mappedIds) mappedIds[it.parentId!!] else destination.id!!
-                // We reset position as it should not take the position of any existing element.
-                it.order = -1
-            }
-        }
-        // The ids have been remapped, now we can add the elements
-        notables.forEach { this.add(it) }
+        this.reMapIds(notables) { it.parentId = destination.id!! }
+        notables.filterIsInstance<NotePart>().forEach { this.add(it) }
+        notables.filterIsInstance<Notable<*>>().forEach { destination.add(it) }
     }
 
     fun close() {
         this.dbAccess.close()
     }
 
+    /**
+     * Allocates new ids to the given elements. The current ids of element are just supposed
+     * to indicate relationships between elements, they will NOT be de-allocated.
+     */
+    internal fun reMapIds(holders: List<DataHolder>, whenOrphan: (d: DataHolder) -> Unit = {}) {
+        val parentRemapped = arrayListOf<DataHolder>()
+        holders.forEach { it ->
+            val previousId = it.id
+            it.initializeId(idAllocator.allocate())
+            val allocatedId = it.id!!
+            if (previousId != null)
+                holders.filter { it.parentId == previousId }.forEach {
+                    it.parentId = allocatedId
+                    parentRemapped.add(it)
+                }
+        }
+        holders.subtract(parentRemapped).forEach(whenOrphan)
+    }
 }

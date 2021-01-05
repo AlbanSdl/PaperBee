@@ -87,9 +87,9 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
 
     override fun onSwipeRight(context: Context, content: Notable<*>) {
         if (folder.id != TRASH_ID) {
-            val trash = this.getDataHolder().db?.findElementById(TRASH_ID) as? NoteFolder
-            this.getDataHolder().remove(content)
-            trash?.add(content)
+            val trash = this.folder.db!!.findElementById(TRASH_ID) as NoteFolder
+            this.folder.remove(content)
+            trash.add(content)
             if (content is NoteFolder) content.filtered.contents.forEach { onSwipeRight(context, it) }
         } else {
             AlertDialog.Builder(context).setTitle(R.string.trash_delete).setMessage(R.string.trash_delete_details).apply {

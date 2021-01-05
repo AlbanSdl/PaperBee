@@ -55,7 +55,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     /**
      * Retrieves the [DataHolder] contained in this [DataHolderList] with the given [order]
      */
-    operator fun get(order: Int): T = this.contents.find { it.order == order } ?: throw IndexOutOfBoundsException()
+    operator fun get(order: Int): T = this.contents.find { it.order == order } ?: throw IndexOutOfBoundsException("No item for position $order")
 
     /**
      * Only retrieves the visible [DataHolder]s contained in this [DataHolderList].
@@ -69,13 +69,13 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param cnt the [DataHolder] to insert in the set
      * @param position the raw index to insert the [cnt] to.
      */
-    private fun add(cnt: T, position: Int) {
+    fun add(cnt: T, position: Int) {
         cnt.parentId = this.id!!
         if (position >= this.size || position < 0)
             cnt.order = this.size
         else {
-            this.updateIndex(1, position)
             cnt.order = position
+            this.reIndex(cnt)
         }
         cnt.db = this.db!!
         this.onChange(ModificationType.ADDITION, this.filtered.indexOf(cnt), null)
@@ -100,7 +100,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
         if (cnt.parentId == this.id!!) {
             val order = this.filtered.indexOf(cnt)
             cnt.parentId = null
-            this.updateIndex(-1, cnt.order)
+            this.reIndex()
             this.onChange(ModificationType.REMOVAL, order, null)
         }
         cnt.order = -1
@@ -133,9 +133,8 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
         if (fromIndex in 0 until size && toIndex in 0 until size && fromIndex != toIndex) {
             val elem = this[fromIndex]
             val previousVisiblePosition = this.filtered.indexOf(elem)
-            if (fromIndex < toIndex) this.updateIndex(-1, fromIndex + 1, toIndex)
-            else this.updateIndex(1, toIndex, fromIndex - 1)
             elem.order = toIndex
+            this.reIndex(elem, fromIndex > toIndex)
             if (!this.filters.contains(elem.id))
                 this.onChange(ModificationType.MOVED, previousVisiblePosition, this.filtered.indexOf(elem))
         }
@@ -152,16 +151,19 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     }
 
     /**
-     * Adds a number to the indices of all elements contained between index [fromIndex] and
-     * [toIndex] (inclusive) in this DataHolderList. The indices you use as [fromIndex] and
-     * [toIndex] are considered as the order of the elements.
+     * Ensures the [DataHolderList] is sorted and all indices are filled.
+     * @param element you may precise an element which will follow a specific rule. Use this
+     * argument when there should be an order conflict
+     * @param placeBefore the given [element] will be placed before the conflicted elements if this
+     * property is true otherwise it will be placed after
      */
-    private fun updateIndex(difference: Int, fromIndex: Int, toIndex: Int = this.size - 1) {
-        val maxIndex = this.size - 1
-        for (i in fromIndex..toIndex) {
-            if (i > maxIndex) break
-            this[i].order += difference
+    private fun reIndex(element: T? = null, placeBefore: Boolean = true) {
+        val toIndex = this.contents.sortedWith { o1, o2 ->
+            val placement = if (o1.order == o2.order) if (element == o1) -1 else if (element == o2) 1 else 0 else 0
+            if (placement != 0) placement * if (placeBefore) 1 else -1 else o1.order - o2.order
         }
+        for (i in toIndex.indices)
+            toIndex[i].order = i
     }
 
     /**

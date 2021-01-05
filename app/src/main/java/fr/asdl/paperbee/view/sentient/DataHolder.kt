@@ -51,8 +51,10 @@ abstract class DataHolder {
         set(value) {
             if (parentId == value) return
             _parent = value
-            _dataChanged.add(COLUMN_NAME_PARENT)
-            this.save()
+            if (value != null) {
+                _dataChanged.add(COLUMN_NAME_PARENT)
+                this.save()
+            }
         }
 
     /**
@@ -63,8 +65,9 @@ abstract class DataHolder {
     var db: DatabaseProxy<*>?
         get() = _dbProxy
         set(value) {
-            if (_dbProxy == null && value != null) {
-                _dbProxy = value
+            val shouldUpdateId = _dbProxy == null && value != null
+            _dbProxy = value
+            if (shouldUpdateId) {
                 val insert = this._id == null
                 this._id = _dbProxy?.registerHolder(this)
                 if (insert) {

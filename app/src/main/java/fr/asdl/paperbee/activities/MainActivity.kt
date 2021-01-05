@@ -37,8 +37,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
             // Handling creation shortcut
             if (intent.extras?.containsKey("create") == true) {
                 val note = Note()
-                note.parentId = ROOT_ID
-                note.db = dbProxy
+                (dbProxy.findElementById(ROOT_ID) as NoteFolder).add(note)
                 note.add(NoteText(""))
                 this.openNotable(note)
             }
