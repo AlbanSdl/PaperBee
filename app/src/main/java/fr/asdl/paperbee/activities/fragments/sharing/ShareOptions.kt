@@ -4,8 +4,10 @@ import com.google.android.material.snackbar.Snackbar
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.AppFragment
 import fr.asdl.paperbee.note.Notable
+import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
 import fr.asdl.paperbee.sharing.files.FileAccessContext
+import fr.asdl.paperbee.view.sentient.DataHolder
 
 class ShareOptions {
 
@@ -26,7 +28,12 @@ class ShareOptions {
             }
             SharingMethod.FILE -> {
                 val encryptedByteArray =
-                    this.shareProcess.encrypt(if (this.password.isEmpty()) null else password, data)
+                    this.shareProcess.encryptToFile(if (this.password.isEmpty()) null else password, data) { it ->
+                        val fullList = arrayListOf<DataHolder>()
+                        fullList.addAll(data)
+                        it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
+                        return@encryptToFile fullList
+                    }
                 context.createFile(
                     context.getString(R.string.share_to_file_filename),
                     null,
@@ -51,7 +58,6 @@ class ShareOptions {
      * Stops synchronously the current operation
      */
     fun forceStop() {
-        TODO()
     }
 
     /**

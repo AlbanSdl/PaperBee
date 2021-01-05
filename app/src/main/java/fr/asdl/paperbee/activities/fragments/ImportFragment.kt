@@ -7,16 +7,16 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.receiving.ReceptionBaseFragment
 import fr.asdl.paperbee.activities.fragments.receiving.ReceptionFragment
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
-import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.sharing.ShareProcess
+import fr.asdl.paperbee.view.sentient.DataHolder
 
 class ImportFragment : AppFragment(), FragmentContainer<ReceptionBaseFragment> {
 
     val shareProcess = ShareProcess()
     var shareData: ByteArray? = null
     var method: SharingMethod = SharingMethod.FILE
-    var content: List<Notable<*>>? = null
+    var content: List<DataHolder>? = null
     var destination: NoteFolder? = null
 
     override val shouldRetainInstance: Boolean = true

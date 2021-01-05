@@ -20,8 +20,8 @@ android {
         applicationId "fr.asdl.paperbee"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 15
-        versionName "0.5.0-alpha"
+        versionCode 16
+        versionName "0.5.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

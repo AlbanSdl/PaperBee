@@ -1,6 +1,7 @@
 package fr.asdl.paperbee.sharing
 
 import fr.asdl.paperbee.exceptions.WrongPasswordException
+import fr.asdl.paperbee.note.Note
 import java.lang.Exception
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
@@ -14,8 +15,8 @@ abstract class SharingFactory<T> {
 
     private val encryptionAlgorithm = "AES"
 
-    private fun getBytes(sharable: T): ByteArray {
-        val bytes = this.toBytes(sharable)
+    private fun getBytes(sharable: T, encryptionKey: String?): ByteArray {
+        val bytes = this.toBytes(sharable, encryptionKey)
         val valHeaderLength = ceil((bytes.size - 31).toFloat() / 255).toInt() + if ((bytes.size - 31) % 255 == 0) 1 else 0
         val byteArray = ByteArray(bytes.size + 1 + valHeaderLength)
         for (i in 0..valHeaderLength) {
@@ -27,8 +28,8 @@ abstract class SharingFactory<T> {
         return byteArray
     }
 
-    private fun getBytes(list: List<T>): ByteArray {
-        val asBytes = list.map { this.getBytes(it) }
+    private fun getBytes(list: List<T>, encryptionKey: String?): ByteArray {
+        val asBytes = list.map { this.getBytes(it, encryptionKey) }
         val arr = ByteArray(asBytes.map { it.size }.sum())
         var indexStart = 0
         asBytes.forEach {
@@ -38,7 +39,7 @@ abstract class SharingFactory<T> {
         return arr
     }
 
-    private fun parseBytes(byteArray: ByteArray): List<T> {
+    private fun parseBytes(byteArray: ByteArray, encryptionKey: String?): List<T> {
         var cursor = 0
         val list: ArrayList<T> = arrayListOf()
         while (cursor < byteArray.size) {
@@ -52,7 +53,7 @@ abstract class SharingFactory<T> {
             }
             val elemArray = ByteArray(length)
             System.arraycopy(byteArray, cursor, elemArray, 0, length)
-            list.add(this.fromBytes(elemArray, protocolVersion))
+            list.add(this.fromBytes(elemArray, protocolVersion, encryptionKey))
             cursor += length
         }
         return list
@@ -72,7 +73,7 @@ abstract class SharingFactory<T> {
         return i
     }
 
-    protected open fun runCipher(operationMode: Int, key: String, byteArray: ByteArray): ByteArray {
+    private fun runCipher(operationMode: Int, key: String, byteArray: ByteArray): ByteArray {
         val salt = ByteArray(16)
         for (i in 0 until 16) salt[i] = key.toCharArray()[i % key.length].toByte()
         val spec = PBEKeySpec(key.toCharArray(), salt, 1000, 256)
@@ -83,22 +84,30 @@ abstract class SharingFactory<T> {
         return cipher.doFinal(byteArray)
     }
 
-    fun encrypt(encryptionKey: String?, values: List<T>): ByteArray {
-        if (encryptionKey == null) return this.getBytes(values)
-        return this.runCipher(Cipher.ENCRYPT_MODE, encryptionKey, this.getBytes(values))
+    protected fun encrypt(encryptionKey: String?, byteArray: ByteArray): ByteArray {
+        if (encryptionKey == null) return byteArray
+        return this.runCipher(Cipher.ENCRYPT_MODE, encryptionKey, byteArray)
     }
 
-    fun decrypt(encryptionKey: String?, value: ByteArray): List<T> {
+    protected fun decrypt(encryptionKey: String?, byteArray: ByteArray): ByteArray {
         try {
-            if (encryptionKey == null) return this.parseBytes(value)
-            return this.parseBytes(this.runCipher(Cipher.DECRYPT_MODE, encryptionKey, value))
+            if (encryptionKey == null) return byteArray
+            return this.runCipher(Cipher.DECRYPT_MODE, encryptionKey, byteArray)
         } catch (e: Exception) {
             throw WrongPasswordException()
         }
     }
 
-    protected abstract fun toBytes(sharable: T): ByteArray
-    protected abstract fun fromBytes(bytes: ByteArray, protocolVersion: Int): T
+    fun encryptToFile(encryptionKey: String?, data: List<T>, addSupplements: (list: List<T>) -> List<T> = { it }): ByteArray {
+        return this.getBytes(addSupplements.invoke(data), encryptionKey)
+    }
+
+    fun decryptFromFile(decryptionKey: String?, byteArray: ByteArray): List<T> {
+        return this.parseBytes(byteArray, decryptionKey)
+    }
+
+    protected abstract fun toBytes(sharable: T, encryptionKey: String?): ByteArray
+    protected abstract fun fromBytes(bytes: ByteArray, protocolVersion: Int, encryptionKey: String?): T
     abstract fun writingProtocolVersion(): Int
 
 }

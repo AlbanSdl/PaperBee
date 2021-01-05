@@ -27,7 +27,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
                     if (res.success) {
                         orig.shareData = data
                         try {
-                            orig.content = orig.shareProcess.decrypt(null, data!!)
+                            orig.content = orig.shareProcess.decryptFromFile(null, data!!)
                         } catch (e: WrongPasswordException) {
                         }
                         orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions")

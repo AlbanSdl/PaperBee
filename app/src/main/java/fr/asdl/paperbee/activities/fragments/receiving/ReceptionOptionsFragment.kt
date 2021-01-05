@@ -43,7 +43,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                 if (orig.content == null) {
                     val passwordField = view.findViewById<TextView>(R.id.share_password_field)
                     try {
-                        orig.content = orig.shareProcess.decrypt(
+                        orig.content = orig.shareProcess.decryptFromFile(
                             passwordField.text.toString(),
                             orig.shareData!!
                         )
