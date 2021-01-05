@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.note
 
+import fr.asdl.paperbee.view.sentient.ModificationType
 import java.util.*
 
 /**
@@ -43,6 +44,22 @@ class Note: Notable<NotePart>() {
             p.getChildren().forEach { mI(it) }
         }
         mI(part)
+    }
+
+    override fun remove(cnt: NotePart?) {
+        if (cnt == null) return
+        val nestedContents = hashMapOf<NotePart, Int>()
+        fun retrieveNested(n: NotePart) {
+            nestedContents[n] = this.filtered.indexOf(cnt)
+            n.getChildren().forEach { retrieveNested(it) }
+        }
+        retrieveNested(cnt)
+        nestedContents.forEach {
+            it.key.parentId = null
+            this.reIndex()
+            this.onChange(ModificationType.REMOVAL, it.value, null)
+            db!!.delete(it.key)
+        }
     }
 
 }

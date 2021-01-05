@@ -157,7 +157,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param placeBefore the given [element] will be placed before the conflicted elements if this
      * property is true otherwise it will be placed after
      */
-    private fun reIndex(element: T? = null, placeBefore: Boolean = true) {
+    protected fun reIndex(element: T? = null, placeBefore: Boolean = true) {
         val toIndex = this.contents.sortedWith { o1, o2 ->
             val placement = if (o1.order == o2.order) if (element == o1) -1 else if (element == o2) 1 else 0 else 0
             if (placement != 0) placement * if (placeBefore) 1 else -1 else o1.order - o2.order
@@ -173,7 +173,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * @param position the index of the beginning of the modification
      * @param toPosition the index of the end of the modification (included)
      */
-    private fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
+    protected fun onChange(actionType: ModificationType, position: Int, toPosition: Int?) {
         this.listeners[actionType]?.invoke(position, toPosition)
     }
 
