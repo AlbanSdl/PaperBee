@@ -1,7 +1,6 @@
 package fr.asdl.paperbee.sharing
 
 import fr.asdl.paperbee.exceptions.WrongPasswordException
-import fr.asdl.paperbee.note.Note
 import java.lang.Exception
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory

@@ -7,6 +7,8 @@ import fr.asdl.paperbee.activities.fragments.ImportFragment
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ReceptionFragment : ReceptionBaseFragment() {
 
@@ -27,15 +29,21 @@ class ReceptionFragment : ReceptionBaseFragment() {
                 orig.readFile(null) { res, data ->
                     if (res.success) {
                         orig.shareData = data
-                        try {
-                            orig.content = orig.shareProcess.decryptFromFile(null, data!!)
-                        } catch (e: WrongPasswordException) {
-                        } catch (e: IncompatibleVersionException) {
-                            view.findViewById<TextView>(R.id.share_from_file_header).text =
-                                getString(R.string.share_from_file_failed_compat)
-                            return@readFile
+                        GlobalScope.launch {
+                            try {
+                                orig.content = orig.shareProcess.decryptFromFile(null, data!!)
+                            } catch (e: WrongPasswordException) {
+                            } catch (e: IncompatibleVersionException) {
+                                this@ReceptionFragment.requireActivity().runOnUiThread {
+                                    view.findViewById<TextView>(R.id.share_from_file_header).text =
+                                        getString(R.string.share_from_file_failed_compat)
+                                }
+                                return@launch
+                            }
+                            this@ReceptionFragment.requireActivity().runOnUiThread {
+                                orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions", shouldAnimateOutgoingFragment = false)
+                            }
                         }
-                        orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions", shouldAnimateOutgoingFragment = false)
                     } else
                         view.findViewById<TextView>(R.id.share_from_file_header).text =
                             getString(R.string.share_from_file_failed_retry)

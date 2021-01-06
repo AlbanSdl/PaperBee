@@ -8,6 +8,8 @@ import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
 import fr.asdl.paperbee.sharing.files.FileAccessContext
 import fr.asdl.paperbee.view.sentient.DataHolder
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ShareOptions {
 
@@ -27,26 +29,28 @@ class ShareOptions {
                 TODO()
             }
             SharingMethod.FILE -> {
-                val encryptedByteArray =
-                    this.shareProcess.encryptToFile(if (this.password.isEmpty()) null else password, data) { it ->
-                        val fullList = arrayListOf<DataHolder>()
-                        fullList.addAll(data)
-                        it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
-                        return@encryptToFile fullList
-                    }
-                context.createFile(
-                    context.getString(R.string.share_to_file_filename),
-                    null,
-                    encryptedByteArray
-                ) {
-                    sharingStarted = false
-                    if (it.hasPerformed()) {
-                        Snackbar.make(
-                            context.requireActivity().findViewById(R.id.main),
-                            it.getActionDetails(FileAccessContext.CREATION),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                        callback.invoke(it.success)
+                GlobalScope.launch {
+                    val encryptedByteArray =
+                        shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
+                            val fullList = arrayListOf<DataHolder>()
+                            fullList.addAll(data)
+                            it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
+                            return@encryptToFile fullList
+                        }
+                    context.createFile(
+                        context.getString(R.string.share_to_file_filename),
+                        null,
+                        encryptedByteArray
+                    ) {
+                        sharingStarted = false
+                        if (it.hasPerformed()) {
+                            Snackbar.make(
+                                context.requireActivity().findViewById(R.id.main),
+                                it.getActionDetails(FileAccessContext.CREATION),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                            callback.invoke(it.success)
+                        }
                     }
                 }
             }

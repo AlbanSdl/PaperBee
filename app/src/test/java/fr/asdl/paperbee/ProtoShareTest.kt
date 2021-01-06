@@ -20,9 +20,10 @@ class ProtoShareTest {
         val folder = NoteFolder()
         folder.parentId = ROOT_ID
         folder.title = "Name"
+        folder.initializeId(0)
         val process = ShareProcess()
-        val sharedData = process.encrypt(password, listOf(folder))
-        val retrievedData = process.decrypt(password, sharedData)
+        val sharedData = process.encryptToFile(password, listOf(folder))
+        val retrievedData = process.decryptFromFile(password, sharedData)
         assertEquals(folder.title, (retrievedData[0] as NoteFolder).title)
     }
 

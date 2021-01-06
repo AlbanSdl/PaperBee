@@ -123,7 +123,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
-                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save() }
+                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save(false) }
             }
         }
 

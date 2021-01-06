@@ -1,16 +1,18 @@
 package fr.asdl.paperbee.storage.v1
 
+import android.util.Base64
+import android.util.Base64.DEFAULT
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
+import fr.asdl.paperbee.exceptions.WrongPasswordException
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
 import java.io.NotSerializableException
-import java.lang.NumberFormatException
 
 
 private val escapeRegex = Regex("[\\\\\"]")
-private val unEscapeRegex = Regex("\\\\.")
-private val deSerialRegex = Regex("(?<!\\\\)\".*?(?<!\\\\)\"")
+private val unEscapeRegex = Regex("\\\\[\\\\\"]")
+private val deSerialRegex = Regex("(?<!\\\\)\".*?(?<!\\\\)\"", RegexOption.DOT_MATCHES_ALL)
 private fun escapeText(input: String): String {
     return escapeRegex.replace(input) { "\\${it.value}" }
 }
@@ -53,15 +55,15 @@ fun serialize(dataHolder: DataHolder, enc: (str: String) -> String): String {
     }
 }
 
-fun deserialize(string: String, dec: (str: String) -> String): DataHolder {
+fun deserialize(content: ByteArray, dec: (str: String) -> String): DataHolder {
     val data = arrayListOf<String>()
-    var result = deSerialRegex.find(string)
+    var result = deSerialRegex.find(String(content))
     while (result != null) {
         data.add(dec(unEscapeText(result.value.substring(1, result.value.length - 1))))
         result = result.next()
     }
     if (data.size < 5) throw IncompatibleVersionException()
-    val holder = when (NotableContract.DataHolderType.fromInt(data[3].toInt())) {
+    val holder = when (NotableContract.DataHolderType.fromInt(getInt(data[3]) ?: throw WrongPasswordException())) {
         NotableContract.DataHolderType.FOLDER -> NoteFolder()
         NotableContract.DataHolderType.NOTE -> Note()
         NotableContract.DataHolderType.TEXT -> NoteText(data[4])
@@ -87,4 +89,12 @@ fun getInt(str: String): Int? {
     } catch (e: NumberFormatException) {
         null
     }
+}
+
+internal fun String.decodeBase64(): ByteArray {
+    return Base64.decode(this, DEFAULT)
+}
+
+internal fun ByteArray.encodeBase64(): String {
+    return Base64.encodeToString(this, DEFAULT)
 }

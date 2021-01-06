@@ -12,3 +12,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+#Constructor accessed via reflection only should not be removed by r8
+-keepclassmembers class fr.asdl.paperbee.storage.v1.DatabaseAccess {
+    public <init>(...);
+}

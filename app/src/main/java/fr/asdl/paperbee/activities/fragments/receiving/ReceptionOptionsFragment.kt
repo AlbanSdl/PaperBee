@@ -13,6 +13,8 @@ import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.bindings.DirectoryTree
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.view.tree.TreeView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ReceptionOptionsFragment : ReceptionBaseFragment() {
 
@@ -32,6 +34,15 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                 }, resources.getDimension(R.dimen.smallText) / resources.displayMetrics.scaledDensity)
             )
             view.findViewById<View>(R.id.next).setOnClickListener {
+                fun callback() {
+                    if (orig.content != null) {
+                        orig.destination!!.db!!.import(orig.content!!, orig.destination!!)
+                        activity?.supportFragmentManager?.popBackStack(
+                            orig.tag,
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE
+                        )
+                    }
+                }
                 if (orig.destination == null) {
                     Toast.makeText(
                         requireContext(),
@@ -40,24 +51,27 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                     ).show()
                     return@setOnClickListener
                 }
+                it.isEnabled = false
                 if (orig.content == null) {
                     val passwordField = view.findViewById<TextView>(R.id.share_password_field)
-                    try {
-                        orig.content = orig.shareProcess.decryptFromFile(
-                            passwordField.text.toString(),
-                            orig.shareData!!
-                        )
-                    } catch (e: WrongPasswordException) {
-                        passwordField.error = getString(R.string.share_import_wrong_password)
+                    GlobalScope.launch {
+                        try {
+                            orig.content = orig.shareProcess.decryptFromFile(
+                                passwordField.text.toString(),
+                                orig.shareData!!
+                            )
+                            requireActivity().runOnUiThread {
+                                callback()
+                            }
+                        } catch (e: WrongPasswordException) {
+                            requireActivity().runOnUiThread {
+                                it.isEnabled = true
+                                passwordField.error = getString(R.string.share_import_wrong_password)
+                            }
+                        }
                     }
                 }
-                if (orig.content != null) {
-                    orig.destination!!.db!!.import(orig.content!!, orig.destination!!)
-                    activity?.supportFragmentManager?.popBackStack(
-                        orig.tag,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                }
+                callback()
             }
         } else if (orig.method == SharingMethod.NFC) {
             view.findViewById<View>(R.id.share_nfc_group).visibility = View.VISIBLE
