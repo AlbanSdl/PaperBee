@@ -67,7 +67,7 @@ sealed class NotePart : DataHolder() {
         // We move the current NotePart after its old parent group
         val note = getNote()!!
         var moveTo = this.order
-        for (i in this.order + 1 until note.size) {
+        for (i in this.order + 1 until note.size - 1) {
             if (!note[i].hasParent(previousParent.id!!))
                 break
             moveTo++
