@@ -120,7 +120,7 @@ sealed class NotePart : DataHolder() {
                         NotePartAttachmentException.Reason.DIFFERENT_NOTE)
                 if (notePart.getDepth() > this.getDepth())
                     for (i in notePart.order + 1 until this.order)
-                        if (note.filtered[i].parentId != notePart.id)
+                        if (note[i].parentId != notePart.id)
                             throw NotePartAttachmentException(this, notePart,
                                 NotePartAttachmentException.Reason.FOREIGN_ELEMENTS)
             }
@@ -138,8 +138,9 @@ sealed class NotePart : DataHolder() {
      */
     private fun getAbove(): NotePart? {
         val note = getNote() ?: return null
-        if (note.filtered.contents.size <= this.order || this.order <= 0) return null
-        return note.filtered[this.order - 1]
+        val visibleOrder = note.filtered.indexOf(this)
+        if (note.filtered.contents.size <= visibleOrder || visibleOrder <= 0) return null
+        return note.filtered[visibleOrder - 1]
     }
 
     /**

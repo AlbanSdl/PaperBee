@@ -71,13 +71,15 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      */
     fun add(cnt: T, position: Int) {
         cnt.parentId = this.id!!
-        if (position >= this.size || position < 0)
-            cnt.order = this.size - 1
-        else {
+        if (position >= this.size || position < 0) {
+            cnt.order = this.size
+            cnt.db = this.db!!
+            this.reIndex(cnt, false)
+        } else {
             cnt.order = position
+            cnt.db = this.db!!
             this.reIndex(cnt)
         }
-        cnt.db = this.db!!
         this.onChange(ModificationType.ADDITION, this.filtered.indexOf(cnt), null)
     }
 

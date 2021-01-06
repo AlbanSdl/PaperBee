@@ -8,6 +8,4 @@ Here is a small non-exhaustive list of the features most likely to be released
 - More elements in notes such as links
 - Interface tweaks and additions
 - NFC sharing
-
-### Database Storage versions ###
-Database storage is experimental. This is NOT compatible with the old save format within the app neither through backups. The only way to transfer your old notes is to copy paste their content to a file and copy paste from this file in new notes after updating the app.
+- Bug fixes !
