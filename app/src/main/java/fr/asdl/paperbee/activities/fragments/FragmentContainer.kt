@@ -23,13 +23,13 @@ interface FragmentContainer<in T> where T : AppFragment, T : SubFragment {
     fun getTransition(fragment: T, backStack: String?): TransitionComponents =
         TransitionComponents()
 
-    fun displayFragment(fragment: T, addToBackStackTag: String?, isFromOnCreateView: Boolean = false) {
+    fun displayFragment(fragment: T, addToBackStackTag: String?, isFromOnCreateView: Boolean = false, shouldAnimateOutgoingFragment: Boolean = true) {
         if (isFromOnCreateView && this.getChildFragmentManager().fragments.size != 0) return
         val transitionInflater = TransitionInflater.from(getContext() ?: return)
         val currentFragment =
             getChildFragmentManager().findFragmentById(this.getFragmentContainerId())
         val transition = this.getTransition(fragment, addToBackStackTag)
-        if (currentFragment != null) {
+        if (currentFragment != null && shouldAnimateOutgoingFragment) {
             currentFragment.sharedElementReturnTransition =
                 transitionInflater.inflateTransition(R.transition.shared_elements_transition)
             currentFragment.exitTransition =

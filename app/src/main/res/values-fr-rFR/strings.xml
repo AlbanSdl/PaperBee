@@ -84,4 +84,7 @@
     </string-array>
     <string name="pref_app_category_misc">Divers</string>
     <string name="pref_app_version_title">Version de l\'application</string>
+    <string name="share_from_file_failed_compat">Ce fichier n\'est pas compatible avec cette version de l\'application</string>
+    <string name="db_error_select">Une erreur est survenue lors de la lecture des notes</string>
+    <string name="db_error_insert">Une erreur est survenue lors de l\'enregistrement de la note</string>
 </resources>

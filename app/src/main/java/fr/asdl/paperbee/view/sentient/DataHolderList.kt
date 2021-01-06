@@ -72,7 +72,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
     fun add(cnt: T, position: Int) {
         cnt.parentId = this.id!!
         if (position >= this.size || position < 0)
-            cnt.order = this.size
+            cnt.order = this.size - 1
         else {
             cnt.order = position
             this.reIndex(cnt)

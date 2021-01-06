@@ -80,6 +80,7 @@
     <string name="share_import">Import</string>
     <string name="share_import_from_tile_header">Select a file to import</string>
     <string name="share_from_file_failed_retry">Invalid file location provided</string>
+    <string name="share_from_file_failed_compat">The file is not compatible with your version of the app</string>
     <string name="share_import_destination">Choose destination</string>
     <string name="share_import_password_header">This file is protected with a password. Provide it to decrypt it</string>
     <string name="share_import_password">Enter password</string>

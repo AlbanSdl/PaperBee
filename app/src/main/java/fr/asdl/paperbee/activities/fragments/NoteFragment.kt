@@ -158,7 +158,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 .setAction(R.string.restore) {
                     notable.db!!.reMapIds(removed.map { it.target })
                     removed.reverse()
-                    removed.forEach { this.getDataHolder().db?.add(it.target); this.getDataHolder().add(it.target, it.order) }
+                    removed.forEach { this.getDataHolder().add(it.target, it.order) }
                     removed.forEach { if (it.parent != null) it.target.parentId = it.parent.id }
                     removed.clear()
                 }.show()

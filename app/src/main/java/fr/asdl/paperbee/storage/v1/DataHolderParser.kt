@@ -5,6 +5,7 @@ import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
 import java.io.NotSerializableException
+import java.lang.NumberFormatException
 
 
 private val escapeRegex = Regex("[\\\\\"]")
@@ -56,7 +57,7 @@ fun deserialize(string: String, dec: (str: String) -> String): DataHolder {
     val data = arrayListOf<String>()
     var result = deSerialRegex.find(string)
     while (result != null) {
-        data.add(dec(unEscapeText(result.value)))
+        data.add(dec(unEscapeText(result.value.substring(1, result.value.length - 1))))
         result = result.next()
     }
     if (data.size < 5) throw IncompatibleVersionException()
@@ -70,12 +71,20 @@ fun deserialize(string: String, dec: (str: String) -> String): DataHolder {
         ) else throw IncompatibleVersionException()
         else -> throw IncompatibleVersionException()
     }
-    holder.initializeId(data[0].toInt())
-    holder.order = data[1].toInt()
-    holder.parentId = data[2].toInt()
+    holder.initializeId(getInt(data[0]) ?: throw IncompatibleVersionException())
+    holder.order = getInt(data[1]) ?: throw IncompatibleVersionException()
+    holder.parentId = getInt(data[2])
     if (holder is Notable<*>) {
         holder.title = data[4]
         if (data.size > 5) holder.color = Color.getFromTag(data[5])
     }
     return holder
+}
+
+fun getInt(str: String): Int? {
+    return try {
+        str.toInt()
+    } catch (e: NumberFormatException) {
+        null
+    }
 }

@@ -121,9 +121,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
      * this method. You may use the ShareProcess to create an appropriate deep copy.
      */
     fun import(notables: List<DataHolder>, destination: NoteFolder = this.findElementById(ROOT_ID) as NoteFolder) {
-        this.reMapIds(notables) { it.parentId = destination.id!! }
-        notables.filterIsInstance<NotePart>().forEach { this.add(it) }
-        notables.filterIsInstance<Notable<*>>().forEach { destination.add(it) }
+        this.reMapIds(notables) { if (it is Notable<*>) destination.add(it) else this.delete(it) }
     }
 
     fun close() {
@@ -138,10 +136,10 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         val parentRemapped = arrayListOf<DataHolder>()
         holders.forEach { it ->
             val previousId = it.id
-            it.initializeId(idAllocator.allocate())
+            this.add(it)
             val allocatedId = it.id!!
             if (previousId != null)
-                holders.filter { it.parentId == previousId }.forEach {
+                holders.filter { it.parentId == previousId && !parentRemapped.contains(it) }.forEach {
                     it.parentId = allocatedId
                     parentRemapped.add(it)
                 }

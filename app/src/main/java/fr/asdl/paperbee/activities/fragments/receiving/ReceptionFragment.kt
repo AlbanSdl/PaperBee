@@ -5,6 +5,7 @@ import android.widget.TextView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.ImportFragment
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
+import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 
 class ReceptionFragment : ReceptionBaseFragment() {
@@ -29,8 +30,12 @@ class ReceptionFragment : ReceptionBaseFragment() {
                         try {
                             orig.content = orig.shareProcess.decryptFromFile(null, data!!)
                         } catch (e: WrongPasswordException) {
+                        } catch (e: IncompatibleVersionException) {
+                            view.findViewById<TextView>(R.id.share_from_file_header).text =
+                                getString(R.string.share_from_file_failed_compat)
+                            return@readFile
                         }
-                        orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions")
+                        orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions", shouldAnimateOutgoingFragment = false)
                     } else
                         view.findViewById<TextView>(R.id.share_from_file_header).text =
                             getString(R.string.share_from_file_failed_retry)
