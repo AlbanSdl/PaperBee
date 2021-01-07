@@ -2,6 +2,9 @@
     <!-- App Resource Strings -->
     <string name="preferences_file" translatable="false">fr.asdl.paperbee</string>
     <string name="pref_app_theme_name" translatable="false">app_theme_pref</string>
+    <string name="pref_app_third_party" translatable="false">app_license_pref</string>
+    <string name="pref_app_version" translatable="false">app_version_pref</string>
+    <string name="pref_app_version_summary" translatable="false">%1$s (%2$d)</string>
     <string name="notes_directory_name" translatable="false">notes</string>
     <string name="transition_name" translatable="false">TransitionOpenBackground</string>
     <string name="transition_name_title" translatable="false">TransitionOpenTitle</string>
@@ -9,6 +12,7 @@
     <string name="transition_name_fab" translatable="false">TransitionFloatingActionButton</string>
     <string name="transition_name_fab_1" translatable="false">TransitionFloatingActionButton1</string>
     <string name="transition_name_fab_2" translatable="false">TransitionFloatingActionButton2</string>
+    <string name="transition_name_sharing_button" translatable="false">transitionShareButton</string>
     <string name="transition_folder_color" translatable="false">TransitionFolder</string>
 
     <!-- Translatable Strings (displayed) -->
@@ -67,7 +71,6 @@
     <string name="share_method_password">Choose a password</string>
     <string name="share_method_password_header">If you share content with a file you should add a password to protect your data if this file is exposed to any third party (eg. social networks, internet provider)</string>
     <string name="share_start">Start sharing</string>
-    <string name="transition_name_sharing_button" translatable="false">transitionShareButton</string>
     <string name="shared_to_file_ok">Data successfully saved to file.</string>
     <string name="shared_to_file_exception">An error occurred when saving data to file. This is most likely a bug.</string>
     <string name="share_to_file_choose">Choose file</string>
@@ -91,12 +94,17 @@
     <string name="pref_app_theme_title">App theme</string>
     <string name="pref_app_appearance">Appearance</string>
     <string name="pref_app_category_misc">Miscellaneous</string>
-    <string name="pref_app_version" translatable="false">app_version_pref</string>
-    <string name="pref_app_version_summary" translatable="false">%1$s (%2$d)</string>
     <string name="pref_app_version_title">App version</string>
+    <string name="pref_app_third_party_license">Third party licenses</string>
     <string-array name="pref_app_theme_options">
         <item>Light</item>
         <item>Dark</item>
         <item>Follow system</item>
     </string-array>
+    <string name="unknown_license">unknown</string>
+    <string name="no_data">No data</string>
+    <string name="license_unknown_text">The license of this dependency has not been correctly bound. Please contact developers to fix this issue.</string>
+    <string name="licensed_under">Licensed under %s License</string>
+    <string name="licensed_authored">By %s</string>
+    <string name="licensed_copyright" translatable="false">© %s</string>
 </resources>
