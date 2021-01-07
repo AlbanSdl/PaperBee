@@ -27,6 +27,12 @@
             app:persistent="false"
             app:title="@string/pref_app_version_title" />
 
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/pref_app_third_party"
+            app:persistent="false"
+            app:title="@string/pref_app_third_party_license" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
