@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.Note
@@ -37,6 +38,13 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
             else -> R.menu.folder_menu
         }
         return super.attach(notable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().findViewById<NavigationView>(R.id.nav).apply {
+            this.setCheckedItem(if (notable.id == TRASH_ID) R.id.goto_trash else R.id.goto_main)
+        }
     }
 
     override fun onLayoutInflated(view: View) {
@@ -74,8 +82,6 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
-            R.id.goto_trash -> (activity as? MainActivity)?.openNotable(notable.db?.findElementById(
-                TRASH_ID) as NoteFolder)
             R.id.empty_trash -> {
                 if (activity != null) AlertDialog.Builder(requireActivity()).setTitle(R.string.trash_empty_confirm).setMessage(R.string.trash_empty_confirm_details).apply {
                     setPositiveButton(android.R.string.ok) { _, _ -> notable.clear(true) }

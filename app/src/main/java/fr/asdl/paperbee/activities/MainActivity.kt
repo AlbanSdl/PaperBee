@@ -46,12 +46,18 @@ class MainActivity : AppCompatActivity(), DarkThemed {
 
     private fun navigate(it: MenuItem, navigationView: NavigationView?): Boolean {
         if (navigationView?.checkedItem != it || navigationView.checkedItem?.isChecked == false) {
+            this.findViewById<DrawerLayout>(R.id.main).closeDrawers()
             when(it.itemId) {
                 R.id.drawer_settings -> {
                     val preferences = PreferenceFragmentRoot()
                     preferences.allowEnterTransitionOverlap = true
-                    this.findViewById<DrawerLayout>(R.id.main).closeDrawers()
                     this.loadFragment(preferences, "preferences", FragmentTransition.SLIDE_BOTTOM)
+                }
+                R.id.goto_trash -> {
+                    this.openNotable(dbProxy.findElementById(DatabaseProxy.TRASH_ID) as NoteFolder)
+                }
+                R.id.goto_main -> {
+                    this.supportFragmentManager.popBackStack()
                 }
             }
         }
