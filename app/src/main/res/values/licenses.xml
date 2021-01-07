@@ -8,7 +8,7 @@
     <!-- Libraries -->
     <string-array name="libs_name">
         <item>Kotlin Standard Library</item>
-        <item>KotlinX Serialization</item>
+        <item>KotlinX Coroutines</item>
         <item>Android JetPack (androidx libraries)</item>
         <item>AndroidX AppCompat</item>
         <item>AndroidX Constraint Layout</item>
@@ -26,7 +26,7 @@
     </string-array>
     <string-array name="libs_copyYear">
         <item>2010–2020</item>
-        <item>2017–2020</item>
+        <item>2016–2020</item>
         <item>2009</item>
         <item>2012</item>
         <item>2017</item>
