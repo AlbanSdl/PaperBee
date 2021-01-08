@@ -2,7 +2,6 @@ package fr.asdl.paperbee.activities.fragments.sharing
 
 import com.google.android.material.snackbar.Snackbar
 import fr.asdl.paperbee.R
-import fr.asdl.paperbee.activities.fragments.AppFragment
 import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
@@ -23,45 +22,53 @@ class ShareOptions {
     /**
      * Uses the current configuration to share asynchronously the given data.
      */
-    fun process(context: AppFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit) {
-        when (this.method) {
-            SharingMethod.NFC -> {
-                TODO()
-            }
-            SharingMethod.FILE -> {
-                GlobalScope.launch {
-                    val encryptedByteArray =
-                        shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
-                            val fullList = arrayListOf<DataHolder>()
-                            fullList.addAll(data)
-                            it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
-                            return@encryptToFile fullList
-                        }
-                    context.createFile(
-                        context.getString(R.string.share_to_file_filename),
-                        null,
-                        encryptedByteArray
-                    ) {
-                        sharingStarted = false
-                        if (it.hasPerformed()) {
-                            Snackbar.make(
-                                context.requireActivity().findViewById(R.id.main),
-                                it.getActionDetails(FileAccessContext.CREATION),
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                            callback.invoke(it.success)
+    fun process(context: ShareProcessFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit) {
+        sharingStarted = true
+        GlobalScope.launch {
+            val encryptedByteArray =
+                shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
+                    val fullList = arrayListOf<DataHolder>()
+                    fullList.addAll(data)
+                    it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
+                    return@encryptToFile fullList
+                }
+            when (this@ShareOptions.method) {
+                SharingMethod.NFC -> {
+                    context.requireActivity().runOnUiThread {
+                        context.sendMessage(encryptedByteArray)
+                    }
+                }
+                SharingMethod.FILE -> {
+                    GlobalScope.launch {
+                        context.createFile(
+                            context.getString(R.string.share_to_file_filename),
+                            null,
+                            encryptedByteArray
+                        ) {
+                            sharingStarted = false
+                            if (it.hasPerformed()) {
+                                Snackbar.make(
+                                    context.requireActivity().findViewById(R.id.main),
+                                    it.getActionDetails(FileAccessContext.CREATION),
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                                callback.invoke(it.success)
+                            }
                         }
                     }
                 }
             }
         }
-        sharingStarted = true
     }
 
     /**
      * Stops synchronously the current operation
      */
-    fun forceStop() {
+    fun forceStop(frag: ShareProcessFragment) {
+        if (this.method == SharingMethod.NFC && this.sharingStarted) {
+            frag.sendMessage(null)
+            this.sharingStarted = false
+        }
     }
 
     /**
@@ -69,7 +76,7 @@ class ShareOptions {
      * as it is too fast)
      */
     fun isStoppable(): Boolean {
-        return this.method != SharingMethod.FILE && this.sharingStarted
+        return this.method == SharingMethod.NFC && this.sharingStarted
     }
 
     /**

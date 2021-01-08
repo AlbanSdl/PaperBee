@@ -12,6 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
 import fr.asdl.paperbee.sharing.files.*
 import fr.asdl.paperbee.sharing.permissions.PermissionAccessor
 import fr.asdl.paperbee.sharing.permissions.PermissionRationale
@@ -145,7 +146,8 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
                     permission
                 )
             )
-                rationale.setCallback { openPermissionRequestDialog() }.display(this.requireContext())
+                rationale.setCallback { openPermissionRequestDialog() }
+                    .display(this.requireContext())
             else
                 openPermissionRequestDialog()
         } else {
@@ -170,5 +172,21 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
     }
 
     override fun getDrawer(): DrawerLayout? = activity?.findViewById(R.id.main)
+
+    /**
+     * Called when Nfc events are triggered by android.
+     * This function will be called when a nfc tag is detected nearby. It may contain data,
+     * otherwise it's a write only tag. (Content will be empty with a zero length list)
+     * This method propagates to [SubFragment]s.
+     * @param nfcTag the detected nfc tag, if it corresponds to a supported tech
+     */
+    @CallSuper
+    open fun onNdefMessage(nfcTag: NfcTag?) {
+        if (this is FragmentContainer<*>) {
+            (this.childFragmentManager.findFragmentById(
+                this.getFragmentContainerId()
+            ) as? AppFragment)?.onNdefMessage(nfcTag)
+        }
+    }
 
 }

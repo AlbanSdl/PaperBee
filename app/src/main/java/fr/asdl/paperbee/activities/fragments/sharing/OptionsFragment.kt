@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.activities.fragments.sharing
 
+import android.nfc.NfcAdapter
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -21,6 +22,8 @@ class OptionsFragment : ShareBaseFragment() {
         // Configuring method choice
         val selectorFile = view.findViewById<RadioButton>(R.id.share_method_selector_file)
         val selectorNfc = view.findViewById<RadioButton>(R.id.share_method_selector_nfc)
+        val nfcAdapter = NfcAdapter.getDefaultAdapter(requireContext())
+        selectorNfc.isEnabled = nfcAdapter != null && nfcAdapter.isEnabled
         when (orig.shareOptions.method) {
             SharingMethod.FILE -> selectorFile.isChecked = true
             SharingMethod.NFC -> {

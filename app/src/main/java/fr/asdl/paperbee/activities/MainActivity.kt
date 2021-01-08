@@ -1,7 +1,11 @@
 package fr.asdl.paperbee.activities
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -12,17 +16,24 @@ import androidx.transition.TransitionInflater
 import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.*
+import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.storage.v1.DatabaseAccess
 import fr.asdl.paperbee.view.DarkThemed
+import java.lang.UnsupportedOperationException
 
 
 class MainActivity : AppCompatActivity(), DarkThemed {
 
+    companion object {
+        private const val NFC_INTENT_CODE = 1001
+    }
+
     lateinit var dbProxy: DatabaseProxy<*>
+    private var nfcAdapter: NfcAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +58,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     private fun navigate(it: MenuItem, navigationView: NavigationView?): Boolean {
         if (navigationView?.checkedItem != it || navigationView.checkedItem?.isChecked == false) {
             this.findViewById<DrawerLayout>(R.id.main).closeDrawers()
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.drawer_settings -> {
                     val preferences = PreferenceFragmentRoot()
                     preferences.allowEnterTransitionOverlap = true
@@ -171,6 +182,48 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     override fun onDestroy() {
         this.dbProxy.close()
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        this.nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        if (this.nfcAdapter != null && this.nfcAdapter!!.isEnabled) {
+            try {
+                val intent =
+                    Intent(requireContext(), javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                val nfcPendingIntent =
+                    PendingIntent.getActivity(requireContext(), NFC_INTENT_CODE, intent, 0)
+                this.nfcAdapter!!.enableForegroundDispatch(this, nfcPendingIntent, null, null)
+            } catch (ex: IllegalStateException) {
+                Log.e(javaClass.simpleName, "Error enabling NFC foreground dispatch", ex)
+            }
+        }
+    }
+
+    override fun onPause() {
+        if (this.nfcAdapter != null && this.nfcAdapter!!.isEnabled) {
+            try {
+                this.nfcAdapter!!.disableForegroundDispatch(this)
+            } catch (ex: IllegalStateException) {
+                Log.e(javaClass.simpleName, "Error disabling NFC foreground dispatch", ex)
+            }
+        }
+        super.onPause()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
+            intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED ||
+            intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED
+        ) {
+            (this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment)?.onNdefMessage(
+            try {
+                NfcTag(intent)
+            } catch (e: UnsupportedOperationException) {
+                null
+            })
+        }
     }
 
 }

@@ -78,7 +78,7 @@
     <string name="share_to_file_filename">save.bee</string>
     <string name="shared_from_file_ok">Data successfully read from file</string>
     <string name="shared_from_file_exception">An error occurred when reading file contents</string>
-    <string name="share_nfc_not_implemented">NFC sharing has not been implemented yet !</string>
+    <string name="share_nfc_current">Decrease distance between phones until sharing has finished</string>
     <string name="share_import">Import</string>
     <string name="share_import_from_tile_header">Select a file to import</string>
     <string name="share_from_file_failed_retry">Invalid file location provided</string>
@@ -109,4 +109,5 @@
     <string name="licensed_under">Licensed under %s License</string>
     <string name="licensed_authored">By %s</string>
     <string name="licensed_copyright" translatable="false">© %s</string>
+    <string name="share_nfc_stopped">Stopped sharing. Go back to re-run.</string>
 </resources>

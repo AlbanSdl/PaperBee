@@ -62,7 +62,7 @@
     <string name="share_to_file_filename">sauvegarde.bee</string>
     <string name="shared_from_file_ok">Données importées avec succès</string>
     <string name="shared_from_file_exception">Une erreur est survenue lors de l\'import des données</string>
-    <string name="share_nfc_not_implemented">Le partage NFC n\'a pas encoré été implémenté !</string>
+    <string name="share_nfc_current">Approche les deux téléphones jusqu\'à ce que le partage soit terminé</string>
     <string name="share_import">Importer</string>
     <string name="share_import_from_tile_header">Sélectionner un fichier à importer</string>
     <string name="share_from_file_failed_retry">Fichier invalide</string>
@@ -92,4 +92,5 @@
     <string name="share_from_file_failed_compat">Ce fichier n\'est pas compatible avec cette version de l\'application</string>
     <string name="db_error_select">Une erreur est survenue lors de la lecture des notes</string>
     <string name="db_error_insert">Une erreur est survenue lors de l\'enregistrement de la note</string>
+    <string name="share_nfc_stopped">Partage arrêté. Retournez aux options pour recommencer.</string>
 </resources>
