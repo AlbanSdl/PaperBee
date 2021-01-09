@@ -4,11 +4,13 @@ import android.view.View
 import android.widget.TextView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.ImportFragment
+import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class ReceptionFragment : ReceptionBaseFragment() {
 
@@ -57,6 +59,33 @@ class ReceptionFragment : ReceptionBaseFragment() {
     override fun getSharedViews(): List<View> {
         if (this.view == null) return super.getSharedViews()
         return listOf(this.requireView().findViewById(R.id.next))
+    }
+
+    override fun onNdefMessage(nfcTag: NfcTag?) {
+        if (nfcTag != null && nfcTag.readData().isNotEmpty()) {
+            GlobalScope.launch {
+                val data = nfcTag.readData()[0].records[0].payload
+                val importFrag = this@ReceptionFragment.parentFragment as ImportFragment
+                try {
+                    importFrag.content = importFrag.shareProcess.decryptFromFile(null, data)
+                    this@ReceptionFragment.requireActivity().runOnUiThread {
+                        importFrag.displayFragment(ReceptionOptionsFragment(), "shareImportOptions")
+                    }
+                } catch (e: Exception) {
+                    when (e) {
+                        is IncompatibleVersionException, is WrongPasswordException -> this@ReceptionFragment.requireActivity().runOnUiThread {
+                            requireView().findViewById<TextView>(R.id.share_nfc_message).text =
+                                getString(R.string.share_from_nfc_incompatible_version)
+                        }
+                        else -> throw e
+                    }
+                }
+            }
+        } else {
+            requireView().findViewById<TextView>(R.id.share_nfc_message).text =
+                getString(R.string.share_from_nfc_incompatible)
+        }
+        super.onNdefMessage(nfcTag)
     }
 
 }

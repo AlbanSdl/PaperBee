@@ -3,6 +3,7 @@ package fr.asdl.paperbee.activities
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.util.Log
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                     Intent(requireContext(), javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 val nfcPendingIntent =
                     PendingIntent.getActivity(requireContext(), NFC_INTENT_CODE, intent, 0)
-                this.nfcAdapter!!.enableForegroundDispatch(this, nfcPendingIntent, null, null)
+                this.nfcAdapter!!.enableForegroundDispatch(this, nfcPendingIntent, getIntentFilters(), null)
             } catch (ex: IllegalStateException) {
                 Log.e(javaClass.simpleName, "Error enabling NFC foreground dispatch", ex)
             }
@@ -211,18 +212,33 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         super.onPause()
     }
 
+    private fun getIntentFilters(): Array<IntentFilter> {
+        val ndefFilter = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
+        try {
+            ndefFilter.addDataType("application/vnd.${requireContext().packageName}")
+        } catch (e: IntentFilter.MalformedMimeTypeException) {
+            Log.e(javaClass.simpleName, "Problem in parsing mime type for nfc reading", e)
+        }
+        return arrayOf(ndefFilter)
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
             intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED ||
             intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED
         ) {
-            (this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment)?.onNdefMessage(
-            try {
+            val currentFragment = this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment
+            val tag = try {
                 NfcTag(intent)
             } catch (e: UnsupportedOperationException) {
                 null
-            })
+            }
+
+            when (currentFragment) {
+                is SharingFragment, is ImportFragment -> currentFragment.onNdefMessage(tag)
+                else -> this.openImport(SharingMethod.NFC)
+            }
         }
     }
 

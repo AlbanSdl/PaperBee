@@ -92,5 +92,11 @@
     <string name="share_from_file_failed_compat">Ce fichier n\'est pas compatible avec cette version de l\'application</string>
     <string name="db_error_select">Une erreur est survenue lors de la lecture des notes</string>
     <string name="db_error_insert">Une erreur est survenue lors de l\'enregistrement de la note</string>
-    <string name="share_nfc_stopped">Partage arrêté. Retournez aux options pour recommencer.</string>
+    <string name="share_nfc_stopped">Partage arrêté. Retourne aux options pour recommencer.</string>
+    <string name="share_nfc_current_running">Partage en cours</string>
+    <string name="share_nfc_current_lost">Diminue la distance entre les appareils</string>
+    <string name="share_nfc_current_cancelled">Operation arrêtée par un tiers</string>
+    <string name="share_nfc_current_incompatible">Le destinataire n\'est pas compatible avec le partage nfc</string>
+    <string name="share_from_nfc_incompatible_version">Assure toi que l\'expéditeur a la même version de l\'application que toi</string>
+    <string name="share_from_nfc_incompatible">L\'expéditeur n\'est pas compatible avec le partage nfc</string>
 </resources>

@@ -110,4 +110,10 @@
     <string name="licensed_authored">By %s</string>
     <string name="licensed_copyright" translatable="false">© %s</string>
     <string name="share_nfc_stopped">Stopped sharing. Go back to re-run.</string>
+    <string name="share_nfc_current_running">Sharing data</string>
+    <string name="share_nfc_current_lost">Decrease distance between phones</string>
+    <string name="share_nfc_current_cancelled">Operation aborted by a peer</string>
+    <string name="share_nfc_current_incompatible">Receiver is not compatible with nfc sharing</string>
+    <string name="share_from_nfc_incompatible_version">Ensure the sender has the same version of the app</string>
+    <string name="share_from_nfc_incompatible">Sender is not compatible with nfc sharing</string>
 </resources>
