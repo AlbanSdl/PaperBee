@@ -1,7 +1,6 @@
 package fr.asdl.paperbee.storage.v1
 
-import android.util.Base64
-import android.util.Base64.DEFAULT
+import android.util.Base64.*
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import fr.asdl.paperbee.note.*
@@ -92,9 +91,9 @@ fun getInt(str: String): Int? {
 }
 
 internal fun String.decodeBase64(): ByteArray {
-    return Base64.decode(this, DEFAULT)
+    return decode(this, DEFAULT)
 }
 
 internal fun ByteArray.encodeBase64(): String {
-    return Base64.encodeToString(this, DEFAULT)
+    return encodeToString(this, NO_WRAP or NO_PADDING)
 }
