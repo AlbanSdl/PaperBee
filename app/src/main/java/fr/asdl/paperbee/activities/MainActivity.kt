@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 this.openNotable(note)
             }
         }
+        this.handleNfcIntent(intent)
     }
 
     private fun navigate(it: MenuItem, navigationView: NavigationView?): Boolean {
@@ -215,17 +216,22 @@ class MainActivity : AppCompatActivity(), DarkThemed {
 
     private fun getIntentFilters(): Array<IntentFilter> {
         val ndefFilter = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
+        val tagFilter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
         try {
             ndefFilter.addDataType("application/vnd.${requireContext().packageName}")
         } catch (e: IntentFilter.MalformedMimeTypeException) {
             Log.e(javaClass.simpleName, "Problem in parsing mime type for nfc reading", e)
         }
-        return arrayOf(ndefFilter)
+        return arrayOf(ndefFilter, tagFilter)
     }
 
     override fun onNewIntent(intent: Intent?) {
+        this.handleNfcIntent(intent)
+        super.onNewIntent(intent)
+    }
+
+    private fun handleNfcIntent(intent: Intent?) {
         if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
-            intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED ||
             intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED
         ) {
             val currentFragment =
@@ -251,7 +257,6 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 else -> this.openImport(SharingMethod.NFC).onNdefMessage(tag)
             }
         }
-        super.onNewIntent(intent)
     }
 
 }
