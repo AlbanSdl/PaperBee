@@ -15,9 +15,9 @@ import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.Note
-import fr.asdl.paperbee.note.bindings.NoteAdapter
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.NoteText
+import fr.asdl.paperbee.note.bindings.NoteAdapter
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
@@ -49,8 +49,10 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
 
     override fun onLayoutInflated(view: View) {
         // Toolbar setup
-        (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.folder_toolbar))
-        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(notable.id != ROOT_ID)
+        (activity as AppCompatActivity).apply {
+            setSupportActionBar(view.findViewById(R.id.folder_toolbar))
+            supportActionBar!!.setDisplayHomeAsUpEnabled(notable.id != ROOT_ID)
+        }
         // No note message
         view.findViewById<TextView>(R.id.no_note).text = getString(when (notable.id) {
             ROOT_ID -> R.string.no_note_root
