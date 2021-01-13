@@ -19,6 +19,7 @@ import fr.asdl.paperbee.sharing.permissions.PermissionRationale
 
 abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, DrawerLock {
 
+    private var pendingNfcTag: NfcTag? = null
     private val activityResultCodes = IntAllocator()
     private val pendingFileAccesses = hashMapOf<Int, FutureFileAccess>()
     private val pendingPermissionUses = hashMapOf<Int, (Boolean) -> Unit>()
@@ -173,6 +174,17 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
 
     override fun getDrawer(): DrawerLayout? = activity?.findViewById(R.id.main)
 
+    @CallSuper
+    override fun onStart() {
+        super.onStart()
+        if (this is FragmentContainer<*> && this.pendingNfcTag != null) {
+            (this.childFragmentManager.findFragmentById(
+                this.getFragmentContainerId()
+            ) as? AppFragment)?.onNdefMessage(this.pendingNfcTag)
+            this.pendingNfcTag = null
+        }
+    }
+
     /**
      * Called when Nfc events are triggered by android.
      * This function will be called when a nfc tag is detected nearby. It may contain data,
@@ -183,9 +195,13 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
     @CallSuper
     open fun onNdefMessage(nfcTag: NfcTag?) {
         if (this is FragmentContainer<*>) {
-            (this.childFragmentManager.findFragmentById(
-                this.getFragmentContainerId()
-            ) as? AppFragment)?.onNdefMessage(nfcTag)
+            if (this.isVisible) {
+                (this.childFragmentManager.findFragmentById(
+                    this.getFragmentContainerId()
+                ) as? AppFragment)?.onNdefMessage(nfcTag)
+            } else {
+                this.pendingNfcTag = nfcTag
+            }
         }
     }
 

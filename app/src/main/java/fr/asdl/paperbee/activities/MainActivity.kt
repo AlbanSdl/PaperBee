@@ -24,14 +24,9 @@ import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.storage.v1.DatabaseAccess
 import fr.asdl.paperbee.view.DarkThemed
-import java.lang.UnsupportedOperationException
 
 
 class MainActivity : AppCompatActivity(), DarkThemed {
-
-    companion object {
-        private const val NFC_INTENT_CODE = 1001
-    }
 
     lateinit var dbProxy: DatabaseProxy<*>
     private var nfcAdapter: NfcAdapter? = null
@@ -99,11 +94,12 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         this.loadFragment(fragment, "share${notable.id!!}", FragmentTransition.SLIDE_BOTTOM)
     }
 
-    fun openImport(method: SharingMethod? = null) {
+    fun openImport(method: SharingMethod? = null): ImportFragment {
         val fragment = ImportFragment()
         if (method != null) fragment.method = method
         fragment.allowEnterTransitionOverlap = true
         this.loadFragment(fragment, "import", FragmentTransition.SLIDE_BOTTOM)
+        return fragment
     }
 
     private fun openNotable(
@@ -193,8 +189,13 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 val intent =
                     Intent(requireContext(), javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 val nfcPendingIntent =
-                    PendingIntent.getActivity(requireContext(), NFC_INTENT_CODE, intent, 0)
-                this.nfcAdapter!!.enableForegroundDispatch(this, nfcPendingIntent, getIntentFilters(), null)
+                    PendingIntent.getActivity(requireContext(), 0, intent, 0)
+                this.nfcAdapter!!.enableForegroundDispatch(
+                    this,
+                    nfcPendingIntent,
+                    getIntentFilters(),
+                    null
+                )
             } catch (ex: IllegalStateException) {
                 Log.e(javaClass.simpleName, "Error enabling NFC foreground dispatch", ex)
             }
@@ -223,12 +224,12 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     }
 
     override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
         if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
             intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED ||
             intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED
         ) {
-            val currentFragment = this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment
+            val currentFragment =
+                this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment
             val tag = try {
                 NfcTag(intent)
             } catch (e: UnsupportedOperationException) {
@@ -236,10 +237,21 @@ class MainActivity : AppCompatActivity(), DarkThemed {
             }
 
             when (currentFragment) {
-                is SharingFragment, is ImportFragment -> currentFragment.onNdefMessage(tag)
-                else -> this.openImport(SharingMethod.NFC)
+                is SharingFragment, is ImportFragment -> {
+                    with(currentFragment) {
+                        if (this is ImportFragment && this.method == SharingMethod.NFC ||
+                            this is SharingFragment && this.shareOptions.method == SharingMethod.NFC
+                        )
+                            this.onNdefMessage(tag)
+                        else {
+                            this@MainActivity.openImport(SharingMethod.NFC).onNdefMessage(tag)
+                        }
+                    }
+                }
+                else -> this.openImport(SharingMethod.NFC).onNdefMessage(tag)
             }
         }
+        super.onNewIntent(intent)
     }
 
 }
