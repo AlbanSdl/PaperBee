@@ -15,6 +15,7 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Handling main activity
         intent.setClass(this, MainActivity::class.java)
+        intent.action = null; intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP // reset intent action
         startActivity(intent)
         finish()
     }
