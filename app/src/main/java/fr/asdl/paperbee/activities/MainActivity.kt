@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.nfc.NfcAdapter
+import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -37,6 +39,9 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         this.findViewById<NavigationView>(R.id.nav).apply {
             this.setNavigationItemSelectedListener { navigate(it, this) }
         }
+        // We remove system gesture on the left (when drawer is closed)
+        this.setCustomDrawerGesture()
+
         this.dbProxy = DatabaseProxy(this, DatabaseAccess::class.java)
         this.dbProxy.attachRoot()
         if (supportFragmentManager.backStackEntryCount == 0) {
@@ -180,6 +185,40 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     override fun onDestroy() {
         this.dbProxy.close()
         super.onDestroy()
+    }
+    
+    /**
+     * Removes system gesture on drawer when closed
+     */
+    private fun setCustomDrawerGesture() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            this.findViewById<DrawerLayout>(R.id.main).apply {
+                this.addDrawerListener(object : DrawerLayout.DrawerListener {
+                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                        // ignoring
+                    }
+
+                    override fun onDrawerOpened(drawerView: View) {
+                        drawerView.systemGestureExclusionRects = listOf()
+                    }
+
+                    override fun onDrawerClosed(drawerView: View) {
+                        drawerView.systemGestureExclusionRects = listOf(
+                            Rect(
+                                drawerView.x.toInt(),
+                                drawerView.y.toInt(),
+                                (drawerView.x + drawerView.width * 1.2).toInt(),
+                                (drawerView.y + drawerView.height).toInt()
+                            )
+                        )
+                    }
+
+                    override fun onDrawerStateChanged(newState: Int) {
+                        // ignoring
+                    }
+                })
+            }
+        }
     }
 
     override fun onResume() {
