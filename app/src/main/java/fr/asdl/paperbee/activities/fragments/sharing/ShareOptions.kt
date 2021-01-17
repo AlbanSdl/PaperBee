@@ -40,20 +40,19 @@ class ShareOptions {
                 }
                 SharingMethod.FILE -> {
                     GlobalScope.launch {
-                        context.createFile(
+                        val accessedFile = context.createFile(
                             context.getString(R.string.share_to_file_filename),
                             null,
                             encryptedByteArray
-                        ) {
-                            sharingStarted = false
-                            if (it.hasPerformed()) {
-                                Snackbar.make(
-                                    context.requireActivity().findViewById(R.id.main),
-                                    it.getActionDetails(FileAccessContext.CREATION),
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
-                                callback.invoke(it.success)
-                            }
+                        )
+                        sharingStarted = false
+                        if (accessedFile.result.hasPerformed()) {
+                            Snackbar.make(
+                                context.requireActivity().findViewById(R.id.main),
+                                    accessedFile.result.getActionDetails(FileAccessContext.CREATION),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                            callback.invoke(accessedFile.result.success)
                         }
                     }
                 }

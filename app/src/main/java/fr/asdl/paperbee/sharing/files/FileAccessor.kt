@@ -20,17 +20,15 @@ interface FileAccessor {
      * data model pass "null" which will be an alias to "application/octet-stream".
      * @param content the [ByteArray] containing the bytes of your file. Use the same kind of values
      * as if you were using OutputStream#write.
-     * @param callback the lambda to execute when the operation has ended. You can check it has been
-     * performed using the [FileAccessResult.success] property. If this property is false, you can
-     * check if the operation has been cancelled by the user or if it is an IOException (in that
-     * case it's most likely an application error that should be fixed).
+     *
+     * @return a [AccessedFile] whose [FileAccessResult] indicates whether operation has
+     * successfully performed.
      */
-    fun createFile(
+    suspend fun createFile(
         fileName: String,
         fileType: String?,
-        content: ByteArray,
-        callback: FileCreationCallBack
-    )
+        content: ByteArray
+    ): AccessedFile
 
     /**
      * Gives the user the opportunity to load the data of a file of his choice in the app.
@@ -40,15 +38,11 @@ interface FileAccessor {
      * [this page](https://android.googlesource.com/platform/external/mime-support/+/master/mime.types)
      * for a list of types compatible across the android ecosystem. If you want to use a custom
      * data model pass "null" which will be an alias to "application/octet-stream".
-     * @param callback the lambda to execute when the operation has ended. You must first check that
-     * [FileAccessResult.success] is true before accessing the [ByteArray] which contains the data
-     * of the file. If the property is false, you can check if the operation has been cancelled
-     * by the user or if it is an IOException (in that case it's most likely an application error
-     * that should be fixed).
+     *
+     * @return a [AccessedFile] containing a [FileAccessResult] which indicates whether the operation
+     * has successfully performed and may contain a [ByteArray] if no error occurred.
      */
-    fun readFile(
-        fileType: String?,
-        callback: FileOpeningCallBack
-    )
-
+    suspend fun readFile(
+        fileType: String?
+    ): AccessedFile
 }

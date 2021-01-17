@@ -28,27 +28,28 @@ class ReceptionFragment : ReceptionBaseFragment() {
             }
             view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<View>(R.id.share_from_file_button).setOnClickListener {
-                orig.readFile(null) { res, data ->
-                    if (res.success) {
-                        orig.shareData = data
-                        GlobalScope.launch {
-                            try {
-                                orig.content = orig.shareProcess.decryptFromFile(null, data!!)
-                            } catch (e: WrongPasswordException) {
-                            } catch (e: IncompatibleVersionException) {
-                                this@ReceptionFragment.requireActivity().runOnUiThread {
-                                    view.findViewById<TextView>(R.id.share_from_file_header).text =
-                                        getString(R.string.share_from_file_failed_compat)
-                                }
-                                return@launch
-                            }
+                GlobalScope.launch {
+                    val result = orig.readFile(null)
+                    if (result.result.success) {
+                        orig.shareData = result.data
+                        try {
+                            orig.content = orig.shareProcess.decryptFromFile(null, result.data!!)
+                        } catch (e: WrongPasswordException) {
+                        } catch (e: IncompatibleVersionException) {
                             this@ReceptionFragment.requireActivity().runOnUiThread {
-                                orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions", shouldAnimateOutgoingFragment = false)
+                                view.findViewById<TextView>(R.id.share_from_file_header).text =
+                                        getString(R.string.share_from_file_failed_compat)
                             }
+                            return@launch
+                        }
+                        this@ReceptionFragment.requireActivity().runOnUiThread {
+                            orig.displayFragment(ReceptionOptionsFragment(), "shareImportOptions", shouldAnimateOutgoingFragment = false)
                         }
                     } else
-                        view.findViewById<TextView>(R.id.share_from_file_header).text =
-                            getString(R.string.share_from_file_failed_retry)
+                        this@ReceptionFragment.requireActivity().runOnUiThread {
+                            view.findViewById<TextView>(R.id.share_from_file_header).text =
+                                    getString(R.string.share_from_file_failed_retry)
+                        }
                 }
             }
         } else if (orig.method == SharingMethod.NFC) {

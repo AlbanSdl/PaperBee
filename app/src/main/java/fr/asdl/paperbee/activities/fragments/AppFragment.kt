@@ -13,15 +13,26 @@ import androidx.fragment.app.Fragment
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
-import fr.asdl.paperbee.sharing.files.*
+import fr.asdl.paperbee.sharing.files.FileAccess
+import fr.asdl.paperbee.sharing.files.FileAccessResult
+import fr.asdl.paperbee.sharing.files.FileAccessor
+import fr.asdl.paperbee.sharing.files.AccessedFile
 import fr.asdl.paperbee.sharing.permissions.PermissionAccessor
 import fr.asdl.paperbee.sharing.permissions.PermissionRationale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, DrawerLock {
 
     private var pendingNfcTag: NfcTag? = null
     private val activityResultCodes = IntAllocator()
-    private val pendingFileAccesses = hashMapOf<Int, FutureFileAccess>()
+    private val pendingFileAccesses = hashMapOf<Int, Continuation<FileAccess>>()
     private val pendingPermissionUses = hashMapOf<Int, (Boolean) -> Unit>()
     open fun restoreState(savedInstanceState: Bundle) {}
     open fun saveState(savedInstanceState: Bundle) {}
@@ -34,18 +45,18 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
 
     @CallSuper
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         this.retainInstance = this.shouldRetainInstance
         if (savedInstanceState != null) this.restoreState(savedInstanceState)
         this.setHasOptionsMenu(true)
         val fragmentInflater = if (styleId != null) inflater.cloneInContext(
-            ContextThemeWrapper(
-                activity,
-                styleId!!
-            )
+                ContextThemeWrapper(
+                        activity,
+                        styleId!!
+                )
         ) else inflater
 
         val view = fragmentInflater.inflate(this.layoutId, container, false)
@@ -75,30 +86,53 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         this.saveState(outState)
     }
 
-    final override fun createFile(
-        fileName: String,
-        fileType: String?,
-        content: ByteArray,
-        callback: FileCreationCallBack
-    ) {
+    final override suspend fun createFile(
+            fileName: String,
+            fileType: String?,
+            content: ByteArray
+    ): AccessedFile {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = fileType ?: "application/octet-stream"
             putExtra(Intent.EXTRA_TITLE, fileName)
         }
         val code = activityResultCodes.allocate()
-        this.pendingFileAccesses[code] = FutureFileCreation(content, callback)
-        startActivityForResult(intent, code)
+        val res: FileAccess = suspendCoroutine {
+            this.pendingFileAccesses[code] = it
+            startActivityForResult(intent, code)
+        }
+        return suspendCoroutine {
+            GlobalScope.launch(Dispatchers.IO) {
+                if (res.result.success)
+                    requireContext().applicationContext.contentResolver.openFileDescriptor(res.uri!!, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).write(content)
+                    }
+                it.resume(AccessedFile(res.result, null))
+            }
+        }
     }
 
-    final override fun readFile(fileType: String?, callback: FileOpeningCallBack) {
+    final override suspend fun readFile(fileType: String?): AccessedFile {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = fileType ?: "application/octet-stream"
         }
         val code = activityResultCodes.allocate()
-        this.pendingFileAccesses[code] = FutureFileOpening(callback)
-        startActivityForResult(intent, code)
+        val res: FileAccess = suspendCoroutine {
+            this.pendingFileAccesses[code] = it
+            startActivityForResult(intent, code)
+        }
+        return suspendCoroutine {
+            GlobalScope.launch(Dispatchers.IO) {
+                if (res.result.success) {
+                    requireContext().applicationContext.contentResolver.openFileDescriptor(res.uri!!, "r")?.use { desc ->
+                        it.resume(AccessedFile(res.result, FileInputStream(desc.fileDescriptor).readBytes()))
+                    }
+                } else {
+                    it.resume(AccessedFile(res.result, null))
+                }
+            }
+        }
     }
 
     @CallSuper
@@ -108,34 +142,25 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
             this.activityResultCodes.release(requestCode)
             if (resultCode == Activity.RESULT_OK) data?.data?.also { uri ->
                 try {
-                    futureFileAccess.onAccessed.invoke(
-                        this.requireActivity(),
-                        FileAccess(FileAccessResult.ACCESSED, uri)
-                    )
+                    futureFileAccess.resume(FileAccess(FileAccessResult.ACCESSED, uri))
                 } catch (io: Exception) {
-                    futureFileAccess.onAccessed.invoke(
-                        this.requireActivity(),
-                        FileAccess(FileAccessResult.ERROR)
-                    )
+                    futureFileAccess.resume(FileAccess(FileAccessResult.ERROR))
                 }
             }
-            else futureFileAccess.onAccessed.invoke(
-                this.requireActivity(),
-                FileAccess(FileAccessResult.CANCELLED)
-            )
+            else futureFileAccess.resume(FileAccess(FileAccessResult.CANCELLED))
         }
     }
 
     override fun usePermission(
-        permission: String,
-        callback: (Boolean) -> Unit,
-        rationale: PermissionRationale?
+            permission: String,
+            callback: (Boolean) -> Unit,
+            rationale: PermissionRationale?
     ) {
         val activity = activity ?: return
         if (ContextCompat.checkSelfPermission(
-                activity,
-                permission
-            ) != PackageManager.PERMISSION_GRANTED
+                        activity,
+                        permission
+                ) != PackageManager.PERMISSION_GRANTED
         ) {
             fun openPermissionRequestDialog() {
                 val code = activityResultCodes.allocate()
@@ -143,12 +168,12 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
                 ActivityCompat.requestPermissions(activity, arrayOf(permission), code)
             }
             if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(
-                    activity,
-                    permission
-                )
+                            activity,
+                            permission
+                    )
             )
                 rationale.setCallback { openPermissionRequestDialog() }
-                    .display(this.requireContext())
+                        .display(this.requireContext())
             else
                 openPermissionRequestDialog()
         } else {
@@ -158,16 +183,16 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
 
     @CallSuper
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ) {
         val permissionUse = this.pendingPermissionUses.remove(requestCode)
         if (permissionUse != null) {
             this.activityResultCodes.release(requestCode)
             permissionUse.invoke(
-                grantResults.isNotEmpty()
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    grantResults.isNotEmpty()
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED
             )
         }
     }
@@ -179,7 +204,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         super.onStart()
         if (this is FragmentContainer<*> && this.pendingNfcTag != null) {
             (this.childFragmentManager.findFragmentById(
-                this.getFragmentContainerId()
+                    this.getFragmentContainerId()
             ) as? AppFragment)?.onNdefMessage(this.pendingNfcTag)
             this.pendingNfcTag = null
         }
@@ -197,7 +222,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         if (this is FragmentContainer<*>) {
             if (this.isVisible) {
                 (this.childFragmentManager.findFragmentById(
-                    this.getFragmentContainerId()
+                        this.getFragmentContainerId()
                 ) as? AppFragment)?.onNdefMessage(nfcTag)
             } else {
                 this.pendingNfcTag = nfcTag

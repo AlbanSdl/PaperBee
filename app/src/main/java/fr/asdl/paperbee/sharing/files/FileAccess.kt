@@ -1,19 +1,19 @@
 package fr.asdl.paperbee.sharing.files
 
-import android.content.Context
 import android.net.Uri
 import androidx.annotation.StringRes
 import fr.asdl.paperbee.R
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 /**
- * Access result values
+ * Used to retrieve the appropriate String of [FileAccessResult.getActionDetails]
  */
 enum class FileAccessContext {
     CREATION, READ
 }
 
+/**
+ * Represents the status of a file access request.
+ */
 enum class FileAccessResult(
     val success: Boolean,
     @StringRes private val actionDetailsCreation: Int,
@@ -35,32 +35,17 @@ enum class FileAccessResult(
 }
 
 /**
- * File Access Objects
+ * Used when accessing a file.
+ * Contains the uri the user selected (if applicable)
  */
-class FileAccess(val result: FileAccessResult, val uri: Uri?) {
+internal class FileAccess(val result: FileAccessResult, val uri: Uri?) {
     constructor(result: FileAccessResult) : this(result, null)
 }
-typealias FileAccessCallback = (Context, FileAccess) -> Unit
-typealias FileCreationCallBack = (FileAccessResult) -> Unit
-typealias FileOpeningCallBack = (FileAccessResult, ByteArray?) -> Unit
 
-sealed class FutureFileAccess(val onAccessed: FileAccessCallback)
-class FutureFileCreation(content: ByteArray, onCreated: FileCreationCallBack) :
-    FutureFileAccess({ ctx, res ->
-        if (res.result.success) {
-            ctx.applicationContext.contentResolver.openFileDescriptor(res.uri!!, "w")?.use {
-                FileOutputStream(it.fileDescriptor).write(content)
-            }
-        }
-        onCreated.invoke(res.result)
-    })
-
-class FutureFileOpening(onOpened: FileOpeningCallBack) : FutureFileAccess({ ctx, res ->
-    if (res.result.success) {
-        ctx.applicationContext.contentResolver.openFileDescriptor(res.uri!!, "r")?.use {
-            onOpened.invoke(res.result, FileInputStream(it.fileDescriptor).readBytes())
-        }
-    } else {
-        onOpened.invoke(res.result, null)
-    }
-})
+/**
+ * Represents an accessed file.
+ * Contains a [FileAccessResult] which indicates whether the file was reached (modified/read)
+ * with the file data if applicable (when reading the file and getting a [FileAccessResult.ACCESSED]
+ * result)
+ */
+class AccessedFile(val result: FileAccessResult, val data: ByteArray?)
