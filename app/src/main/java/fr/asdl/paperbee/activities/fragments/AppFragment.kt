@@ -33,7 +33,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
     private var pendingNfcTag: NfcTag? = null
     private val activityResultCodes = IntAllocator()
     private val pendingFileAccesses = hashMapOf<Int, Continuation<FileAccess>>()
-    private val pendingPermissionUses = hashMapOf<Int, (Boolean) -> Unit>()
+    private val pendingPermissionUses = hashMapOf<Int, Continuation<Boolean>>()
     open fun restoreState(savedInstanceState: Bundle) {}
     open fun saveState(savedInstanceState: Bundle) {}
 
@@ -151,34 +151,24 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         }
     }
 
-    override fun usePermission(
+    override suspend fun usePermission(
             permission: String,
-            callback: (Boolean) -> Unit,
             rationale: PermissionRationale?
-    ) {
-        val activity = activity ?: return
-        if (ContextCompat.checkSelfPermission(
-                        activity,
-                        permission
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            fun openPermissionRequestDialog() {
-                val code = activityResultCodes.allocate()
-                this.pendingPermissionUses[code] = callback
+    ): Boolean {
+        val activity = activity ?: return false
+        suspend fun openPermissionRequestDialog(): Boolean {
+            val code = activityResultCodes.allocate()
+            return suspendCoroutine {
+                this.pendingPermissionUses[code] = it
                 ActivityCompat.requestPermissions(activity, arrayOf(permission), code)
             }
-            if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(
-                            activity,
-                            permission
-                    )
-            )
-                rationale.setCallback { openPermissionRequestDialog() }
-                        .display(this.requireContext())
-            else
-                openPermissionRequestDialog()
-        } else {
-            callback.invoke(true)
         }
+        return if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED)
+            if (rationale != null && ActivityCompat.shouldShowRequestPermissionRationale(activity, permission))
+                if (rationale.display(this.requireContext())) openPermissionRequestDialog()
+                else false
+            else openPermissionRequestDialog()
+        else true
     }
 
     @CallSuper
@@ -190,10 +180,8 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
         val permissionUse = this.pendingPermissionUses.remove(requestCode)
         if (permissionUse != null) {
             this.activityResultCodes.release(requestCode)
-            permissionUse.invoke(
-                    grantResults.isNotEmpty()
-                            && grantResults[0] == PackageManager.PERMISSION_GRANTED
-            )
+            permissionUse.resume(grantResults.isNotEmpty()
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         }
     }
 
