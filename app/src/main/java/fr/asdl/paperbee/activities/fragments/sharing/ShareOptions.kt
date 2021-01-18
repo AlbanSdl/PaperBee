@@ -7,7 +7,6 @@ import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
 import fr.asdl.paperbee.sharing.files.FileAccessContext
 import fr.asdl.paperbee.view.sentient.DataHolder
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class ShareOptions {
@@ -24,7 +23,7 @@ class ShareOptions {
      */
     fun process(context: ShareProcessFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit) {
         sharingStarted = true
-        GlobalScope.launch {
+        context.getScope().launch {
             val encryptedByteArray =
                 shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
                     val fullList = arrayListOf<DataHolder>()
@@ -39,7 +38,7 @@ class ShareOptions {
                     }
                 }
                 SharingMethod.FILE -> {
-                    GlobalScope.launch {
+                    context.getScope().launch {
                         val accessedFile = context.createFile(
                             context.getString(R.string.share_to_file_filename),
                             null,

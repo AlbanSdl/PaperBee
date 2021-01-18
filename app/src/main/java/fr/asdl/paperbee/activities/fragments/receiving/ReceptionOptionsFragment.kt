@@ -13,7 +13,6 @@ import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.bindings.DirectoryTree
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.view.tree.TreeView
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class ReceptionOptionsFragment : ReceptionBaseFragment() {
@@ -54,7 +53,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                 it.isEnabled = false
                 if (orig.content == null) {
                     val passwordField = view.findViewById<TextView>(R.id.share_password_field)
-                    GlobalScope.launch {
+                    getScope().launch {
                         try {
                             orig.content = orig.shareProcess.decryptFromFile(
                                 passwordField.text.toString(),

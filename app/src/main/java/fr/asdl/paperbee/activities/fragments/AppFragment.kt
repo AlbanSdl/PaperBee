@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import fr.asdl.paperbee.IntAllocator
+import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
 import fr.asdl.paperbee.sharing.files.FileAccess
@@ -19,8 +20,8 @@ import fr.asdl.paperbee.sharing.files.FileAccessor
 import fr.asdl.paperbee.sharing.files.AccessedFile
 import fr.asdl.paperbee.sharing.permissions.PermissionAccessor
 import fr.asdl.paperbee.sharing.permissions.PermissionRationale
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -102,7 +103,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
             startActivityForResult(intent, code)
         }
         return suspendCoroutine {
-            GlobalScope.launch(Dispatchers.IO) {
+            getScope().launch(Dispatchers.IO) {
                 if (res.result.success)
                     requireContext().applicationContext.contentResolver.openFileDescriptor(res.uri!!, "w")?.use {
                         FileOutputStream(it.fileDescriptor).write(content)
@@ -123,7 +124,7 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
             startActivityForResult(intent, code)
         }
         return suspendCoroutine {
-            GlobalScope.launch(Dispatchers.IO) {
+            getScope().launch(Dispatchers.IO) {
                 if (res.result.success) {
                     requireContext().applicationContext.contentResolver.openFileDescriptor(res.uri!!, "r")?.use { desc ->
                         it.resume(AccessedFile(res.result, FileInputStream(desc.fileDescriptor).readBytes()))
@@ -216,6 +217,10 @@ abstract class AppFragment : Fragment(), FileAccessor, PermissionAccessor, Drawe
                 this.pendingNfcTag = nfcTag
             }
         }
+    }
+
+    fun getScope(): CoroutineScope {
+        return (requireActivity().application as PaperBeeApplication).paperScope
     }
 
 }

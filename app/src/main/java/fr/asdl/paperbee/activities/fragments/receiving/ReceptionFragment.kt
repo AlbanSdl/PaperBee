@@ -8,7 +8,6 @@ import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -28,7 +27,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
             }
             view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<View>(R.id.share_from_file_button).setOnClickListener {
-                GlobalScope.launch {
+                getScope().launch {
                     val result = orig.readFile(null)
                     if (result.result.success) {
                         orig.shareData = result.data
@@ -64,7 +63,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
 
     override fun onNdefMessage(nfcTag: NfcTag?) {
         if (nfcTag != null && nfcTag.readData().isNotEmpty()) {
-            GlobalScope.launch {
+            getScope().launch {
                 val data = nfcTag.readData()[0].records[0].payload
                 val importFrag = this@ReceptionFragment.parentFragment as ImportFragment
                 try {

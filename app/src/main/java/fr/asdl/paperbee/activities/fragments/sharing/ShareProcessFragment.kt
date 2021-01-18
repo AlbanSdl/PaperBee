@@ -11,7 +11,6 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.SharingFragment
 import fr.asdl.paperbee.sharing.files.FileAccessor
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -80,7 +79,7 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
         if (this.ndefMessage != null && nfcTag != null) {
             requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_running)
             requireView().findViewById<View>(R.id.share_nfc_progress).visibility = View.VISIBLE
-            GlobalScope.launch(Dispatchers.IO) {
+            getScope().launch(Dispatchers.IO) {
                 try {
                     nfcTag.writeData(ndefMessage!!)
                     ndefMessage = null

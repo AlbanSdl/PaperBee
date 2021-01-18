@@ -21,7 +21,7 @@ import fr.asdl.paperbee.view.sentient.DataHolder
 
 class DatabaseAccess(context: Context) : DatabaseAccess(context) {
 
-    override fun querySelect(
+    override suspend fun querySelect(
         filter: DatabaseFilter,
         sort: String?
     ): List<DataHolder> {

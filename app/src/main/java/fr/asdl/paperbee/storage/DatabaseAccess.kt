@@ -5,8 +5,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 import androidx.annotation.CallSuper
+import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.view.sentient.DataHolder
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.Closeable
 
@@ -33,7 +34,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
         this._dbStoreR?.close()
     }
 
-    protected abstract fun querySelect(
+    protected abstract suspend fun querySelect(
         filter: DatabaseFilter,
         sort: String?
     ): List<DataHolder>
@@ -58,21 +59,18 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
      * @param sort the sorting part of the SQLite query. Use the name of the column followed by
      * ASC or DESC for an ascending or descending order.
      */
-    fun select(
+    suspend fun select(
         filter: DatabaseFilter = DatabaseFilter(),
         sort: String? = null,
-        callback: SQLSelectionCallback
-    ) {
-        GlobalScope.launch {
-            callback.invoke(this@DatabaseAccess.querySelect(filter, sort))
-        }
+    ): List<DataHolder> {
+        return this@DatabaseAccess.querySelect(filter, sort)
     }
 
     /**
      * Inserts a DataHolder in the database.
      */
     fun insert(dataHolder: DataHolder, callback: SQLInsertionCallback) {
-        GlobalScope.launch {
+        getScope().launch {
             callback.invoke(this@DatabaseAccess.queryInsert(dataHolder) >= 0)
         }
     }
@@ -86,7 +84,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
         filter: DatabaseFilter,
         callback: SQLCountedCallback
     ) {
-        GlobalScope.launch {
+        getScope().launch {
             callback.invoke(this@DatabaseAccess.queryUpdate(holder, columnsToUpdate, filter))
         }
     }
@@ -95,9 +93,13 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
      * Deletes DataHolders from the Database.
      */
     fun delete(filter: DatabaseFilter, callback: SQLCountedCallback) {
-        GlobalScope.launch {
+        getScope().launch {
             callback.invoke(this@DatabaseAccess.queryDelete(filter))
         }
+    }
+
+    private fun getScope(): CoroutineScope {
+        return (this.context as MainActivity).getScope()
     }
 
 }

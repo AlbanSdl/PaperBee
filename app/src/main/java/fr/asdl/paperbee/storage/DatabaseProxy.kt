@@ -9,6 +9,7 @@ import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ID
 import fr.asdl.paperbee.view.sentient.DataHolder
 import fr.asdl.paperbee.view.sentient.DataHolderList
+import java.lang.UnsupportedOperationException
 import java.util.*
 
 class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Class<T>) {
@@ -24,10 +25,14 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         databaseClass.declaredConstructors[0].newInstance(context) as DatabaseAccess
     private val holderList: ArrayList<DataHolder> = arrayListOf()
 
-    init {
-        dbAccess.select {
-            it.forEach { d -> d.db = this; holderList.add(d) }
-        }
+    /**
+     * Call this method to retrieve the saved elements from database.
+     * Also loads root and trash
+     */
+    suspend fun load() {
+        holderList.add(this.acquireSystemFolder(ROOT_ID, dbAccess.context.getString(R.string.notes_root_name)))
+        holderList.add(this.acquireSystemFolder(TRASH_ID, dbAccess.context.getString(R.string.trash_can)))
+        dbAccess.select().forEach { d -> d.db = this; holderList.add(d) }
     }
 
     fun findElementById(id: Int?): DataHolder? = holderList.find { it.id == id }
@@ -90,25 +95,13 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         )
     }
 
-    internal fun attachRoot() {
-        holderList.add(this.acquireRoot())
-        holderList.add(this.acquireTrash())
-    }
-
-    private fun acquireRoot(): NoteFolder {
-        val root = NoteFolder()
-        root.initializeId(ROOT_ID)
-        root.title = dbAccess.context.getString(R.string.notes_root_name)
-        root.db = this
-        return root
-    }
-
-    private fun acquireTrash(): NoteFolder {
-        val trash = NoteFolder()
-        trash.initializeId(TRASH_ID)
-        trash.title = dbAccess.context.getString(R.string.trash_can)
-        trash.db = this
-        return trash
+    private fun acquireSystemFolder(folderId: Int, folderTitle: String): NoteFolder {
+        if (folderId >= 0) throw UnsupportedOperationException()
+        val folder = NoteFolder()
+        folder.initializeId(folderId)
+        folder.title = folderTitle
+        folder.db = this
+        return folder
     }
 
     /**
