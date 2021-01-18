@@ -109,8 +109,7 @@ class PreferenceLicenseFragment : AppFragment() {
             val view = convertView ?: View.inflate(requireContext(), R.layout.license_summary, null)
             view.apply {
                 findViewById<TextView>(R.id.component_name).text = license.libName
-                findViewById<TextView>(R.id.component_author).text = getString(R.string.licensed_authored, license.copyRightInfo.author)
-                findViewById<TextView>(R.id.component_copyright).text = getString(R.string.licensed_copyright, license.copyRightInfo.year)
+                findViewById<TextView>(R.id.component_author).text = getString(R.string.licensed_copyright, license.copyRightInfo.year, license.copyRightInfo.author)
                 findViewById<TextView>(R.id.component_license).apply {
                     this.visibility = if (!isExpanded) View.VISIBLE else View.GONE
                     this.text = context.getString(R.string.licensed_under, license.libLicense.getName(context))
