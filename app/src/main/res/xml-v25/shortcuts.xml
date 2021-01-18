@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="createNote"
         android:enabled="true"
-        android:icon="@drawable/ic_shortcut_note_add"
+        android:icon="@mipmap/ic_shortcut_add"
         android:shortcutShortLabel="@string/shortcutCreateLabelShort"
         android:shortcutLongLabel="@string/shortcutCreateLabelLong">
         <intent
