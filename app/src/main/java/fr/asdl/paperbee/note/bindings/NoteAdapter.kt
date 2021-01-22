@@ -18,13 +18,13 @@ import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 import fr.asdl.paperbee.view.tree.TreeView
 
-class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>, Any>(folder) {
+class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<Notable<*>>(folder) {
 
     override fun getLayoutId(): Int {
         return R.layout.notes_layout
     }
 
-    override fun onBindViewHolder(holder: ViewHolder<Any>, content: Notable<*>) {
+    override fun onBindViewHolder(holder: ViewHolder, content: Notable<*>) {
         // We set the background tint if the notable has a color
         holder.itemView.findViewById<CardView>(R.id.note_element).setBackgroundColor(
             ContextCompat.getColor(holder.itemView.context!!,
@@ -59,7 +59,7 @@ class NoteAdapter(private val folder: NoteFolder) : SentientRecyclerViewAdapter<
             fold?.visibility = View.GONE
     }
 
-    private fun setTransitionNames(holder: ViewHolder<Any>, content: Notable<*>) {
+    private fun setTransitionNames(holder: ViewHolder, content: Notable<*>) {
         val transitionComponents = listOf(holder.findViewById(R.id.note_element), holder.findViewById(R.id.note_title), holder.findViewById(R.id.note_elements_recycler))
         for (view in transitionComponents)
             if (view != null)

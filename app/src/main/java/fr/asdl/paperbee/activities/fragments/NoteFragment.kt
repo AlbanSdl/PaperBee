@@ -18,6 +18,7 @@ import fr.asdl.paperbee.activities.MainActivity
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.note.bindings.NotePartAdapter
 import fr.asdl.paperbee.note.bindings.NotePartDecoration
+import fr.asdl.paperbee.note.bindings.NotePartEditor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.options.Color
@@ -108,18 +109,15 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         return fragmentRoot.findViewById(R.id.transitionBackground)
     }
 
-    private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter<EditTextChangeWatcher>(note) {
+    private inner class NotePartEditorAdapter(note: Note) : NotePartAdapter(note) {
 
         private var currentlyMoving: NotePart? = null
 
-        override fun onBindViewHolder(holder: ViewHolder<EditTextChangeWatcher>, content: NotePart) {
+        override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
             super.onBindViewHolder(holder, content)
             if (content is TextNotePart) {
-                val textView = (holder.findViewById(R.id.note_text) as? EditText)
-                val watcher = EditTextChangeWatcher(content)
-                holder.attach(watcher)
-                textView?.setText(content.content)
-                textView?.addTextChangedListener(watcher)
+                val textView = (holder.findViewById(R.id.note_text) as? NotePartEditor)
+                textView?.attach(content as NoteText)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
@@ -127,8 +125,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             }
         }
 
-        override fun onViewRecycled(holder: ViewHolder<EditTextChangeWatcher>) {
-            (holder.findViewById(R.id.note_text) as? EditText)?.removeTextChangedListener(holder.getAttachedData())
+        override fun onViewRecycled(holder: ViewHolder) {
+            (holder.findViewById(R.id.note_text) as? NotePartEditor)?.detach()
         }
 
         override fun getLayoutId(): Int {
@@ -164,18 +162,6 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 }.show()
         }
 
-    }
-
-    private inner class EditTextChangeWatcher(private val notePart: NotePart) : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable?) {
-            if (notePart is TextNotePart && s != null) {
-                (notePart as TextNotePart).content = s.toString()
-                notePart.notifyDataChanged(COLUMN_NAME_PAYLOAD)
-                notePart.save(false)
-            }
-        }
     }
 
 }

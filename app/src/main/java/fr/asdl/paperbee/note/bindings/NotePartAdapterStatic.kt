@@ -9,10 +9,10 @@ import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.note.NotePart
 
 
-class NotePartAdapterStatic(note: Note, private val clickDelegateView: View? = null) : NotePartAdapter<Any>(note) {
+class NotePartAdapterStatic(note: Note, private val clickDelegateView: View? = null) : NotePartAdapter(note) {
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onBindViewHolder(holder: ViewHolder<Any>, content: NotePart) {
+    override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
         super.onBindViewHolder(holder, content)
         if (clickDelegateView != null) {
             holder.itemView.setOnTouchListener { v, e ->

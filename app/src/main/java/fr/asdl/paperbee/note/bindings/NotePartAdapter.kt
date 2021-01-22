@@ -10,9 +10,9 @@ import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NA
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 
 
-abstract class NotePartAdapter<K>(private val note: Note) : SentientRecyclerViewAdapter<NotePart, K>(note) {
+abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
 
-    override fun onBindViewHolder(holder: ViewHolder<K>, content: NotePart) {
+    override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
         // TextNoteParts
         val textView = (holder.findViewById(R.id.note_text) as TextView)
         if (content is TextNotePart) {

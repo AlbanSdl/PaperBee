@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
  * Already inflates the layout given in [getLayoutId] for any new [ViewHolder].
  * Customization can be made in [onBindViewHolder] to add the content of the [DataHolder].
  */
-abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
+abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     private val dataContainer: DataHolderList<T>
-) : RecyclerView.Adapter<SentientRecyclerViewAdapter.ViewHolder<K>>() {
+) : RecyclerView.Adapter<SentientRecyclerViewAdapter.ViewHolder>() {
 
     /**
      * Called on the initialization of the Adapter.
@@ -49,11 +49,11 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
         return this.dataContainer.filtered[index]
     }
 
-    final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<K> {
+    final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(this.getLayoutId(), parent, false))
     }
 
-    final override fun onBindViewHolder(holder: ViewHolder<K>, position: Int) {
+    final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (this.getHeldItem(position) != null) this.onBindViewHolder(holder, this.getHeldItem(position)!!)
     }
 
@@ -65,7 +65,7 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * @param holder the [ViewHolder] allocated to the [content]
      * @param content the [DataHolder] from the [DataHolderList] attached to the [ViewHolder]
      */
-    abstract fun onBindViewHolder(holder: ViewHolder<K>, content: T)
+    abstract fun onBindViewHolder(holder: ViewHolder, content: T)
 
     final override fun getItemCount(): Int {
         return this.dataContainer.filtered.contents.size
@@ -94,19 +94,12 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder, K>(
      * Similar to a regular [RecyclerView.ViewHolder]. Only contains a shortened method
      * [findViewById] instead of [itemView].findViewById
      */
-    class ViewHolder<T>(view: View) : RecyclerView.ViewHolder(view) {
-
-        private var attachedData: T? = null
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         fun findViewById(id: Int): View? {
             return this.itemView.findViewById(id)
         }
 
-        fun attach(data: T) {
-            this.attachedData = data
-        }
-
-        fun getAttachedData(): T? = this.attachedData
     }
 
     /**

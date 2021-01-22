@@ -21,8 +21,8 @@ class SentientSwipeBehaviour(swipeDir: Int, private val sentientRecyclerView: Se
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, swipeDir or ItemTouchHelper.UP or ItemTouchHelper.DOWN) {
 
     @Suppress("UNCHECKED_CAST")
-    private fun asAdapter(action: (SentientRecyclerViewAdapter<DataHolder, *>) -> Unit) {
-        val adapter = sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder, *>
+    private fun asAdapter(action: (SentientRecyclerViewAdapter<DataHolder>) -> Unit) {
+        val adapter = sentientRecyclerView.adapter as? SentientRecyclerViewAdapter<DataHolder>
         if (adapter != null) action.invoke(adapter)
     }
 
