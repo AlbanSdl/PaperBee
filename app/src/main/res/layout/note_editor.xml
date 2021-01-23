@@ -54,8 +54,24 @@
                 android:scrollbarThumbVertical="@null"
                 android:transitionName="@string/transition_name_contents"
                 app:allowSwipe="right"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/editor_format_toolbar"
                 app:layout_constraintTop_toBottomOf="@id/editor_toolbar" />
+
+            <LinearLayout
+                android:id="@+id/editor_format_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/dark" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

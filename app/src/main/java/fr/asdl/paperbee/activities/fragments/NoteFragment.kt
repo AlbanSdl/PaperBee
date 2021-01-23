@@ -33,6 +33,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
     override var menuLayoutId: Int? = R.menu.editor_menu
     override val styleId: Int = R.style.EditorTheme
     private var focusedNote: NotePart? = null
+    private var currentEditor: NotePartEditor? = null
 
     override fun onLayoutInflated(view: View) {
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
@@ -40,15 +41,28 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         val editorToolbar: LinearLayout = view.findViewById(R.id.editor_toolbar)
-        LayoutInflater.from(editorToolbar.context).inflate(R.layout.editor_toolbar, editorToolbar)
-        (editorToolbar.getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>().forEach {
-            it.setOnClickListener(this)
-        }
+        ((LayoutInflater.from(editorToolbar.context).inflate(
+            R.layout.editor_toolbar,
+            editorToolbar
+        ) as ViewGroup).getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>()
+            .forEach {
+                it.setOnClickListener(this)
+            }
         this.updateContextToolbarEnabled(editorToolbar)
+
+        val editorFormatToolbar = view.findViewById<LinearLayout>(R.id.editor_format_toolbar)
+        ((LayoutInflater.from(editorFormatToolbar.context).inflate(
+            R.layout.editor_format_toolbar,
+            editorFormatToolbar
+        ) as ViewGroup).getChildAt(1) as ViewGroup).children.filterIsInstance<RoundedImageView>()
+            .forEach {
+                it.setOnClickListener(this)
+            }
 
         // We add the note contents
         (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
-        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(object : TextWatcher {
+        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(object :
+            TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -64,7 +78,9 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         val adapter = NotePartEditorAdapter(notable)
         rec.adapter = adapter
         rec.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus ->
-            this.focusedNote = if (newFocus != null) adapter.getHeldItem(rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1) else null
+            this.focusedNote = if (newFocus != null) adapter.getHeldItem(
+                rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1
+            ) else null
             this.updateContextToolbarEnabled(rec.rootView)
         }
     }
@@ -76,11 +92,36 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             this.focusedNote != null && this.focusedNote?.getParentPart() != null
     }
 
+    private fun updateFormatToolbarVisible(visible: Boolean) {
+        requireView().findViewById<LinearLayout>(R.id.editor_format_toolbar).apply {
+            if (!visible && visibility != View.GONE) {
+                animate().cancel()
+                animate().alpha(0f).withEndAction {
+                    visibility = View.GONE
+                }
+            } else if (visible && visibility == View.GONE) {
+                visibility = View.VISIBLE
+                animate().cancel()
+                animate().alpha(1f)
+            }
+        }
+    }
+
+    fun onUserSelection(hasSelection: Boolean, editor: NotePartEditor) {
+        this.updateFormatToolbarVisible(hasSelection)
+        this.currentEditor = if (hasSelection) editor else null
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
             R.id.set_color -> {
-                ColorPicker(requireActivity(), listOf(*Color.values()), Color.getIndex(notable.color), false) {
+                ColorPicker(
+                    requireActivity(),
+                    listOf(*Color.values()),
+                    Color.getIndex(notable.color),
+                    false
+                ) {
                     notable.color = it
                     this.updateBackgroundTint()
                     notable.notifyDataChanged(COLUMN_NAME_EXTRA)
@@ -100,6 +141,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.add_checkbox_element -> notable.add(NoteCheckBoxable())
             R.id.moveIn -> this.focusedNote?.moveIn()
             R.id.moveOut -> this.focusedNote?.moveOut()
+            R.id.bold, R.id.italic, R.id.underline -> this.currentEditor?.applyButtonSpan(v.id)
         }
     }
 
@@ -118,10 +160,17 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? NotePartEditor)
                 textView?.attach(content)
+                textView?.setSelectionListener(this@NoteFragment::onUserSelection)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
-                checkBox?.setOnClickListener { content.checked = checkBox.isChecked; content.notifyDataChanged(COLUMN_NAME_EXTRA); content.save(false) }
+                checkBox?.setOnClickListener {
+                    content.checked = checkBox.isChecked; content.notifyDataChanged(
+                    COLUMN_NAME_EXTRA
+                ); content.save(
+                    false
+                )
+                }
             }
         }
 
@@ -145,6 +194,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
 
         override fun onSwipeRight(context: Context, content: NotePart) {
             data class PartHierarchy(val target: NotePart, val parent: NotePart?, val order: Int)
+
             val removed = arrayListOf<PartHierarchy>()
             fun saveRestore(part: NotePart) {
                 part.getChildren().forEach { saveRestore(it) }
@@ -152,7 +202,11 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             }
             saveRestore(content)
             notable.remove(content)
-            Snackbar.make(activity!!.findViewById(R.id.transitionContents), R.string.note_part_deleted, Snackbar.LENGTH_LONG)
+            Snackbar.make(
+                activity!!.findViewById(R.id.transitionContents),
+                R.string.note_part_deleted,
+                Snackbar.LENGTH_LONG
+            )
                 .setAction(R.string.restore) {
                     notable.db!!.reMapIds(removed.map { it.target })
                     removed.reverse()

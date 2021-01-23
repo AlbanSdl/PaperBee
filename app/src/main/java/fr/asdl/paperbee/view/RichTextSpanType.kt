@@ -8,7 +8,7 @@ import androidx.annotation.IdRes
 import fr.asdl.paperbee.R
 import java.lang.UnsupportedOperationException
 
-enum class RichTextSpanType(private val span: CharacterStyle, @IdRes private val id: Int, val delimiter: String) {
+enum class RichTextSpanType(private val span: CharacterStyle, @IdRes val id: Int, val delimiter: String) {
     BOLD(StyleSpan(Typeface.BOLD), R.id.bold, "b"),
     ITALIC(StyleSpan(Typeface.ITALIC), R.id.italic, "i"),
     UNDERLINE(UnderlineSpan(), R.id.underline, "u");

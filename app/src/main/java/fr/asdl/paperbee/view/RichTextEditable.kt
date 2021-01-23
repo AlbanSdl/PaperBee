@@ -1,26 +1,27 @@
 package fr.asdl.paperbee.view
 
-import android.annotation.TargetApi
 import android.content.Context
-import android.os.Build
 import android.text.Editable
 import android.text.Spannable
 import android.text.TextWatcher
 import android.text.style.CharacterStyle
 import android.util.AttributeSet
-import android.view.ActionMode
-import android.view.Menu
-import android.view.MenuItem
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.AppCompatEditText
 import fr.asdl.paperbee.IndexRange
-import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.TextNotePart
 
 abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet: AttributeSet) :
-    AppCompatEditText(context, attributeSet), TextWatcher, ActionMode.Callback {
+    AppCompatEditText(context, attributeSet), TextWatcher {
 
     private var mAttachedElement: T? = null
+
+    final override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+        super.onSelectionChanged(selStart, selEnd)
+        this.onSelectionUpdated(this.hasSelection(), this.getSelectionSpans())
+    }
+
+    protected abstract fun onSelectionUpdated(hasSelection: Boolean, selectionSpans: Array<CharacterStyle>)
 
     /**
      * Used to attach an object to the [RichTextEditable]. An eventual attached object
@@ -31,7 +32,6 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
         mAttachedElement = attachedElement
         this.text = attachedElement.content
         this.addTextChangedListener(this)
-        this.customSelectionActionModeCallback = this
     }
 
     /**
@@ -41,7 +41,6 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     fun detach() {
         this.removeTextChangedListener(this)
         this.mAttachedElement = null
-        this.customSelectionActionModeCallback = null
     }
 
     private fun getSelectionSpans(): Array<CharacterStyle> {
@@ -54,7 +53,7 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * The new style is applied with the [Spannable.SPAN_EXCLUSIVE_INCLUSIVE] flag meaning any
      * inserted char right after the span will be included too.
      */
-    private fun applySpan(spanType: RichTextSpanType) {
+    protected fun applySpan(spanType: RichTextSpanType) {
         if (this.hasSelection()) {
             val coverage = arrayListOf<IndexRange>()
             for (i in this.getSelectionSpans())
@@ -99,31 +98,6 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     override fun afterTextChanged(s: Editable?) {
         if (mAttachedElement is T && s != null)
             this.onTextUpdated(s, mAttachedElement!!)
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        menu?.apply {
-            removeItem(android.R.id.selectAll)
-            removeItem(android.R.id.shareText)
-        }
-        mode?.menuInflater?.inflate(R.menu.editor_actionmode, menu)
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return false
-    }
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        if (item?.itemId == null) return false
-        val richTextSpan = RichTextSpanType.getSpanType(item.itemId)
-        if (richTextSpan != null)
-            this.applySpan(richTextSpan)
-        return richTextSpan != null
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
     }
 
 }
