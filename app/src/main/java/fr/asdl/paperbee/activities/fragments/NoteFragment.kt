@@ -117,7 +117,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             super.onBindViewHolder(holder, content)
             if (content is TextNotePart) {
                 val textView = (holder.findViewById(R.id.note_text) as? NotePartEditor)
-                textView?.attach(content as NoteText)
+                textView?.attach(content)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)

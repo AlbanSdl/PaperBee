@@ -15,11 +15,10 @@ import androidx.annotation.CallSuper
 import androidx.appcompat.widget.AppCompatEditText
 import fr.asdl.paperbee.IndexRange
 import fr.asdl.paperbee.R
-import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.note.TextNotePart
 
-abstract class RichTextEditable<T>(context: Context, attributeSet: AttributeSet) :
-    AppCompatEditText(context, attributeSet), TextWatcher, ActionMode.Callback where T : NotePart, T : TextNotePart {
+abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet: AttributeSet) :
+    AppCompatEditText(context, attributeSet), TextWatcher, ActionMode.Callback {
 
     private var mAttachedElement: T? = null
 
