@@ -8,10 +8,10 @@ import androidx.annotation.IdRes
 import fr.asdl.paperbee.R
 import java.lang.UnsupportedOperationException
 
-enum class RichTextSpanType(private val span: CharacterStyle, @IdRes private val id: Int) {
-    BOLD(StyleSpan(Typeface.BOLD), R.id.bold),
-    ITALIC(StyleSpan(Typeface.ITALIC), R.id.italic),
-    UNDERLINE(UnderlineSpan(), R.id.underline);
+enum class RichTextSpanType(private val span: CharacterStyle, @IdRes private val id: Int, val delimiter: String) {
+    BOLD(StyleSpan(Typeface.BOLD), R.id.bold, "b"),
+    ITALIC(StyleSpan(Typeface.ITALIC), R.id.italic, "i"),
+    UNDERLINE(UnderlineSpan(), R.id.underline, "u");
 
     fun getSpan(): CharacterStyle {
         return when(span) {
@@ -35,10 +35,16 @@ enum class RichTextSpanType(private val span: CharacterStyle, @IdRes private val
                 else -> null
             }
         }
-        fun getSpanType(@IdRes id: Int): RichTextSpanType? {
+        private fun getSpanType(selector: (RichTextSpanType) -> Boolean): RichTextSpanType? {
             for (i in values())
-                if (i.id == id) return i
+                if (selector.invoke(i)) return i
             return null
+        }
+        fun getSpanType(@IdRes id: Int): RichTextSpanType? {
+            return this.getSpanType { it.id == id }
+        }
+        fun getSpanType(delimiter: String): RichTextSpanType? {
+            return this.getSpanType { it.delimiter == delimiter }
         }
     }
 }

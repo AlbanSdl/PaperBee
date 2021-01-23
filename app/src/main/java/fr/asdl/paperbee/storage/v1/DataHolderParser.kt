@@ -4,13 +4,12 @@ import android.util.Base64.*
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import fr.asdl.paperbee.note.*
-import fr.asdl.paperbee.storage.SpanProcessor
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
 import java.io.NotSerializableException
 
 
-private val spanProcessor = object : SpanProcessor {}
+private val spanProcessor = SpanProcessorImpl()
 private val escapeRegex = Regex("[\\\\\"]")
 private val unEscapeRegex = Regex("\\\\[\\\\\"]")
 private val deSerialRegex = Regex("(?<!\\\\)\".*?(?<!\\\\)\"", RegexOption.DOT_MATCHES_ALL)

@@ -71,8 +71,10 @@ abstract class RichTextEditable<T>(context: Context, attributeSet: AttributeSet)
                             setSpan(spanType.getSpan(), selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
                         if (IndexRange.merge(*coverage.toTypedArray()).contains(
                                 IndexRange(selectionStart, selectionEnd)
-                            ))
+                            )) {
+                            this@RichTextEditable.onTextUpdated(this@RichTextEditable.text!!, mAttachedElement!!)
                             return@applySpan
+                        }
                     }
                 }
             this.text!!.setSpan(

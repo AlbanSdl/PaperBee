@@ -7,10 +7,21 @@ import kotlin.math.min
  * Represents an INCLUSIVE index/int range
  * @throws IllegalArgumentException if [start] is not strictly lower than [end]
  */
-data class IndexRange(val start: Int, val end: Int) {
+class IndexRange(start: Int, end: Int) {
+
+    private var _start: Int = start
+    private var _end: Int = end
+
+    var start
+        get() = _start
+        private set(value) { _start = value }
+
+    var end
+        get() = _end
+        private set(value) { _end = value }
 
     init {
-        if (length < 0) throw IllegalArgumentException("Bad range definition. Start and end are inverted.")
+        if (length <= 0) throw IllegalArgumentException("Bad range definition. Start and end are inverted.")
     }
 
     /**
@@ -23,15 +34,15 @@ data class IndexRange(val start: Int, val end: Int) {
      * Returns whether the current range can extend the given [range]
      */
     fun extends(range: IndexRange): Boolean {
-        return this.and(range.shifted(-1, 1)).length > 0
+        return this.and(range.shifted(-1, 1)) != null
     }
 
     /**
      * Returns the intersection of ranges.
-     * If the ranges have no common value, a zero-length [IndexRange] will be returned.
+     * If the ranges have no common value, null will be returned.
      */
-    fun and(range: IndexRange): IndexRange {
-        if (this.end < range.start || range.end < this.start) return IndexRange(this.start, this.start)
+    fun and(range: IndexRange): IndexRange? {
+        if (this.end < range.start || range.end < this.start) return null
         return IndexRange(max(range.start, this.start), min(range.end, this.end))
     }
 
@@ -52,7 +63,15 @@ data class IndexRange(val start: Int, val end: Int) {
         return IndexRange(this.start + start, this.end + end)
     }
 
-    val length get() = end - start
+    /**
+     * Shifts the position of the current range
+     */
+    fun shift(start: Int, end: Int) {
+        this.start += start
+        this.end += end
+    }
+
+    val length get() = end - start + 1
 
     companion object {
         /**
