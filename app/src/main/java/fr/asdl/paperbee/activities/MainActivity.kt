@@ -45,7 +45,9 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         // We remove system gesture on the left (when drawer is closed)
         this.setCustomDrawerGesture()
 
-        this.loadFragment(LayoutFragment(R.layout.loading), null)
+        // If the app opens we display a little loading screen
+        if (savedInstanceState == null)
+            this.loadFragment(LayoutFragment(R.layout.loading), null)
 
         getScope().launch {
             dbProxy = DatabaseProxy(this@MainActivity, DatabaseAccess::class.java)
@@ -56,7 +58,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 if (intent.extras?.containsKey("create") == true) {
                     val note = Note()
                     (dbProxy.findElementById(ROOT_ID) as NoteFolder).add(note)
-                    note.add(NoteText(""))
+                    note.add(NoteText())
                     openNotable(note)
                 }
             }

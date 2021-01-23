@@ -115,4 +115,7 @@
     <string name="share_nfc_current_incompatible">Receiver is not compatible with nfc sharing</string>
     <string name="share_from_nfc_incompatible_version">Ensure the sender has the same version of the app</string>
     <string name="share_from_nfc_incompatible">Sender is not compatible with nfc sharing</string>
+    <string name="format_bold">Bold</string>
+    <string name="format_italic">Italic</string>
+    <string name="format_underline">Underline</string>
 </resources>

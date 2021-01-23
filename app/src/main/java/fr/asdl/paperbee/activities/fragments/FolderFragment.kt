@@ -112,7 +112,7 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
             R.id.add_note_selector -> {
                 val note = Note()
                 notable.add(note)
-                note.add(NoteText(""))
+                note.add(NoteText())
                 (this.activity as MainActivity).openNotable(note)
             }
             R.id.add_folder_selector -> {

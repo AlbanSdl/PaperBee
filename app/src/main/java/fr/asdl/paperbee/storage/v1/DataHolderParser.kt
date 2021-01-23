@@ -4,11 +4,13 @@ import android.util.Base64.*
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import fr.asdl.paperbee.note.*
+import fr.asdl.paperbee.storage.SpanProcessor
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
 import java.io.NotSerializableException
 
 
+private val spanProcessor = object : SpanProcessor {}
 private val escapeRegex = Regex("[\\\\\"]")
 private val unEscapeRegex = Regex("\\\\[\\\\\"]")
 private val deSerialRegex = Regex("(?<!\\\\)\".*?(?<!\\\\)\"", RegexOption.DOT_MATCHES_ALL)
@@ -37,7 +39,7 @@ fun serialize(dataHolder: DataHolder, enc: (str: String) -> String): String {
                 )
             }\",\"${
                 escapeText(enc(dataHolder.parentId.toString()))
-            }\",\"${escapeText(enc(this.id.toString()))}\",\"${escapeText(enc((dataHolder as TextNotePart).content))}\"]"
+            }\",\"${escapeText(enc(this.id.toString()))}\",\"${escapeText(enc(spanProcessor.serialize((dataHolder as TextNotePart).content)))}\"]"
             NotableContract.DataHolderType.CHECKBOX -> "[\"${escapeText(enc(dataHolder.id.toString()))}\",\"${
                 escapeText(
                     enc(
@@ -46,7 +48,7 @@ fun serialize(dataHolder: DataHolder, enc: (str: String) -> String): String {
                 )
             }\",\"${
                 escapeText(enc(dataHolder.parentId.toString()))
-            }\",\"${escapeText(enc(this.id.toString()))}\",\"${escapeText(enc((dataHolder as TextNotePart).content))}\",\"${
+            }\",\"${escapeText(enc(this.id.toString()))}\",\"${escapeText(enc(spanProcessor.serialize((dataHolder as TextNotePart).content)))}\",\"${
                 escapeText(enc((dataHolder as CheckableNotePart).checked.toString()))
             }\"]"
             else -> throw NotSerializableException()
@@ -65,9 +67,9 @@ fun deserialize(content: ByteArray, dec: (str: String) -> String): DataHolder {
     val holder = when (NotableContract.DataHolderType.fromInt(getInt(data[3]) ?: throw WrongPasswordException())) {
         NotableContract.DataHolderType.FOLDER -> NoteFolder()
         NotableContract.DataHolderType.NOTE -> Note()
-        NotableContract.DataHolderType.TEXT -> NoteText(data[4])
+        NotableContract.DataHolderType.TEXT -> NoteText(spanProcessor.deserialize(data[4]))
         NotableContract.DataHolderType.CHECKBOX -> if (data.size > 5) NoteCheckBoxable(
-            data[4],
+            spanProcessor.deserialize(data[4]),
             data[5].toBoolean()
         ) else throw IncompatibleVersionException()
         else -> throw IncompatibleVersionException()

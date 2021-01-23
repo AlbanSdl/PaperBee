@@ -96,8 +96,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
     override fun onClick(v: View?) {
         if (v == null) return
         when (v.id) {
-            R.id.add_text_element -> notable.add(NoteText(""))
-            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable("", false))
+            R.id.add_text_element -> notable.add(NoteText())
+            R.id.add_checkbox_element -> notable.add(NoteCheckBoxable())
             R.id.moveIn -> this.focusedNote?.moveIn()
             R.id.moveOut -> this.focusedNote?.moveOut()
         }

@@ -9,6 +9,7 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseAccess
 import fr.asdl.paperbee.storage.DatabaseFilter
+import fr.asdl.paperbee.storage.SpanProcessor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ID
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ORDER
@@ -19,7 +20,7 @@ import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.TABLE_NAM
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.sentient.DataHolder
 
-class DatabaseAccess(context: Context) : DatabaseAccess(context) {
+class DatabaseAccess(context: Context) : DatabaseAccess(context), SpanProcessor {
 
     override suspend fun querySelect(
         filter: DatabaseFilter,
@@ -70,9 +71,9 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
         val holder: DataHolder? = when (NotableContract.DataHolderType.fromInt(type)) {
             NotableContract.DataHolderType.NOTE -> { val n = Note(); n.title = payload ?: ""; n.parentId = parentId?.toInt(); n }
             NotableContract.DataHolderType.FOLDER -> { val f = NoteFolder(); f.title = payload ?: ""; f.parentId = parentId?.toInt(); f }
-            NotableContract.DataHolderType.TEXT -> { val t = NoteText(payload ?: ""); t.parentId = parentId?.toInt(); t}
+            NotableContract.DataHolderType.TEXT -> { val t = NoteText(deserialize(payload ?: "")); t.parentId = parentId?.toInt(); t}
             NotableContract.DataHolderType.CHECKBOX -> { val c = NoteCheckBoxable(
-                payload ?: "",
+                deserialize(payload ?: ""),
                 extra == "true"
             ); c.parentId = parentId?.toInt(); c }
             else -> null
@@ -91,7 +92,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
             put(COLUMN_NAME_TYPE, NotableContract.DataHolderType.getType(holder)?.id)
             put(
                 COLUMN_NAME_PAYLOAD,
-                if (holder is Notable<*>) holder.title else if (holder is TextNotePart) holder.content else null
+                if (holder is Notable<*>) holder.title else if (holder is TextNotePart) serialize(holder.content) else null
             )
             put(
                 COLUMN_NAME_EXTRA,
@@ -123,7 +124,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
                     COLUMN_NAME_ORDER -> put(i, holder.order)
                     COLUMN_NAME_PAYLOAD -> put(
                         i,
-                        if (holder is Notable<*>) holder.title else if (holder is TextNotePart) holder.content else null
+                        if (holder is Notable<*>) holder.title else if (holder is TextNotePart) serialize(holder.content) else null
                     )
                     COLUMN_NAME_EXTRA -> put(
                         i,

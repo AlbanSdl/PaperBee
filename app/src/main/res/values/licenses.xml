@@ -9,7 +9,7 @@
     <string-array name="libs_name">
         <item>Kotlin Standard Library</item>
         <item>KotlinX Coroutines</item>
-        <item>Android JetPack (androidx libraries)</item>
+        <item>Android JetPack</item>
         <item>AndroidX AppCompat</item>
         <item>AndroidX Constraint Layout</item>
         <item>AndroidX Preference</item>
