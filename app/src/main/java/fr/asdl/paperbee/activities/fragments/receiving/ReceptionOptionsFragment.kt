@@ -56,6 +56,7 @@ class ReceptionOptionsFragment : ReceptionBaseFragment() {
                     getScope().launch {
                         try {
                             orig.content = orig.shareProcess.decryptFromFile(
+                                requireContext(),
                                 passwordField.text.toString(),
                                 orig.shareData!!
                             )

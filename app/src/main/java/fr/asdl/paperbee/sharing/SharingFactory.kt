@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.sharing
 
+import android.content.Context
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import java.lang.Exception
 import javax.crypto.Cipher
@@ -14,8 +15,8 @@ abstract class SharingFactory<T> {
 
     private val encryptionAlgorithm = "AES"
 
-    private fun getBytes(sharable: T, encryptionKey: String?): ByteArray {
-        val bytes = this.toBytes(sharable, encryptionKey)
+    private fun getBytes(context: Context, sharable: T, encryptionKey: String?): ByteArray {
+        val bytes = this.toBytes(context, sharable, encryptionKey)
         val valHeaderLength = ceil((bytes.size - 31).toFloat() / 255).toInt() + if ((bytes.size - 31) % 255 == 0) 1 else 0
         val byteArray = ByteArray(bytes.size + 1 + valHeaderLength)
         for (i in 0..valHeaderLength) {
@@ -27,8 +28,8 @@ abstract class SharingFactory<T> {
         return byteArray
     }
 
-    private fun getBytes(list: List<T>, encryptionKey: String?): ByteArray {
-        val asBytes = list.map { this.getBytes(it, encryptionKey) }
+    private fun getBytes(context: Context, list: List<T>, encryptionKey: String?): ByteArray {
+        val asBytes = list.map { this.getBytes(context, it, encryptionKey) }
         val arr = ByteArray(asBytes.map { it.size }.sum())
         var indexStart = 0
         asBytes.forEach {
@@ -38,7 +39,7 @@ abstract class SharingFactory<T> {
         return arr
     }
 
-    private fun parseBytes(byteArray: ByteArray, encryptionKey: String?): List<T> {
+    private fun parseBytes(context: Context, byteArray: ByteArray, encryptionKey: String?): List<T> {
         var cursor = 0
         val list: ArrayList<T> = arrayListOf()
         while (cursor < byteArray.size) {
@@ -52,7 +53,7 @@ abstract class SharingFactory<T> {
             }
             val elemArray = ByteArray(length)
             System.arraycopy(byteArray, cursor, elemArray, 0, length)
-            list.add(this.fromBytes(elemArray, protocolVersion, encryptionKey))
+            list.add(this.fromBytes(context, elemArray, protocolVersion, encryptionKey))
             cursor += length
         }
         return list
@@ -97,16 +98,16 @@ abstract class SharingFactory<T> {
         }
     }
 
-    fun encryptToFile(encryptionKey: String?, data: List<T>, addSupplements: (list: List<T>) -> List<T> = { it }): ByteArray {
-        return this.getBytes(addSupplements.invoke(data), encryptionKey)
+    fun encryptToFile(context: Context, encryptionKey: String?, data: List<T>, addSupplements: (list: List<T>) -> List<T> = { it }): ByteArray {
+        return this.getBytes(context, addSupplements.invoke(data), encryptionKey)
     }
 
-    fun decryptFromFile(decryptionKey: String?, byteArray: ByteArray): List<T> {
-        return this.parseBytes(byteArray, decryptionKey)
+    fun decryptFromFile(context: Context, decryptionKey: String?, byteArray: ByteArray): List<T> {
+        return this.parseBytes(context, byteArray, decryptionKey)
     }
 
-    protected abstract fun toBytes(sharable: T, encryptionKey: String?): ByteArray
-    protected abstract fun fromBytes(bytes: ByteArray, protocolVersion: Int, encryptionKey: String?): T
+    protected abstract fun toBytes(context: Context, sharable: T, encryptionKey: String?): ByteArray
+    protected abstract fun fromBytes(context: Context, bytes: ByteArray, protocolVersion: Int, encryptionKey: String?): T
     abstract fun writingProtocolVersion(): Int
 
 }

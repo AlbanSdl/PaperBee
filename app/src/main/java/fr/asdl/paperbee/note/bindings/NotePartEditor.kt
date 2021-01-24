@@ -4,17 +4,12 @@ import android.content.Context
 import android.text.Editable
 import android.text.style.CharacterStyle
 import android.util.AttributeSet
-import android.util.Log
-import android.view.View
 import androidx.annotation.IdRes
-import androidx.core.content.ContextCompat
-import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.note.TextNotePart
 import fr.asdl.paperbee.storage.v1.NotableContract
 import fr.asdl.paperbee.view.RichTextEditable
-import fr.asdl.paperbee.view.RichTextSpanType
-import fr.asdl.paperbee.view.rounded.RoundedImageView
+import fr.asdl.paperbee.view.RichTextSpan
 
 class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEditable<TextNotePart>(context, attributeSet) {
 
@@ -39,7 +34,7 @@ class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEdit
     }
 
     fun applyButtonSpan(@IdRes buttonId: Int) {
-        this.applySpan(RichTextSpanType.getSpanType(buttonId) ?: return)
+        this.applySpan(RichTextSpan(buttonId))
     }
 
 }

@@ -53,20 +53,20 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * The new style is applied with the [Spannable.SPAN_EXCLUSIVE_INCLUSIVE] flag meaning any
      * inserted char right after the span will be included too.
      */
-    protected fun applySpan(spanType: RichTextSpanType) {
+    protected fun applySpan(span: RichTextSpan) {
         if (this.hasSelection()) {
             val coverage = arrayListOf<IndexRange>()
             for (i in this.getSelectionSpans())
-                if (RichTextSpanType.getSpanType(i) === spanType) {
+                if (RichTextSpan.getSpanType(i) === span.type) {
                     val startIndex = this.text!!.getSpanStart(i)
                     val endIndex = this.text!!.getSpanEnd(i)
                     this.text!!.apply {
                         removeSpan(i)
                         coverage.add(IndexRange(startIndex, endIndex))
                         if (selectionStart > startIndex)
-                            setSpan(spanType.getSpan(), startIndex, selectionStart, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+                            setSpan(span.getSpan(context), startIndex, selectionStart, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
                         if (selectionEnd < endIndex)
-                            setSpan(spanType.getSpan(), selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+                            setSpan(span.getSpan(context), selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
                         if (IndexRange.merge(*coverage.toTypedArray()).contains(
                                 IndexRange(selectionStart, selectionEnd)
                             )) {
@@ -76,7 +76,7 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
                     }
                 }
             this.text!!.setSpan(
-                spanType.getSpan(),
+                span.getSpan(context),
                 this.selectionStart,
                 this.selectionEnd,
                 Spannable.SPAN_EXCLUSIVE_INCLUSIVE

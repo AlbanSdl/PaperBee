@@ -1,11 +1,12 @@
 package fr.asdl.paperbee.storage
 
+import android.content.Context
 import android.text.Editable
 
 interface SpanProcessor {
 
-    fun serialize(editable: Editable): String
+    fun serialize(context: Context, editable: Editable): String
 
-    fun deserialize(string: String): Editable
+    fun deserialize(context: Context, string: String): Editable
 
 }

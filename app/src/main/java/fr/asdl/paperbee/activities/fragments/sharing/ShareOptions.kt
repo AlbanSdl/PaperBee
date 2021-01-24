@@ -25,7 +25,7 @@ class ShareOptions {
         sharingStarted = true
         context.getScope().launch {
             val encryptedByteArray =
-                shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
+                shareProcess.encryptToFile(context.requireContext(), if (password.isEmpty()) null else password, data) { it ->
                     val fullList = arrayListOf<DataHolder>()
                     fullList.addAll(data)
                     it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
