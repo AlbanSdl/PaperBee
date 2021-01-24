@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.content.ContextCompat
 import fr.asdl.paperbee.view.options.Color
 
-class RichTextSpan private constructor(val type: RichTextSpanType, private val extra: Any?) {
+class RichTextSpan private constructor(val type: RichTextSpanType, val extra: Any?) {
 
     private constructor(type: RichTextSpanType, extra: String?) : this(type, parseExtra(type, extra))
 
@@ -53,7 +53,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, private val e
 
     companion object {
 
-        fun getSpanType(span: CharacterStyle): RichTextSpanType? {
+        private fun getSpanType(span: CharacterStyle): RichTextSpanType? {
             return when (span) {
                 is StyleSpan -> {
                     when (span.style) {

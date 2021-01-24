@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import com.google.android.material.snackbar.Snackbar
@@ -141,7 +142,22 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.add_checkbox_element -> notable.add(NoteCheckBoxable())
             R.id.moveIn -> this.focusedNote?.moveIn()
             R.id.moveOut -> this.focusedNote?.moveOut()
-            R.id.bold, R.id.italic, R.id.underline -> this.currentEditor?.applyButtonSpan(v.id)
+            R.id.bold, R.id.italic, R.id.underline -> this.currentEditor?.applyButtonSpan(requireContext(), v.id)
+            R.id.background_color, R.id.font_color -> {
+                ColorPicker(requireContext(), listOf(*Color.values()), null, false, null) {
+                    this.currentEditor?.applyButtonSpanWithExtra(requireContext(), v.id, it)
+                }
+            }
+            R.id.insert_link -> {
+                lateinit var dialog: AlertDialog
+                dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
+                    .setTitle(R.string.format_insert_link_dialog_name)
+                    .setView(R.layout.editor_format_link_insert)
+                    .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ -> dial.dismiss(); this.currentEditor?.applyButtonSpanWithExtra(requireContext(), v.id, null) }
+                    .setNeutralButton(android.R.string.cancel) { dial, _ -> dial.dismiss() }
+                    .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ -> this.currentEditor?.applyButtonSpanWithExtra(requireContext(), v.id, dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text); dial.dismiss(); }
+                    .show()
+            }
         }
     }
 

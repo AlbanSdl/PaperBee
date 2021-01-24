@@ -53,11 +53,12 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * The new style is applied with the [Spannable.SPAN_EXCLUSIVE_INCLUSIVE] flag meaning any
      * inserted char right after the span will be included too.
      */
-    protected fun applySpan(span: RichTextSpan) {
+    protected fun applySpan(context: Context, span: RichTextSpan) {
         if (this.hasSelection()) {
             val coverage = arrayListOf<IndexRange>()
-            for (i in this.getSelectionSpans())
-                if (RichTextSpan.getSpanType(i) === span.type) {
+            for (i in this.getSelectionSpans()) {
+                val iSpan = RichTextSpan(i, context)
+                if (iSpan.type === span.type) {
                     val startIndex = this.text!!.getSpanStart(i)
                     val endIndex = this.text!!.getSpanEnd(i)
                     this.text!!.apply {
@@ -69,18 +70,21 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
                             setSpan(span.getSpan(context), selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
                         if (IndexRange.merge(*coverage.toTypedArray()).contains(
                                 IndexRange(selectionStart, selectionEnd)
-                            )) {
+                            ) && iSpan.extra == span.extra) {
                             this@RichTextEditable.onTextUpdated(this@RichTextEditable.text!!, mAttachedElement!!)
                             return@applySpan
                         }
                     }
                 }
-            this.text!!.setSpan(
-                span.getSpan(context),
-                this.selectionStart,
-                this.selectionEnd,
-                Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-            )
+            }
+            if (!span.type.hasExtra || span.getExtraAsString() != null) {
+                this.text!!.setSpan(
+                    span.getSpan(context),
+                    this.selectionStart,
+                    this.selectionEnd,
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+                )
+            }
             this.onTextUpdated(this.text!!, mAttachedElement!!)
         }
     }

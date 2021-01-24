@@ -33,8 +33,12 @@ class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEdit
         this.selectionListener = listener
     }
 
-    fun applyButtonSpan(@IdRes buttonId: Int) {
-        this.applySpan(RichTextSpan(buttonId))
+    fun applyButtonSpan(context: Context, @IdRes buttonId: Int) {
+        this.applySpan(context, RichTextSpan(buttonId))
+    }
+
+    fun applyButtonSpanWithExtra(context: Context, @IdRes buttonId: Int, extra: Any?) {
+        this.applySpan(context, RichTextSpan(buttonId, extra))
     }
 
 }

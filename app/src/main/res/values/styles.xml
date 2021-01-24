@@ -40,11 +40,17 @@
     <style name="ColorPickerTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="android:background">@color/pickerBackground</item>
         <item name="buttonBarNegativeButtonStyle">@style/ColorPickerTheme.Button</item>
+        <item name="buttonBarNeutralButtonStyle">@style/ColorPickerTheme.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/ColorPickerTheme.ButtonEnd</item>
     </style>
 
     <style name="ColorPickerTheme.Button" parent="android:Widget.Material.ButtonBar.AlertDialog">
         <item name="android:backgroundTint">@color/colorAccent</item>
         <item name="android:textColor">@color/blank</item>
+    </style>
+
+    <style name="ColorPickerTheme.ButtonEnd" parent="ColorPickerTheme.Button">
+        <item name="android:layout_marginStart">@dimen/padding_small</item>
     </style>
 
 </resources>
