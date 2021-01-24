@@ -5,8 +5,6 @@ import android.content.res.Configuration
 import android.graphics.Typeface
 import android.text.style.*
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.content.ContextCompat
 import fr.asdl.paperbee.view.options.Color
 
@@ -39,7 +37,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
             RichTextSpanType.ITALIC -> StyleSpan(Typeface.ITALIC)
             RichTextSpanType.UNDERLINE -> UnderlineSpan()
             RichTextSpanType.COLOR, RichTextSpanType.BACKGROUND -> {
-                val cc = toggleContextDarkTheme(context)
+                val cc = if (type == RichTextSpanType.COLOR) toggleContextDarkTheme(context) else context
                 val color = ContextCompat.getColor(cc, (extra as Color).id)
                 if (type == RichTextSpanType.COLOR) ForegroundColorSpan(color) else BackgroundColorSpan(
                     color
@@ -91,8 +89,9 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
                         if (characterStyle is ForegroundColorSpan) characterStyle.foregroundColor
                         else (characterStyle as BackgroundColorSpan).backgroundColor
                     var appColor: Color? = null
+                    val cc = if (characterStyle is ForegroundColorSpan) toggleContextDarkTheme(context) else context
                     for (i in Color.values())
-                        if (ContextCompat.getColor(context, i.id) == color) appColor = i
+                        if (ContextCompat.getColor(cc, i.id) == color) appColor = i
                     appColor
                 }
                 is URLSpan -> characterStyle.url
@@ -102,16 +101,15 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
 
         private fun getInvertedTheme(context: Context): Int {
             return when (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                MODE_NIGHT_NO -> MODE_NIGHT_YES
-                else -> MODE_NIGHT_NO
+                Configuration.UI_MODE_NIGHT_NO -> Configuration.UI_MODE_NIGHT_YES
+                else -> Configuration.UI_MODE_NIGHT_NO
             }
         }
 
         private fun toggleContextDarkTheme(context: Context): Context {
-            val uiMode = getInvertedTheme(context) and Configuration.UI_MODE_NIGHT_MASK
             val conf = Configuration(context.resources.configuration)
             conf.uiMode =
-                (uiMode or (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()))
+                (getInvertedTheme(context) or (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()))
             return context.createConfigurationContext(conf)
         }
     }

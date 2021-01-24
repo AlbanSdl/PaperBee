@@ -84,8 +84,9 @@ class SpanProcessorImpl : SpanProcessor {
         fun parse(parsable: String, indexOffset: Int = 0) {
             this.find(parsable, deSerialRegex).forEach {
                 it.groups.apply {
+                    if (this[5] == null) return@apply
                     mappedSpan[IndexRange(this[5]!!.range.first + indexOffset, this[5]!!.range.last + indexOffset)] =
-                        RichTextSpan(this[2]?.value ?: return@forEach, unEscapeText(this[4]?.value ?: ""))
+                        RichTextSpan(this[2]?.value ?: return@apply, unEscapeText(this[4]?.value ?: ""))
                     pendingRemoval.add(IndexRange(this[1]!!.range.first + indexOffset, this[1]!!.range.last + indexOffset))
                     pendingRemoval.add(IndexRange(this[6]!!.range.first + indexOffset, this[6]!!.range.last + indexOffset))
                     parse(this[5]!!.value, this[5]!!.range.first + indexOffset)
