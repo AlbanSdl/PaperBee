@@ -13,10 +13,8 @@ class SpanProcessorImpl : SpanProcessor {
 
     private val escapeRegex = Regex("[\\\\<>]")
     private val unEscapeRegex = Regex("\\\\[\\\\<>]")
-    private val deSerialRegex = Regex(
-        "((?<!\\\\)<(?<tag>[^/]*?)( (.*?))?(?<!\\\\)>)(.*?)((?<!\\\\)</\\k<tag>(?<!\\\\)>)",
-        RegexOption.DOT_MATCHES_ALL
-    )
+    private val deSerialRegexTagStart = Regex("(?<!\\\\)<([^/]*?)( (.*?))?(?<!\\\\)>")
+    private val deSerialRegexTagEnd = Regex("(?<!\\\\)</([^/]*?)(?<!\\\\)>")
 
     private fun find(string: String, regex: Regex): List<MatchResult> {
         val data = arrayListOf<MatchResult>()
@@ -36,11 +34,29 @@ class SpanProcessorImpl : SpanProcessor {
         return unEscapeRegex.replace(input) { it.value.drop(1) }
     }
 
+    private fun mapByPairs(starts: Map<IndexRange, RichTextSpan>, ends: Map<IndexRange, String>): Map<IndexRange, RichTextSpan> {
+        val spans = hashMapOf<IndexRange, RichTextSpan>()
+        val sortedEnds = ends.toSortedMap(compareBy { it.start })
+        starts.forEach root@{ s ->
+            sortedEnds.forEach {
+                if (it.value == s.value.type.delimiter && it.key.start > s.key.start) {
+                    if (s.key.end + 1 < it.key.start - 1) {
+                        spans[IndexRange(s.key.end + 1, it.key.start - 1)] = s.value
+                        return@root
+                    }
+                }
+            }
+        }
+        return spans
+    }
+
     override fun serialize(context: Context, editable: RichSpannable): String {
         val serialized = StringBuilder(escapeText(editable.toString()))
         val mappedSpan = hashMapOf<IndexRange, RichTextSpan>()
         editable.getSpans(0, editable.length, null).forEach {
-            mappedSpan[IndexRange(editable.getSpanStart(it), editable.getSpanEnd(it))] = it
+            val range = IndexRange(editable.getSpanStart(it), editable.getSpanEnd(it))
+            if (range.length > 1)
+                mappedSpan[range] = it
         }
         fun appendTag(tag: String, pos: Int) {
             serialized.insert(pos, tag)
@@ -74,25 +90,25 @@ class SpanProcessorImpl : SpanProcessor {
             }
             mappedSpan.keys.forEach { r ->
                 r.shift(
-                    if (r.start >= range.start) -range.length else 0,
+                    if (r.start > range.start) -range.length else 0,
                     if (r.end >= range.end) -range.length else 0
                 )
             }
         }
 
-        fun parse(parsable: String, indexOffset: Int = 0) {
-            this.find(parsable, deSerialRegex).forEach {
-                it.groups.apply {
-                    if (this[5] == null) return@apply
-                    mappedSpan[IndexRange(this[5]!!.range.first + indexOffset, this[5]!!.range.last + indexOffset)] =
-                        RichTextSpan(this[2]?.value ?: return@apply, unEscapeText(this[4]?.value ?: ""))
-                    pendingRemoval.add(IndexRange(this[1]!!.range.first + indexOffset, this[1]!!.range.last + indexOffset))
-                    pendingRemoval.add(IndexRange(this[6]!!.range.first + indexOffset, this[6]!!.range.last + indexOffset))
-                    parse(this[5]!!.value, this[5]!!.range.first + indexOffset)
-                }
-            }
+        val startTags = hashMapOf<IndexRange, RichTextSpan>()
+        val endTags = hashMapOf<IndexRange, String>()
+        this.find(clearString, deSerialRegexTagStart).forEach {
+            startTags[IndexRange(it.groups[0]!!.range.first, it.groups[0]!!.range.last)] =
+                RichTextSpan(it.groups[1]?.value ?: return@forEach, it.groups[3]?.value)
         }
-        parse(clearString)
+        this.find(clearString, deSerialRegexTagEnd).forEach {
+            endTags[IndexRange(it.groups[0]!!.range.first, it.groups[0]!!.range.last)] = it.groups[1]?.value ?: return@forEach
+        }
+        pendingRemoval.addAll(startTags.keys)
+        pendingRemoval.addAll(endTags.keys)
+        mappedSpan.putAll(this.mapByPairs(startTags, endTags))
+
         pendingRemoval.forEach { removeTag(it) }
         val editable = SpannableStringBuilder(unEscapeText(clearString))
         for (entry in mappedSpan)
