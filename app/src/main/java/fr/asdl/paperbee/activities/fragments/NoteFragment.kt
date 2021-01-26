@@ -160,7 +160,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                     .setNeutralButton(android.R.string.cancel) { dial, _ -> dial.dismiss() }
                     .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ -> this.currentEditor?.applyButtonSpanWithExtra(
                         v.id,
-                        dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text
+                        dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
                     ); dial.dismiss(); }
                     .show()
             }

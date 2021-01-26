@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.Spannable
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.util.Log
 import androidx.annotation.CallSuper
@@ -16,6 +17,10 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
 
     private var mAttachedElement: T? = null
     private var mAttachedSpannable: RichSpannable? = null
+
+    init {
+        this.movementMethod = LinkMovementMethod.getInstance();
+    }
 
     final override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
