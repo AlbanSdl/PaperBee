@@ -1,7 +1,5 @@
 package fr.asdl.paperbee.note
 
-import android.text.Editable
-import android.text.SpannableStringBuilder
 import fr.asdl.paperbee.exceptions.NotePartAttachmentException
 import fr.asdl.paperbee.view.sentient.DataHolder
 
@@ -163,14 +161,14 @@ sealed class NotePart : DataHolder() {
 }
 
 interface TextNotePart {
-    var content: Editable
+    var content: String
 }
 
 interface CheckableNotePart {
     var checked: Boolean
 }
 
-class NoteText(override var content: Editable = SpannableStringBuilder()) : NotePart(), TextNotePart
+class NoteText(override var content: String = "") : NotePart(), TextNotePart
 
-class NoteCheckBoxable(override var content: Editable = SpannableStringBuilder(),
+class NoteCheckBoxable(override var content: String = "",
                        override var checked: Boolean = false) : NotePart(), TextNotePart, CheckableNotePart

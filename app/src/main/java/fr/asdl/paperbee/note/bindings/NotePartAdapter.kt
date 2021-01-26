@@ -7,6 +7,7 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
+import fr.asdl.paperbee.view.RichSpannable
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 
 
@@ -16,7 +17,7 @@ abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAda
         // TextNoteParts
         val textView = (holder.findViewById(R.id.note_text) as TextView)
         if (content is TextNotePart) {
-            textView.text = content.content
+            textView.text = RichSpannable(textView.context, content.content)
             textView.visibility = View.VISIBLE
         }
         else textView.visibility = View.GONE

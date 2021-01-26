@@ -4,9 +4,9 @@ import android.content.Context
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.CharacterStyle
 import fr.asdl.paperbee.IndexRange
 import fr.asdl.paperbee.storage.SpanProcessor
+import fr.asdl.paperbee.view.RichSpannable
 import fr.asdl.paperbee.view.RichTextSpan
 
 class SpanProcessorImpl : SpanProcessor {
@@ -36,12 +36,11 @@ class SpanProcessorImpl : SpanProcessor {
         return unEscapeRegex.replace(input) { it.value.drop(1) }
     }
 
-    override fun serialize(context: Context, editable: Editable): String {
+    override fun serialize(context: Context, editable: RichSpannable): String {
         val serialized = StringBuilder(escapeText(editable.toString()))
         val mappedSpan = hashMapOf<IndexRange, RichTextSpan>()
-        editable.getSpans(0, editable.length, CharacterStyle::class.java).forEach {
-            mappedSpan[IndexRange(editable.getSpanStart(it), editable.getSpanEnd(it))] =
-                RichTextSpan(it, context)
+        editable.getSpans(0, editable.length, null).forEach {
+            mappedSpan[IndexRange(editable.getSpanStart(it), editable.getSpanEnd(it))] = it
         }
         fun appendTag(tag: String, pos: Int) {
             serialized.insert(pos, tag)
@@ -101,7 +100,7 @@ class SpanProcessorImpl : SpanProcessor {
                 entry.value.getSpan(context),
                 entry.key.start,
                 entry.key.end + 1,
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_INCLUSIVE
             )
         return editable
     }

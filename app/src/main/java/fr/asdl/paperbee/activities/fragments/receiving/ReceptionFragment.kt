@@ -32,7 +32,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
                     if (result.result.success) {
                         orig.shareData = result.data
                         try {
-                            orig.content = orig.shareProcess.decryptFromFile(requireContext(),null, result.data!!)
+                            orig.content = orig.shareProcess.decryptFromFile(null, result.data!!)
                         } catch (e: WrongPasswordException) {
                         } catch (e: IncompatibleVersionException) {
                             this@ReceptionFragment.requireActivity().runOnUiThread {
@@ -67,7 +67,7 @@ class ReceptionFragment : ReceptionBaseFragment() {
                 val data = nfcTag.readData()[0].records[0].payload
                 val importFrag = this@ReceptionFragment.parentFragment as ImportFragment
                 try {
-                    importFrag.content = importFrag.shareProcess.decryptFromFile(requireContext(), null, data)
+                    importFrag.content = importFrag.shareProcess.decryptFromFile(null, data)
                     this@ReceptionFragment.requireActivity().runOnUiThread {
                         importFrag.displayFragment(ReceptionOptionsFragment(), "shareImportOptions")
                     }

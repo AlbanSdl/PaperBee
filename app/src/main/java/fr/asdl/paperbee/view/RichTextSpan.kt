@@ -10,6 +10,8 @@ import fr.asdl.paperbee.view.options.Color
 
 class RichTextSpan private constructor(val type: RichTextSpanType, val extra: Any?) {
 
+    private var raw: CharacterStyle? = null
+
     private constructor(type: RichTextSpanType, extra: String?) : this(type, parseExtra(type, extra))
 
     constructor(@IdRes typeId: Int, extra: Any? = null) : this(findSpanType { it.id == typeId }
@@ -18,10 +20,12 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
     constructor(delimiter: String, extra: String? = null) : this(findSpanType { it.delimiter == delimiter }
         ?: throw IllegalArgumentException(), extra)
 
-    constructor(characterStyle: CharacterStyle, context: Context) : this(
+    internal constructor(characterStyle: CharacterStyle, context: Context) : this(
         getSpanType(characterStyle) ?: throw java.lang.IllegalArgumentException(),
         getSpanExtra(characterStyle, context)
-    )
+    ) {
+        this.raw = characterStyle
+    }
 
     fun getExtraAsString(): String? {
         return when (this.extra) {
@@ -31,8 +35,8 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
         }
     }
 
-    fun getSpan(context: Context): CharacterStyle {
-        return when (type) {
+    fun getSpan(context: Context?): CharacterStyle? {
+        if (raw == null && context != null) raw = when (type) {
             RichTextSpanType.BOLD -> StyleSpan(Typeface.BOLD)
             RichTextSpanType.ITALIC -> StyleSpan(Typeface.ITALIC)
             RichTextSpanType.UNDERLINE -> UnderlineSpan()
@@ -47,6 +51,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
                 URLSpan(extra as String)
             }
         }
+        return raw
     }
 
     companion object {

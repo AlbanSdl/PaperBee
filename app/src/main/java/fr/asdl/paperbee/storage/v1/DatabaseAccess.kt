@@ -21,8 +21,6 @@ import fr.asdl.paperbee.view.sentient.DataHolder
 
 class DatabaseAccess(context: Context) : DatabaseAccess(context) {
 
-    private val spanProcessor = SpanProcessorImpl()
-
     override suspend fun querySelect(
         filter: DatabaseFilter,
         sort: String?
@@ -42,7 +40,6 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
             with(cursor) {
                 while (moveToNext()) {
                     val obj = toObject(
-                        context,
                         getLong(getColumnIndexOrThrow(COLUMN_NAME_ID)),
                         getLong(getColumnIndexOrThrow(COLUMN_NAME_ORDER)),
                         getLongOrNull(getColumnIndexOrThrow(COLUMN_NAME_PARENT)),
@@ -63,7 +60,6 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
     }
 
     private fun toObject(
-        context: Context,
         id: Long,
         order: Long,
         parentId: Long?,
@@ -74,9 +70,9 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
         val holder: DataHolder? = when (NotableContract.DataHolderType.fromInt(type)) {
             NotableContract.DataHolderType.NOTE -> { val n = Note(); n.title = payload ?: ""; n.parentId = parentId?.toInt(); n }
             NotableContract.DataHolderType.FOLDER -> { val f = NoteFolder(); f.title = payload ?: ""; f.parentId = parentId?.toInt(); f }
-            NotableContract.DataHolderType.TEXT -> { val t = NoteText(spanProcessor.deserialize(context, payload ?: "")); t.parentId = parentId?.toInt(); t}
+            NotableContract.DataHolderType.TEXT -> { val t = NoteText(payload ?: ""); t.parentId = parentId?.toInt(); t}
             NotableContract.DataHolderType.CHECKBOX -> { val c = NoteCheckBoxable(
-                spanProcessor.deserialize(context, payload ?: ""),
+                payload ?: "",
                 extra == "true"
             ); c.parentId = parentId?.toInt(); c }
             else -> null
@@ -95,7 +91,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
             put(COLUMN_NAME_TYPE, NotableContract.DataHolderType.getType(holder)?.id)
             put(
                 COLUMN_NAME_PAYLOAD,
-                if (holder is Notable<*>) holder.title else if (holder is TextNotePart) spanProcessor.serialize(context, holder.content) else null
+                if (holder is Notable<*>) holder.title else if (holder is TextNotePart) holder.content else null
             )
             put(
                 COLUMN_NAME_EXTRA,
@@ -127,7 +123,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
                     COLUMN_NAME_ORDER -> put(i, holder.order)
                     COLUMN_NAME_PAYLOAD -> put(
                         i,
-                        if (holder is Notable<*>) holder.title else if (holder is TextNotePart) spanProcessor.serialize(context, holder.content) else null
+                        if (holder is Notable<*>) holder.title else if (holder is TextNotePart) holder.content else null
                     )
                     COLUMN_NAME_EXTRA -> put(
                         i,

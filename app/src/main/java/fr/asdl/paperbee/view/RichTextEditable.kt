@@ -4,8 +4,8 @@ import android.content.Context
 import android.text.Editable
 import android.text.Spannable
 import android.text.TextWatcher
-import android.text.style.CharacterStyle
 import android.util.AttributeSet
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.AppCompatEditText
 import fr.asdl.paperbee.IndexRange
@@ -15,13 +15,14 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     AppCompatEditText(context, attributeSet), TextWatcher {
 
     private var mAttachedElement: T? = null
+    private var mAttachedSpannable: RichSpannable? = null
 
     final override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
-        this.onSelectionUpdated(this.hasSelection(), this.getSelectionSpans())
+        this.onSelectionUpdated(this.hasSelection(), if (selStart < selEnd) this.getSelectionSpans() else arrayOf())
     }
 
-    protected abstract fun onSelectionUpdated(hasSelection: Boolean, selectionSpans: Array<CharacterStyle>)
+    protected abstract fun onSelectionUpdated(hasSelection: Boolean, selectionSpans: Array<RichTextSpan>)
 
     /**
      * Used to attach an object to the [RichTextEditable]. An eventual attached object
@@ -30,7 +31,8 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     fun attach(attachedElement: T) {
         this.detach()
         mAttachedElement = attachedElement
-        this.text = attachedElement.content
+        mAttachedSpannable = RichSpannable(context, attachedElement.content)
+        this.text = mAttachedSpannable
         this.addTextChangedListener(this)
     }
 
@@ -41,10 +43,19 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     fun detach() {
         this.removeTextChangedListener(this)
         this.mAttachedElement = null
+        this.mAttachedSpannable = null
     }
 
-    private fun getSelectionSpans(): Array<CharacterStyle> {
-        return this.text!!.getSpans(this.selectionStart, this.selectionEnd, CharacterStyle::class.java)
+    private fun getSelectionSpans(type: RichTextSpanType? = null): Array<RichTextSpan> {
+        return mAttachedSpannable?.getSpans(selectionStart, selectionEnd, type) ?: arrayOf()
+    }
+
+    private fun updateContent() {
+        val selection = IndexRange(selectionStart, selectionEnd)
+        text = this.mAttachedSpannable!!
+        setSelection(selection.start, selection.end)
+        this.onSelectionChanged(selectionStart, selectionEnd)
+        onTextUpdated(this.mAttachedSpannable!!, mAttachedElement!!)
     }
 
     /**
@@ -53,39 +64,35 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * The new style is applied with the [Spannable.SPAN_EXCLUSIVE_INCLUSIVE] flag meaning any
      * inserted char right after the span will be included too.
      */
-    protected fun applySpan(context: Context, span: RichTextSpan) {
+    protected fun applySpan(span: RichTextSpan) {
         if (this.hasSelection()) {
             val coverage = arrayListOf<IndexRange>()
-            for (i in this.getSelectionSpans()) {
-                val iSpan = RichTextSpan(i, context)
-                if (iSpan.type === span.type) {
-                    val startIndex = this.text!!.getSpanStart(i)
-                    val endIndex = this.text!!.getSpanEnd(i)
-                    this.text!!.apply {
-                        removeSpan(i)
-                        coverage.add(IndexRange(startIndex, endIndex))
-                        if (selectionStart > startIndex)
-                            setSpan(span.getSpan(context), startIndex, selectionStart, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                        if (selectionEnd < endIndex)
-                            setSpan(span.getSpan(context), selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                        if (IndexRange.merge(*coverage.toTypedArray()).contains(
-                                IndexRange(selectionStart, selectionEnd)
-                            ) && iSpan.extra == span.extra) {
-                            this@RichTextEditable.onTextUpdated(this@RichTextEditable.text!!, mAttachedElement!!)
-                            return@applySpan
-                        }
-                    }
+            for (i in this.getSelectionSpans(span.type)) {
+                val startIndex = this.mAttachedSpannable!!.getSpanStart(i)
+                val endIndex = this.mAttachedSpannable!!.getSpanEnd(i)
+                this.mAttachedSpannable!!.apply {
+                    removeSpan(i)
+                    coverage.add(IndexRange(startIndex, endIndex))
+                    if (selectionStart > startIndex)
+                        setSpan(span, startIndex, selectionStart, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+                    if (selectionEnd < endIndex)
+                        setSpan(span, selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+                    if (IndexRange.merge(*coverage.toTypedArray()).contains(
+                            IndexRange(selectionStart, selectionEnd)
+                        ) && i.extra == span.extra)
+                        return@applySpan this@RichTextEditable.updateContent()
                 }
             }
             if (!span.type.hasExtra || span.getExtraAsString() != null) {
-                this.text!!.setSpan(
-                    span.getSpan(context),
+                this.mAttachedSpannable!!.setSpan(
+                    span,
                     this.selectionStart,
                     this.selectionEnd,
                     Spannable.SPAN_EXCLUSIVE_INCLUSIVE
                 )
-            }
-            this.onTextUpdated(this.text!!, mAttachedElement!!)
+            } else
+                Log.e(javaClass.simpleName, "Cannot apply span: missing extra !")
+            this.updateContent()
         }
     }
 
@@ -93,15 +100,17 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * This method is called on every update of the text.
      * May be used to notify and enqueue a save to a persistent form
      */
-    protected abstract fun onTextUpdated(updated: Editable, attachedElement: T)
+    protected abstract fun onTextUpdated(updated: RichSpannable, attachedElement: T)
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
     @CallSuper
     override fun afterTextChanged(s: Editable?) {
-        if (mAttachedElement is T && s != null)
-            this.onTextUpdated(s, mAttachedElement!!)
+        if (mAttachedElement is T && s != null) {
+            mAttachedSpannable = RichSpannable(this.mAttachedSpannable!!, s)
+            this.onTextUpdated(mAttachedSpannable!!, mAttachedElement!!)
+        }
     }
 
 }
