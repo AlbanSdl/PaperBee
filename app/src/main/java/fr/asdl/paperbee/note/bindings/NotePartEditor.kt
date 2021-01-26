@@ -9,6 +9,7 @@ import fr.asdl.paperbee.storage.v1.NotableContract
 import fr.asdl.paperbee.view.RichSpannable
 import fr.asdl.paperbee.view.RichTextEditable
 import fr.asdl.paperbee.view.RichTextSpan
+import fr.asdl.paperbee.view.RichTextSpanType
 
 class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEditable<TextNotePart>(context, attributeSet) {
 
@@ -38,6 +39,12 @@ class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEdit
 
     fun applyButtonSpanWithExtra(@IdRes buttonId: Int, extra: Any?) {
         this.applySpan(RichTextSpan(buttonId, extra))
+    }
+
+    fun getCurrentSelectionFullSpan(type: RichTextSpanType?): RichTextSpan? {
+        if (type == null) return null
+        return super.getSelectionSpans(type)
+            .firstOrNull { super.getSpanStart(it) <= selectionStart && super.getSpanEnd(it) >= selectionEnd }
     }
 
 }

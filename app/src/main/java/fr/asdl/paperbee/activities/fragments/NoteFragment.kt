@@ -22,6 +22,7 @@ import fr.asdl.paperbee.note.bindings.NotePartDecoration
 import fr.asdl.paperbee.note.bindings.NotePartEditor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
+import fr.asdl.paperbee.view.RichTextSpan
 import fr.asdl.paperbee.view.options.Color
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.rounded.RoundedImageView
@@ -144,11 +145,14 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.moveOut -> this.focusedNote?.moveOut()
             R.id.bold, R.id.italic, R.id.underline -> this.currentEditor?.applyButtonSpan(v.id)
             R.id.background_color, R.id.font_color -> {
-                ColorPicker(requireContext(), listOf(*Color.values()), null, false, null) {
+                val colors = listOf(*Color.values())
+                val current = this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
+                ColorPicker(requireContext(), colors, colors.indexOf(current?.extra), false, null) {
                     this.currentEditor?.applyButtonSpanWithExtra(v.id, it)
                 }
             }
             R.id.insert_link -> {
+                val current = this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
                 lateinit var dialog: AlertDialog
                 dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
                     .setTitle(R.string.format_insert_link_dialog_name)
@@ -163,6 +167,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                         dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
                     ); dial.dismiss(); }
                     .show()
+                dialog.findViewById<EditText>(R.id.insert_link_edit)?.setText(current?.extra as String?)
             }
         }
     }

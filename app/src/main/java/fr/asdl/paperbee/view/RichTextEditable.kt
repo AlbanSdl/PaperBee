@@ -19,7 +19,7 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     private var mAttachedSpannable: RichSpannable? = null
 
     init {
-        this.movementMethod = LinkMovementMethod.getInstance();
+        this.movementMethod = LinkMovementMethod.getInstance()
     }
 
     final override fun onSelectionChanged(selStart: Int, selEnd: Int) {
@@ -51,7 +51,7 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
         this.mAttachedSpannable = null
     }
 
-    private fun getSelectionSpans(type: RichTextSpanType? = null): Array<RichTextSpan> {
+    protected fun getSelectionSpans(type: RichTextSpanType? = null): Array<RichTextSpan> {
         return mAttachedSpannable?.getSpans(selectionStart, selectionEnd, type) ?: arrayOf()
     }
 
@@ -116,6 +116,14 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
             mAttachedSpannable = RichSpannable(this.mAttachedSpannable!!, s)
             this.onTextUpdated(mAttachedSpannable!!, mAttachedElement!!)
         }
+    }
+
+    protected fun getSpanStart(it: RichTextSpan): Int {
+        return this.mAttachedSpannable?.getSpanStart(it) ?: -1
+    }
+
+    protected fun getSpanEnd(it: RichTextSpan): Int {
+        return this.mAttachedSpannable?.getSpanEnd(it) ?: -1
     }
 
 }

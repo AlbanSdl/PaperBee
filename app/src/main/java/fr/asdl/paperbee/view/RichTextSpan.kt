@@ -73,7 +73,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
             }
         }
 
-        private fun findSpanType(selector: (RichTextSpanType) -> Boolean): RichTextSpanType? {
+        fun findSpanType(selector: (RichTextSpanType) -> Boolean): RichTextSpanType? {
             for (i in RichTextSpanType.values())
                 if (selector.invoke(i)) return i
             return null
