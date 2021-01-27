@@ -4,11 +4,16 @@ import android.content.Context
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.style.CharacterStyle
+import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.storage.SpanProcessor
 import fr.asdl.paperbee.storage.v1.SpanProcessorImpl
+import java.lang.ref.WeakReference
 
-class RichSpannable private constructor(private val context: Context, clearedText: Editable) :
+class RichSpannable private constructor(context: Context, clearedText: Editable) :
     SpannableStringBuilder(clearedText) {
+
+    private val context = WeakReference(context)
+    private fun requireContext() = context.get() ?: throw ContextLostException()
 
     constructor(context: Context, origin: String) : this(context, spanProcessor.deserialize(context, origin)) {
         super.getSpans(0, this.length, CharacterStyle::class.java).forEach {
@@ -20,7 +25,7 @@ class RichSpannable private constructor(private val context: Context, clearedTex
      * Returns a new updated [RichSpannable] with [content] as visible text and keeping the
      * spans of its previous form (known as [from])
      */
-    constructor(from: RichSpannable, content: Editable) : this(from.context, content) {
+    constructor(from: RichSpannable, content: Editable) : this(from.requireContext(), content) {
         this.spans.clear()
         this.spans.addAll(from.spans)
     }
@@ -49,7 +54,7 @@ class RichSpannable private constructor(private val context: Context, clearedTex
     fun setSpan(span: RichTextSpan?, start: Int, end: Int, flags: Int) {
         if (span != null) {
             spans.add(span)
-            return super.setSpan(span.getSpan(context), start, end, flags)
+            return super.setSpan(span.getSpan(requireContext()), start, end, flags)
         }
     }
 
@@ -74,7 +79,7 @@ class RichSpannable private constructor(private val context: Context, clearedTex
     }
 
     fun getSpanStart(span: RichTextSpan?): Int {
-        return super.getSpanStart(span?.getSpan(context))
+        return super.getSpanStart(span?.getSpan(context.get()))
     }
 
     @Deprecated("Should not use raw spans", ReplaceWith("getSpanStart(span as RichTextSpan)"))
@@ -83,7 +88,7 @@ class RichSpannable private constructor(private val context: Context, clearedTex
     }
 
     fun getSpanEnd(span: RichTextSpan?): Int {
-        return super.getSpanEnd(span?.getSpan(context))
+        return super.getSpanEnd(span?.getSpan(context.get()))
     }
 
     @Deprecated("Should not use raw spans", ReplaceWith("getSpanEnd(span as RichTextSpan)"))
@@ -97,7 +102,7 @@ class RichSpannable private constructor(private val context: Context, clearedTex
     }
 
     fun toRawString(): String {
-        return spanProcessor.serialize(this.context, this)
+        return spanProcessor.serialize(requireContext(), this)
     }
 
     companion object {

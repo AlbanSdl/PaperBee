@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseAccess
 import fr.asdl.paperbee.storage.DatabaseFilter
@@ -21,7 +22,7 @@ import fr.asdl.paperbee.view.sentient.DataHolder
 
 class DatabaseAccess(context: Context) : DatabaseAccess(context) {
 
-    override suspend fun querySelect(
+    override fun querySelect(
         filter: DatabaseFilter,
         sort: String?
     ): List<DataHolder> {
@@ -51,7 +52,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
                 }
             }
         } catch (ex: Exception) {
-            this.notifyUser(context.getString(R.string.db_error_select))
+            this.notifyUser(context.get()?.getString(R.string.db_error_select) ?: throw ContextLostException())
         } finally {
             cursor.close()
         }
@@ -102,7 +103,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
         return try {
             writeAccess.insert(TABLE_NAME, null, values)
         } catch (ex: Exception) {
-            this.notifyUser(context.getString(R.string.db_error_insert))
+            this.notifyUser(context.get()?.getString(R.string.db_error_insert) ?: throw ContextLostException())
             -1
         }
     }
@@ -142,6 +143,6 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
 
     }
 
-    override fun getBridge(): SQLiteOpenHelper = Database(context)
+    override fun getBridge(): SQLiteOpenHelper = Database(context.get() ?: throw ContextLostException())
 
 }

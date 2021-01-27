@@ -3,16 +3,22 @@ package fr.asdl.paperbee.preferences
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.exceptions.ContextLostException
+import java.lang.ref.WeakReference
 
-class AppPreferences(val context: Context) {
+class AppPreferences(context: Context) {
+
+    val context = WeakReference(context)
 
     companion object {
         val APP_THEME = Preference(R.string.pref_app_theme_name, MODE_NIGHT_FOLLOW_SYSTEM.toString())
     }
 
+    fun getContext(): Context = context.get() ?: throw ContextLostException()
+
     inline fun <reified T> get(preference: Preference<T>): T {
-        val pref = this.context.getSharedPreferences(this.context.getString(R.string.preferences_file), Context.MODE_PRIVATE)
-        val prefName = this.context.getString(preference.resId)
+        val pref = getContext().getSharedPreferences(getContext().getString(R.string.preferences_file), Context.MODE_PRIVATE)
+        val prefName = getContext().getString(preference.resId)
         return when (T::class) {
             String::class -> pref.getString(prefName, preference.default!! as String) as T
             Integer::class -> pref.getInt(prefName, preference.default!! as Int) as T
@@ -24,8 +30,8 @@ class AppPreferences(val context: Context) {
     }
 
     inline fun <reified T> set(preference: Preference<T>, value: T) {
-        val editor = this.context.getSharedPreferences(this.context.getString(R.string.preferences_file), Context.MODE_PRIVATE).edit()
-        val prefName = this.context.getString(preference.resId)
+        val editor = getContext().getSharedPreferences(getContext().getString(R.string.preferences_file), Context.MODE_PRIVATE).edit()
+        val prefName = getContext().getString(preference.resId)
         when (T::class) {
             String::class -> editor.putString(prefName, value as? String ?: preference.default!! as String)
             Integer::class -> editor.putInt(prefName, value as? Int ?: preference.default!! as Int)

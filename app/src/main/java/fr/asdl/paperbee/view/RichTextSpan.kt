@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.text.style.*
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
+import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.view.options.FontColor
 
 class RichTextSpan private constructor(val type: RichTextSpanType, val extra: Any?) {
@@ -49,7 +50,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
             RichTextSpanType.LINK -> {
                 URLSpan(extra as String)
             }
-        }
+        } else if (raw == null) throw ContextLostException()
         return raw
     }
 

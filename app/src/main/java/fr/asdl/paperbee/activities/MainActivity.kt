@@ -25,15 +25,12 @@ import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
-import fr.asdl.paperbee.storage.v1.DatabaseAccess
 import fr.asdl.paperbee.view.DarkThemed
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(), DarkThemed {
 
-    lateinit var dbProxy: DatabaseProxy<*>
+    val dbProxy: DatabaseProxy<*> get() = (this.application as PaperBeeApplication).dbProxy
     private var nfcAdapter: NfcAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,22 +42,14 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         // We remove system gesture on the left (when drawer is closed)
         this.setCustomDrawerGesture()
 
-        // If the app opens we display a little loading screen
-        if (savedInstanceState == null)
-            this.loadFragment(LayoutFragment(R.layout.loading), null)
-
-        getScope().launch {
-            dbProxy = DatabaseProxy(this@MainActivity, DatabaseAccess::class.java)
-            dbProxy.load()
-            if (supportFragmentManager.backStackEntryCount == 0) {
-                openNotable(dbProxy.findElementById(ROOT_ID) as NoteFolder, false)
-                // Handling creation shortcut
-                if (intent.extras?.containsKey("create") == true) {
-                    val note = Note()
-                    (dbProxy.findElementById(ROOT_ID) as NoteFolder).add(note)
-                    note.add(NoteText())
-                    openNotable(note)
-                }
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            openNotable(dbProxy.findElementById(ROOT_ID) as NoteFolder, false)
+            // Handling creation shortcut
+            if (intent.extras?.containsKey("create") == true) {
+                val note = Note()
+                (dbProxy.findElementById(ROOT_ID) as NoteFolder).add(note)
+                note.add(NoteText())
+                openNotable(note)
             }
         }
 
@@ -191,11 +180,6 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     override fun requireContext(): Context {
         return this
     }
-
-    override fun onDestroy() {
-        this.dbProxy.close()
-        super.onDestroy()
-    }
     
     /**
      * Removes system gesture on drawer when closed
@@ -306,10 +290,6 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 else -> this.openImport(SharingMethod.NFC).onNdefMessage(tag)
             }
         }
-    }
-
-    fun getScope(): CoroutineScope {
-        return (this.application as PaperBeeApplication).paperScope
     }
 
 }

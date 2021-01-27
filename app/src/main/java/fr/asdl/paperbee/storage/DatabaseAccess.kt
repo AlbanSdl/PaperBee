@@ -5,19 +5,22 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 import androidx.annotation.CallSuper
-import fr.asdl.paperbee.activities.MainActivity
+import fr.asdl.paperbee.PaperBeeApplication
+import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.view.sentient.DataHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.Closeable
+import java.lang.ref.WeakReference
 
 /**
  * The Access to the Notable database across application and database schema versions.
  * Contains the low level functions handled differently depending on the version of the database
  * schema.
  */
-abstract class DatabaseAccess(internal val context: Context) : Closeable {
+abstract class DatabaseAccess(context: Context) : Closeable {
 
+    internal val context: WeakReference<Context> = WeakReference(context)
     private var _dbStoreW: SQLiteDatabase? = null
     private var _dbStoreR: SQLiteDatabase? = null
 
@@ -34,7 +37,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
         this._dbStoreR?.close()
     }
 
-    protected abstract suspend fun querySelect(
+    protected abstract fun querySelect(
         filter: DatabaseFilter,
         sort: String?
     ): List<DataHolder>
@@ -50,7 +53,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
     ): Int
 
     protected fun notifyUser(string: String) {
-        Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context.get() ?: return, string, Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -59,7 +62,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
      * @param sort the sorting part of the SQLite query. Use the name of the column followed by
      * ASC or DESC for an ascending or descending order.
      */
-    suspend fun select(
+    fun select(
         filter: DatabaseFilter = DatabaseFilter(),
         sort: String? = null,
     ): List<DataHolder> {
@@ -99,7 +102,7 @@ abstract class DatabaseAccess(internal val context: Context) : Closeable {
     }
 
     private fun getScope(): CoroutineScope {
-        return (this.context as MainActivity).getScope()
+        return (this.context.get() as? PaperBeeApplication)?.paperScope ?: throw ContextLostException()
     }
 
 }

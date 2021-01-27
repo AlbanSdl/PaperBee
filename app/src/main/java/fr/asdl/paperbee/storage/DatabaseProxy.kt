@@ -3,6 +3,7 @@ package fr.asdl.paperbee.storage
 import android.content.Context
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.NotePart
@@ -19,7 +20,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         const val TRASH_ID = -2
     }
 
-    val context: Context get() = dbAccess.context
+    val context: Context get() = dbAccess.context.get() ?: throw ContextLostException()
     private val idAllocator: IntAllocator = IntAllocator()
     private val dbAccess: DatabaseAccess =
         databaseClass.declaredConstructors[0].newInstance(context) as DatabaseAccess
@@ -29,9 +30,10 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
      * Call this method to retrieve the saved elements from database.
      * Also loads root and trash
      */
-    suspend fun load() {
-        holderList.add(this.acquireSystemFolder(ROOT_ID, dbAccess.context.getString(R.string.notes_root_name)))
-        holderList.add(this.acquireSystemFolder(TRASH_ID, dbAccess.context.getString(R.string.trash_can)))
+    fun load() {
+        val context = dbAccess.context.get() ?: throw ContextLostException()
+        holderList.add(this.acquireSystemFolder(ROOT_ID, context.getString(R.string.notes_root_name)))
+        holderList.add(this.acquireSystemFolder(TRASH_ID, context.getString(R.string.trash_can)))
         dbAccess.select().forEach { d -> d.db = this; holderList.add(d) }
     }
 
@@ -117,6 +119,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         this.reMapIds(notables) { if (it is Notable<*>) destination.add(it) else this.delete(it) }
     }
 
+    @Suppress("unused") // process is killed by android and db is closed
     fun close() {
         this.dbAccess.close()
     }

@@ -1,9 +1,11 @@
 package fr.asdl.paperbee.view.sentient
 
-import android.app.Activity
+import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ORDER
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PARENT
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * The base class for any item contained in a [DataHolderList]. This is useful for any element
@@ -101,9 +103,9 @@ abstract class DataHolder {
         val updateVisuals = visualUpdate && updates.any { it != COLUMN_NAME_PARENT && it != COLUMN_NAME_ORDER }
         this._dbProxy?.update(this, updates) {
             if (it) {
-                (this.db?.context as Activity).runOnUiThread {
-                    this._dataChanged.removeAll(updates)
-                    if (updateVisuals) this.getParent()?.notifyUpdated(this@DataHolder)
+                (this.db?.context as PaperBeeApplication).paperScope.launch(Dispatchers.Main) {
+                    _dataChanged.removeAll(updates)
+                    if (updateVisuals) getParent()?.notifyUpdated(this@DataHolder)
                 }
             }
         }
