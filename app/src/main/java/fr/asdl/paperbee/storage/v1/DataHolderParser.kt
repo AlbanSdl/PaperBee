@@ -4,7 +4,7 @@ import android.util.Base64.*
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
 import fr.asdl.paperbee.note.*
-import fr.asdl.paperbee.view.options.Color
+import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.sentient.DataHolder
 import java.io.NotSerializableException
 
@@ -77,7 +77,7 @@ fun deserialize(content: ByteArray, dec: (str: String) -> String): DataHolder {
     holder.parentId = getInt(data[2])
     if (holder is Notable<*>) {
         holder.title = data[4]
-        if (data.size > 5) holder.color = Color.getFromTag(data[5])
+        if (data.size > 5) holder.color = NoteColor.getFromTag(data[5])
     }
     return holder
 }

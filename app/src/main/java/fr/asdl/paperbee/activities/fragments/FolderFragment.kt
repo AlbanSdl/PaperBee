@@ -22,7 +22,7 @@ import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.TRASH_ID
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
-import fr.asdl.paperbee.view.options.Color
+import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 
@@ -91,7 +91,7 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
                 }.show()
             }
             R.id.set_color -> {
-                ColorPicker(requireActivity(), listOf(*Color.values()), Color.getIndex(notable.color), false) {
+                ColorPicker(requireActivity(), NoteColor.values(), notable.color, false) {
                     notable.color = it
                     this.updateBackgroundTint()
                     notable.notifyDataChanged(COLUMN_NAME_EXTRA)

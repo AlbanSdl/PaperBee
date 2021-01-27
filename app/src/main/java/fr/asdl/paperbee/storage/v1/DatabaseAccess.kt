@@ -16,7 +16,7 @@ import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_TYPE
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.TABLE_NAME
-import fr.asdl.paperbee.view.options.Color
+import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.sentient.DataHolder
 
 class DatabaseAccess(context: Context) : DatabaseAccess(context) {
@@ -79,7 +79,7 @@ class DatabaseAccess(context: Context) : DatabaseAccess(context) {
         }
         holder?.initializeId(id.toInt())
         holder?.order = order.toInt()
-        if (holder is Notable<*>) holder.color = Color.getFromTag(extra)
+        if (holder is Notable<*>) holder.color = NoteColor.getFromTag(extra)
         return holder
     }
 

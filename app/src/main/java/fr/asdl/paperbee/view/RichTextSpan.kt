@@ -6,7 +6,7 @@ import android.graphics.Typeface
 import android.text.style.*
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
-import fr.asdl.paperbee.view.options.Color
+import fr.asdl.paperbee.view.options.FontColor
 
 class RichTextSpan private constructor(val type: RichTextSpanType, val extra: Any?) {
 
@@ -29,7 +29,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
 
     fun getExtraAsString(): String? {
         return when (this.extra) {
-            is Color -> this.extra.tag
+            is FontColor -> this.extra.tag
             is String -> this.extra
             else -> null
         }
@@ -41,8 +41,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
             RichTextSpanType.ITALIC -> StyleSpan(Typeface.ITALIC)
             RichTextSpanType.UNDERLINE -> UnderlineSpan()
             RichTextSpanType.COLOR, RichTextSpanType.BACKGROUND -> {
-                val cc = if (type == RichTextSpanType.COLOR) toggleContextDarkTheme(context) else context
-                val color = ContextCompat.getColor(cc, (extra as Color).id)
+                val color = ContextCompat.getColor(getColorTheme(context, type), (extra as FontColor).id)
                 if (type == RichTextSpanType.COLOR) ForegroundColorSpan(color) else BackgroundColorSpan(
                     color
                 )
@@ -81,7 +80,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
 
         private fun parseExtra(type: RichTextSpanType, string: String?): Any? {
             return when (type) {
-                RichTextSpanType.COLOR, RichTextSpanType.BACKGROUND -> Color.getFromTag(string)
+                RichTextSpanType.COLOR, RichTextSpanType.BACKGROUND -> FontColor.fromTag(string)
                 RichTextSpanType.LINK -> string
                 else -> null
             }
@@ -93,11 +92,8 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
                     val color =
                         if (characterStyle is ForegroundColorSpan) characterStyle.foregroundColor
                         else (characterStyle as BackgroundColorSpan).backgroundColor
-                    var appColor: Color? = null
-                    val cc = if (characterStyle is ForegroundColorSpan) toggleContextDarkTheme(context) else context
-                    for (i in Color.values())
-                        if (ContextCompat.getColor(cc, i.id) == color) appColor = i
-                    appColor
+                    val cc = getColorTheme(context, getSpanType(characterStyle)!!)
+                    FontColor.get { ContextCompat.getColor(cc, it.id) == color }
                 }
                 is URLSpan -> characterStyle.url
                 else -> null
@@ -111,7 +107,8 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
             }
         }
 
-        private fun toggleContextDarkTheme(context: Context): Context {
+        fun getColorTheme(context: Context, spanType: RichTextSpanType): Context {
+            if (spanType != RichTextSpanType.COLOR) return context
             val conf = Configuration(context.resources.configuration)
             conf.uiMode =
                 (getInvertedTheme(context) or (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()))

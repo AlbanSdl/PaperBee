@@ -23,8 +23,9 @@ import fr.asdl.paperbee.note.bindings.NotePartEditor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.RichTextSpan
-import fr.asdl.paperbee.view.options.Color
+import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.options.ColorPicker
+import fr.asdl.paperbee.view.options.FontColor
 import fr.asdl.paperbee.view.rounded.RoundedImageView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 
@@ -120,8 +121,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.set_color -> {
                 ColorPicker(
                     requireActivity(),
-                    listOf(*Color.values()),
-                    Color.getIndex(notable.color),
+                    NoteColor.values(),
+                    notable.color,
                     false
                 ) {
                     notable.color = it
@@ -145,9 +146,10 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.moveOut -> this.focusedNote?.moveOut()
             R.id.bold, R.id.italic, R.id.underline -> this.currentEditor?.applyButtonSpan(v.id)
             R.id.background_color, R.id.font_color -> {
-                val colors = listOf(*Color.values())
-                val current = this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
-                ColorPicker(requireContext(), colors, colors.indexOf(current?.extra), false, null) {
+                val spanType = RichTextSpan.findSpanType { it.id == v.id } ?: return
+                val current = this.currentEditor?.getCurrentSelectionFullSpan(spanType)
+                ColorPicker(requireContext(), FontColor.values(), current?.extra as FontColor?, false,
+                    colorContext = RichTextSpan.getColorTheme(requireContext(), spanType)) {
                     this.currentEditor?.applyButtonSpanWithExtra(v.id, it)
                 }
             }

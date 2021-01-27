@@ -2,7 +2,6 @@ package fr.asdl.paperbee.view.sentient
 
 import java.lang.IndexOutOfBoundsException
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * This is the base class for every element that can be used in a [SentientRecyclerViewAdapter].
@@ -34,7 +33,7 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
      * The listeners of the [DataHolder]. Registered by the [SentientRecyclerViewAdapter],
      * they are lambdas which will be called when their [ModificationType] is detected
      */
-    private val listeners: HashMap<ModificationType, (Int, Int?) -> Unit> = HashMap()
+    private val listeners: EnumMap<ModificationType, (Int, Int?) -> Unit> = EnumMap(ModificationType::class.java)
 
     /**
      * The list of all the ids of hidden elements of the [DataHolderList]
