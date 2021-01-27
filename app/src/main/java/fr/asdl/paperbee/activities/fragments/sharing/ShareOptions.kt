@@ -28,7 +28,7 @@ class ShareOptions {
                 shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
                     val fullList = arrayListOf<DataHolder>()
                     fullList.addAll(data)
-                    it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id!!)) }
+                    it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id)) }
                     return@encryptToFile fullList
                 }
             when (this@ShareOptions.method) {

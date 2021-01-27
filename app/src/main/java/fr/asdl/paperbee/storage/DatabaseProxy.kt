@@ -5,6 +5,7 @@ import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.exceptions.ContextLostException
 import fr.asdl.paperbee.note.Notable
+import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.note.NoteFolder
 import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_ID
@@ -41,7 +42,7 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
     fun findContent(id: Int?): LinkedList<DataHolder> {
         return LinkedList(holderList.filter { it.parentId == id }.sortedBy { it.order })
     }
-    fun findNoteContent(id: Int): LinkedList<NotePart> {
+    fun findNoteContent(id: Int?): LinkedList<NotePart> {
         return LinkedList(holderList.filterIsInstance<NotePart>().filter { it.getNote()?.id == id }.sortedBy { it.order })
     }
 
@@ -66,8 +67,11 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
         ) { it ->
             if (it > 0) {
                 if (dataHolder.id != null) idAllocator.release(dataHolder.id!!)
+                if (dataHolder is DataHolderList<*>) {
+                    if (dataHolder is Note) this.findNoteContent(dataHolder.id).reversed().forEach { delete(it) }
+                    else this.findContent(dataHolder.id).forEach { delete(it) }
+                }
                 holderList.remove(dataHolder)
-                if (dataHolder is DataHolderList<*>) this.findContent(dataHolder.id).forEach { delete(it) }
                 dataHolder.db = null // if the item is reinserted it will update its id
             }
         }

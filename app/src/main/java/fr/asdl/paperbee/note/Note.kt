@@ -9,7 +9,7 @@ import java.util.*
 class Note: Notable<NotePart>() {
 
     override val contents: LinkedList<NotePart>
-        get() = db?.findNoteContent(this.id!!) ?: LinkedList()
+        get() = db?.findNoteContent(this.id) ?: LinkedList()
 
     /**
      * Hides all the sub-elements contained in a NotePart
