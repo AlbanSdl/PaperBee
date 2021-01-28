@@ -1,14 +1,11 @@
 package fr.asdl.paperbee.activities
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.nfc.NfcAdapter
 import android.graphics.Rect
+import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -20,8 +17,8 @@ import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.*
-import fr.asdl.paperbee.nfc.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
+import fr.asdl.paperbee.nfc.NfcTag
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.DatabaseProxy.Companion.ROOT_ID
@@ -31,7 +28,6 @@ import fr.asdl.paperbee.view.DarkThemed
 class MainActivity : AppCompatActivity(), DarkThemed {
 
     val dbProxy: DatabaseProxy<*> get() = (this.application as PaperBeeApplication).dbProxy
-    private var nfcAdapter: NfcAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -215,58 +211,13 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        this.nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        if (this.nfcAdapter != null && this.nfcAdapter!!.isEnabled) {
-            try {
-                val intent =
-                    Intent(requireContext(), javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                val nfcPendingIntent =
-                    PendingIntent.getActivity(requireContext(), 0, intent, 0)
-                this.nfcAdapter!!.enableForegroundDispatch(
-                    this,
-                    nfcPendingIntent,
-                    getIntentFilters(),
-                    null
-                )
-            } catch (ex: IllegalStateException) {
-                Log.e(javaClass.simpleName, "Error enabling NFC foreground dispatch", ex)
-            }
-        }
-    }
-
-    override fun onPause() {
-        if (this.nfcAdapter != null && this.nfcAdapter!!.isEnabled) {
-            try {
-                this.nfcAdapter!!.disableForegroundDispatch(this)
-            } catch (ex: IllegalStateException) {
-                Log.e(javaClass.simpleName, "Error disabling NFC foreground dispatch", ex)
-            }
-        }
-        super.onPause()
-    }
-
-    private fun getIntentFilters(): Array<IntentFilter> {
-        val ndefFilter = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
-        val tagFilter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
-        try {
-            ndefFilter.addDataType("application/vnd.${requireContext().packageName}")
-        } catch (e: IntentFilter.MalformedMimeTypeException) {
-            Log.e(javaClass.simpleName, "Problem in parsing mime type for nfc reading", e)
-        }
-        return arrayOf(ndefFilter, tagFilter)
-    }
-
     override fun onNewIntent(intent: Intent?) {
         this.handleNfcIntent(intent)
         super.onNewIntent(intent)
     }
 
     private fun handleNfcIntent(intent: Intent?) {
-        if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
-            intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED
-        ) {
+        if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
             val currentFragment =
                 this.supportFragmentManager.findFragmentById(R.id.folder_contents) as? AppFragment
             val tag = try {
