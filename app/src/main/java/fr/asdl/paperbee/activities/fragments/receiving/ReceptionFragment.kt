@@ -1,13 +1,16 @@
 package fr.asdl.paperbee.activities.fragments.receiving
 
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.view.View
 import android.widget.TextView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.ImportFragment
-import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
+import fr.asdl.paperbee.nfc.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.exceptions.IncompatibleVersionException
 import fr.asdl.paperbee.exceptions.WrongPasswordException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -63,7 +66,14 @@ class ReceptionFragment : ReceptionBaseFragment() {
 
     override fun onNdefMessage(nfcTag: NfcTag?) {
         if (nfcTag != null && nfcTag.readData().isNotEmpty()) {
-            getScope().launch {
+            getScope().launch(Dispatchers.IO) {
+                // Notify sender that data has been read
+                val typeBytes = "application/vnd.${requireContext().packageName}".toByteArray()
+                val record1 = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, byteArrayOf(0x00, 0x01))
+                val record2 = NdefRecord.createApplicationRecord(requireContext().packageName)
+                val message = NdefMessage(record1, record2)
+                nfcTag.writeData(message)
+                // Use the data we read from tag
                 val data = nfcTag.readData()[0].records[0].payload
                 val importFrag = this@ReceptionFragment.parentFragment as ImportFragment
                 try {

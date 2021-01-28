@@ -1,23 +1,20 @@
 package fr.asdl.paperbee.activities.fragments.sharing
 
+import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
-import android.nfc.TagLostException
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.SharingFragment
 import fr.asdl.paperbee.sharing.files.FileAccessor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.IOException
 
 class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
 
     override val layoutId: Int = R.layout.share_process
-    private var ndefMessage: NdefMessage? = null
 
     override fun onLayoutInflated(view: View) {
         this.setToolBarIsClose(false)
@@ -66,38 +63,38 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
         mimeType: String = "application/vnd.${requireContext().packageName}"
     ) {
         if (byteArray == null) {
-            this.ndefMessage = null
+            requireActivity().stopService(Intent(requireActivity(), NfcShareService::class.java))
+            (this.requireActivity().application as PaperBeeApplication).apply {
+                nfcServiceListenerFrom = null
+                nfcServiceListenerTo = null
+            }
             return
         }
         val typeBytes = mimeType.toByteArray()
         val record1 = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, byteArray)
         val record2 = NdefRecord.createApplicationRecord(requireContext().packageName)
-        this.ndefMessage = NdefMessage(arrayOf(record1, record2))
-    }
-
-    override fun onNdefMessage(nfcTag: NfcTag?) {
-        if (this.ndefMessage != null && nfcTag != null) {
-            requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_running)
-            requireView().findViewById<View>(R.id.share_nfc_progress).visibility = View.VISIBLE
-            getScope().launch(Dispatchers.IO) {
-                try {
-                    nfcTag.writeData(ndefMessage!!)
-                    ndefMessage = null
-                    activity?.supportFragmentManager?.popBackStack(
-                        (this@ShareProcessFragment.parentFragment as? SharingFragment)!!.tag,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                } catch (tagLost: TagLostException) {
-                    requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_lost)
-                } catch (io: IOException) {
-                    requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_cancelled)
+        val ndef = NdefMessage(arrayOf(record1, record2))
+        (this.requireActivity().application as PaperBeeApplication).apply {
+            nfcServiceListenerFrom = { ndef }
+            nfcServiceListenerTo = {
+                when (it) {
+                    NfcShareService.RESULT_CODE_READING -> {
+                        requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_running)
+                        requireView().findViewById<View>(R.id.share_nfc_progress).visibility = View.VISIBLE
+                    }
+                    NfcShareService.RESULT_CODE_READ_FINISHED -> {
+                        activity?.supportFragmentManager?.popBackStack(
+                            (this@ShareProcessFragment.parentFragment as? SharingFragment)!!.tag,
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE
+                        )
+                    }
+                    NfcShareService.RESULT_CODE_ERROR -> {
+                        requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_error)
+                    }
                 }
-                requireView().findViewById<View>(R.id.share_nfc_progress).visibility = View.GONE
             }
-        } else if (this.ndefMessage != null) {
-            requireView().findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current_incompatible)
         }
-        super.onNdefMessage(nfcTag)
+        requireActivity().startService(Intent(requireActivity(), NfcShareService::class.java))
     }
 
 }

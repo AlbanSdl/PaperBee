@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import fr.asdl.paperbee.IntAllocator
 import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
-import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
+import fr.asdl.paperbee.nfc.NfcTag
 import fr.asdl.paperbee.sharing.files.FileAccess
 import fr.asdl.paperbee.sharing.files.FileAccessResult
 import fr.asdl.paperbee.sharing.files.FileAccessor

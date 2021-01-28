@@ -1,4 +1,4 @@
-package fr.asdl.paperbee.activities.fragments.sharing
+package fr.asdl.paperbee.nfc
 
 import android.content.Intent
 import android.nfc.*

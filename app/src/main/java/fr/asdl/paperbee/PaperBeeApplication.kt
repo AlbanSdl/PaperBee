@@ -2,6 +2,7 @@ package fr.asdl.paperbee
 
 import android.app.Application
 import android.content.Context
+import android.nfc.NdefMessage
 import fr.asdl.paperbee.storage.DatabaseProxy
 import fr.asdl.paperbee.storage.v1.DatabaseAccess
 import fr.asdl.paperbee.view.DarkThemed
@@ -13,6 +14,9 @@ class PaperBeeApplication : Application(), DarkThemed {
 
     val paperScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     lateinit var dbProxy: DatabaseProxy<*>
+
+    var nfcServiceListenerFrom: (() -> NdefMessage)? = null
+    var nfcServiceListenerTo: ((Int) -> Unit)? = null
 
     override fun requireContext(): Context {
         return this

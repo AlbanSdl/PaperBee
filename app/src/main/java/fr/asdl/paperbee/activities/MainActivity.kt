@@ -20,7 +20,7 @@ import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.*
-import fr.asdl.paperbee.activities.fragments.sharing.NfcTag
+import fr.asdl.paperbee.nfc.NfcTag
 import fr.asdl.paperbee.activities.fragments.sharing.SharingMethod
 import fr.asdl.paperbee.note.*
 import fr.asdl.paperbee.storage.DatabaseProxy

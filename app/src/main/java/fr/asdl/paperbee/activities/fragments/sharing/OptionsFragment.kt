@@ -1,5 +1,6 @@
 package fr.asdl.paperbee.activities.fragments.sharing
 
+import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,6 +25,7 @@ class OptionsFragment : ShareBaseFragment() {
         val selectorNfc = view.findViewById<RadioButton>(R.id.share_method_selector_nfc)
         val nfcAdapter = NfcAdapter.getDefaultAdapter(requireContext())
         selectorNfc.isEnabled = nfcAdapter != null && nfcAdapter.isEnabled
+                && requireActivity().packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
         when (orig.shareOptions.method) {
             SharingMethod.FILE -> selectorFile.isChecked = true
             SharingMethod.NFC -> {

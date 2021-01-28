@@ -110,9 +110,7 @@
     <string name="licensed_copyright" translatable="false">© %s, %s</string>
     <string name="share_nfc_stopped">Stopped sharing. Go back to re-run.</string>
     <string name="share_nfc_current_running">Sharing data</string>
-    <string name="share_nfc_current_lost">Decrease distance between phones</string>
-    <string name="share_nfc_current_cancelled">Operation aborted by a peer</string>
-    <string name="share_nfc_current_incompatible">Receiver is not compatible with nfc sharing</string>
+    <string name="share_nfc_current_error">An error occurred while sharing data to remote. Check phones are compatible or decrease distance between phones.</string>
     <string name="share_from_nfc_incompatible_version">Ensure the sender has the same version of the app</string>
     <string name="share_from_nfc_incompatible">Sender is not compatible with nfc sharing</string>
     <string name="format_bold">Bold</string>
@@ -124,4 +122,6 @@
     <string name="format_insert_link_dialog_name">Edit link</string>
     <string name="format_insert_link_dialog_remove">Remove link</string>
     <string name="format_insert_link_dialog_apply">Set link</string>
+    <string name="apdu_host_desc">Note sharing host</string>
+    <string name="apdu_aid_desc">Note sharing</string>
 </resources>
