@@ -15,6 +15,7 @@ import fr.asdl.paperbee.sharing.files.FileAccessor
 class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
 
     override val layoutId: Int = R.layout.share_process
+    private var serviceIntent: Intent? = null
 
     override fun onLayoutInflated(view: View) {
         this.setToolBarIsClose(false)
@@ -63,7 +64,8 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
         mimeType: String = "application/vnd.${requireContext().packageName}"
     ) {
         if (byteArray == null) {
-            requireActivity().stopService(Intent(requireActivity(), NfcShareService::class.java))
+            requireActivity().stopService(this.serviceIntent)
+            this.serviceIntent = null
             (this.requireActivity().application as PaperBeeApplication).apply {
                 nfcServiceListenerFrom = null
                 nfcServiceListenerTo = null
@@ -83,6 +85,7 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
                         requireView().findViewById<View>(R.id.share_nfc_progress).visibility = View.VISIBLE
                     }
                     NfcShareService.RESULT_CODE_READ_FINISHED -> {
+                        serviceIntent = null
                         activity?.supportFragmentManager?.popBackStack(
                             (this@ShareProcessFragment.parentFragment as? SharingFragment)!!.tag,
                             FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -94,7 +97,20 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
                 }
             }
         }
-        requireActivity().startService(Intent(requireActivity(), NfcShareService::class.java))
+        this.serviceIntent = Intent(requireActivity(), NfcShareService::class.java)
+        requireActivity().startService(this.serviceIntent!!)
+    }
+
+    override fun onPause() {
+        if (this.serviceIntent != null)
+            requireActivity().stopService(this.serviceIntent!!)
+        super.onPause()
+    }
+
+    override fun onResume() {
+        if (this.serviceIntent != null)
+            requireActivity().startService(this.serviceIntent!!)
+        super.onResume()
     }
 
 }
