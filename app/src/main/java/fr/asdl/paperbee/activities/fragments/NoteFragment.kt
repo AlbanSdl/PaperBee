@@ -3,16 +3,14 @@ package fr.asdl.paperbee.activities.fragments
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
+import androidx.core.view.doOnDetach
 import com.google.android.material.snackbar.Snackbar
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
@@ -23,9 +21,9 @@ import fr.asdl.paperbee.note.bindings.NotePartEditor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.RichTextSpan
-import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.options.FontColor
+import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.rounded.RoundedImageView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 
@@ -37,6 +35,15 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
     override val styleId: Int = R.style.EditorTheme
     private var focusedNote: NotePart? = null
     private var currentEditor: NotePartEditor? = null
+    private val focusWatcher = (object : ViewTreeObserver.OnGlobalFocusChangeListener {
+        override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
+            val rec = view?.findViewById<SentientRecyclerView>(R.id.note_editor_elements) ?: return
+            focusedNote = if (newFocus != null) (rec.adapter as NotePartEditorAdapter).getHeldItem(
+                rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1
+            ) else null
+            updateContextToolbarEnabled(rec.rootView)
+        }
+    })
 
     override fun onLayoutInflated(view: View) {
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
@@ -80,12 +87,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         rec.addItemDecoration(NotePartDecoration())
         val adapter = NotePartEditorAdapter(notable)
         rec.adapter = adapter
-        rec.viewTreeObserver.addOnGlobalFocusChangeListener { _, newFocus ->
-            this.focusedNote = if (newFocus != null) adapter.getHeldItem(
-                rec.findContainingViewHolder(newFocus)?.adapterPosition ?: -1
-            ) else null
-            this.updateContextToolbarEnabled(rec.rootView)
-        }
+        rec.viewTreeObserver.addOnGlobalFocusChangeListener(focusWatcher)
+        rec.doOnDetach { it.viewTreeObserver.removeOnGlobalFocusChangeListener(focusWatcher) }
     }
 
     private fun updateContextToolbarEnabled(viewFrom: View) {
@@ -148,28 +151,36 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.background_color, R.id.font_color -> {
                 val spanType = RichTextSpan.findSpanType { it.id == v.id } ?: return
                 val current = this.currentEditor?.getCurrentSelectionFullSpan(spanType)
-                ColorPicker(requireContext(), FontColor.values(), current?.extra as FontColor?, false,
-                    colorContext = RichTextSpan.getColorTheme(requireContext(), spanType)) {
+                ColorPicker(
+                    requireContext(), FontColor.values(), current?.extra as FontColor?, false,
+                    colorContext = RichTextSpan.getColorTheme(requireContext(), spanType)
+                ) {
                     this.currentEditor?.applyButtonSpanWithExtra(v.id, it)
                 }
             }
             R.id.insert_link -> {
-                val current = this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
+                val current =
+                    this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
                 lateinit var dialog: AlertDialog
                 dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
                     .setTitle(R.string.format_insert_link_dialog_name)
                     .setView(R.layout.editor_format_link_insert)
-                    .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ -> dial.dismiss(); this.currentEditor?.applyButtonSpanWithExtra(
+                    .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ ->
+                        dial.dismiss(); this.currentEditor?.applyButtonSpanWithExtra(
                         v.id,
                         null
-                    ) }
+                    )
+                    }
                     .setNeutralButton(android.R.string.cancel) { dial, _ -> dial.dismiss() }
-                    .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ -> this.currentEditor?.applyButtonSpanWithExtra(
-                        v.id,
-                        dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
-                    ); dial.dismiss(); }
+                    .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ ->
+                        this.currentEditor?.applyButtonSpanWithExtra(
+                            v.id,
+                            dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
+                        ); dial.dismiss()
+                    }
                     .show()
-                dialog.findViewById<EditText>(R.id.insert_link_edit)?.setText(current?.extra as String?)
+                dialog.findViewById<EditText>(R.id.insert_link_edit)
+                    ?.setText(current?.extra as String?)
             }
         }
     }
