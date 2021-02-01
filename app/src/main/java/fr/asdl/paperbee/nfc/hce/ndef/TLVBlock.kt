@@ -4,6 +4,8 @@ import android.nfc.NdefMessage
 
 class TLVBlock(val id: Int, var type: Type, var access: FileAccess, var content: NdefMessage) {
 
+    var rawData: ByteArray = content.toByteArray()
+
     enum class Type(val code: Byte) {
         NDEF(0x04), PROPRIETARY(0x05)
     }

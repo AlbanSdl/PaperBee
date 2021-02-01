@@ -13,6 +13,8 @@ class NfcShareService : NdefCard() {
         const val RESULT_CODE_ERROR = 0x200
     }
 
+    private val id = byteArrayOf(0xF7.toByte(), 0x14, 0x28, 0x26, 0x02, 0x80.toByte(), 0x01)
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val ndef = (this.application as PaperBeeApplication).nfcServiceListenerFrom?.invoke()
         if (ndef != null) this.cc.addNdefMessage(ndef, false)
@@ -29,9 +31,7 @@ class NfcShareService : NdefCard() {
         this.stopSelf()
     }
 
-    override fun getTagId(): ByteArray {
-        return byteArrayOf(0xF7.toByte(), 0x14, 0x28, 0x26, 0x02, 0x80.toByte(), 0x01)
-    }
+    override fun getTagId(): ByteArray = id
 
     override fun onDeactivated(reason: Int) {
         super.onDeactivated(reason)
