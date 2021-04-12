@@ -13,13 +13,13 @@ import fr.asdl.paperbee.IndexRange
 import fr.asdl.paperbee.note.TextNotePart
 
 abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet: AttributeSet) :
-    AppCompatEditText(context, attributeSet), TextWatcher {
+    AppCompatEditText(context, attributeSet), TextWatcher, UrlSpanLongClickListener {
 
     private var mAttachedElement: T? = null
     private var mAttachedSpannable: RichSpannable? = null
 
     init {
-        this.movementMethod = LinkMovementMethod.getInstance()
+        this.movementMethod = LongClickLinkMovementMethod.instance
     }
 
     final override fun onSelectionChanged(selStart: Int, selEnd: Int) {

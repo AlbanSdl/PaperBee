@@ -21,6 +21,7 @@ import fr.asdl.paperbee.note.bindings.NotePartEditor
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_EXTRA
 import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NAME_PAYLOAD
 import fr.asdl.paperbee.view.RichTextSpan
+import fr.asdl.paperbee.view.RichTextUrlSpan
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.options.FontColor
 import fr.asdl.paperbee.view.options.NoteColor
@@ -118,6 +119,10 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         this.currentEditor = if (hasSelection) editor else null
     }
 
+    fun onUrlLongClick(urlSpan: RichTextUrlSpan, from: NotePartEditor) {
+        this.openUrlEditDialog(RichTextSpan(urlSpan, requireContext()))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> activity?.onBackPressed()
@@ -140,6 +145,29 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         return true
     }
 
+    private fun openUrlEditDialog(current: RichTextSpan?) {
+        lateinit var dialog: AlertDialog
+        dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
+            .setTitle(R.string.format_insert_link_dialog_name)
+            .setView(R.layout.editor_format_link_insert)
+            .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ ->
+                dial.dismiss(); this.currentEditor?.applyButtonSpanWithExtra(
+                R.id.insert_link,
+                null
+            )
+            }
+            .setNeutralButton(android.R.string.cancel) { dial, _ -> dial.dismiss() }
+            .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ ->
+                this.currentEditor?.applyButtonSpanWithExtra(
+                    R.id.insert_link,
+                    dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
+                ); dial.dismiss()
+            }
+            .show()
+        dialog.findViewById<EditText>(R.id.insert_link_edit)
+            ?.setText(current?.extra as String?)
+    }
+
     override fun onClick(v: View?) {
         if (v == null) return
         when (v.id) {
@@ -160,30 +188,8 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                     this.currentEditor?.applyButtonSpanWithExtra(v.id, currentColor)
                 }
             }
-            R.id.insert_link -> {
-                val current =
-                    this.currentEditor?.getCurrentSelectionFullSpan(RichTextSpan.findSpanType { it.id == v.id })
-                lateinit var dialog: AlertDialog
-                dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
-                    .setTitle(R.string.format_insert_link_dialog_name)
-                    .setView(R.layout.editor_format_link_insert)
-                    .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ ->
-                        dial.dismiss(); this.currentEditor?.applyButtonSpanWithExtra(
-                        v.id,
-                        null
-                    )
-                    }
-                    .setNeutralButton(android.R.string.cancel) { dial, _ -> dial.dismiss() }
-                    .setPositiveButton(R.string.format_insert_link_dialog_apply) { dial, _ ->
-                        this.currentEditor?.applyButtonSpanWithExtra(
-                            v.id,
-                            dialog.findViewById<EditText>(R.id.insert_link_edit)!!.text.toString()
-                        ); dial.dismiss()
-                    }
-                    .show()
-                dialog.findViewById<EditText>(R.id.insert_link_edit)
-                    ?.setText(current?.extra as String?)
-            }
+            R.id.insert_link -> openUrlEditDialog(currentEditor?.getCurrentSelectionFullSpan(
+                RichTextSpan.findSpanType { it.id == v.id }))
         }
     }
 
@@ -203,6 +209,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 val textView = (holder.findViewById(R.id.note_text) as? NotePartEditor)
                 textView?.attach(content)
                 textView?.setSelectionListener(this@NoteFragment::onUserSelection)
+                textView?.setUrlLongClickListener(this@NoteFragment::onUrlLongClick)
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)

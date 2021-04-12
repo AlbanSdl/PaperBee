@@ -6,14 +6,12 @@ import androidx.annotation.IdRes
 import fr.asdl.paperbee.note.NotePart
 import fr.asdl.paperbee.note.TextNotePart
 import fr.asdl.paperbee.storage.v1.NotableContract
-import fr.asdl.paperbee.view.RichSpannable
-import fr.asdl.paperbee.view.RichTextEditable
-import fr.asdl.paperbee.view.RichTextSpan
-import fr.asdl.paperbee.view.RichTextSpanType
+import fr.asdl.paperbee.view.*
 
 class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEditable<TextNotePart>(context, attributeSet) {
 
     private var selectionListener: ((Boolean, NotePartEditor) -> Unit)? = null
+    private var longClickListener: ((RichTextUrlSpan, NotePartEditor) -> Unit)? = null
 
     override fun onTextUpdated(updated: RichSpannable, attachedElement: TextNotePart) {
         if (attachedElement is NotePart) {
@@ -29,8 +27,16 @@ class NotePartEditor(context: Context, attributeSet: AttributeSet): RichTextEdit
         this.selectionListener?.invoke(hasSelection, this)
     }
 
+    override fun onUrlLongClick(span: RichTextUrlSpan) {
+        this.longClickListener?.invoke(span, this)
+    }
+
     fun setSelectionListener(listener: (Boolean, NotePartEditor) -> Unit) {
         this.selectionListener = listener
+    }
+
+    fun setUrlLongClickListener(listener: (RichTextUrlSpan, NotePartEditor) -> Unit) {
+        this.longClickListener = listener
     }
 
     fun applyButtonSpan(@IdRes buttonId: Int) {

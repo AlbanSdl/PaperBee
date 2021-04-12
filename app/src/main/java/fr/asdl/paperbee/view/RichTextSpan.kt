@@ -47,9 +47,7 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
                     color
                 )
             }
-            RichTextSpanType.LINK -> {
-                URLSpan(extra as String)
-            }
+            RichTextSpanType.LINK -> RichTextUrlSpan(extra as String)
         } else if (raw == null) throw ContextLostException()
         return raw
     }
