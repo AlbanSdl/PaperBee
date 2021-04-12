@@ -71,13 +71,15 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * inserted char right after the span will be included too.
      */
     protected fun applySpan(span: RichTextSpan) {
-        if (span.type.hasExtra && span.getExtraAsString() == null) {
+        if (span.type.hasExtra && span.getExtraAsString() == null && span.type != RichTextSpanType.LINK) {
             Log.wtf(javaClass.simpleName, "Cannot use null extra !")
             return
         }
 
-        fun applySpan(span: RichTextSpan, range: IndexRange) =
+        fun applySpan(span: RichTextSpan, range: IndexRange) {
+            if (span.type == RichTextSpanType.LINK && span.extra == null) return
             mAttachedSpannable!!.setSpan(span, range.start, range.end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        }
 
         if (this.hasSelection()) {
             val selection = IndexRange(selectionStart, selectionEnd)
