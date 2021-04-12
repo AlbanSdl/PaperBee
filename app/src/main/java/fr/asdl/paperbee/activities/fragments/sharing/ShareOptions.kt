@@ -7,6 +7,7 @@ import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
 import fr.asdl.paperbee.sharing.files.FileAccessContext
 import fr.asdl.paperbee.view.sentient.DataHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ShareOptions {
@@ -21,9 +22,10 @@ class ShareOptions {
     /**
      * Uses the current configuration to share asynchronously the given data.
      */
-    fun process(context: ShareProcessFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit) {
+    fun process(context: ShareProcessFragment, data: List<Notable<*>>, callback: (Boolean) -> Unit,
+                processingFinished: (() -> Unit)? = null) {
         sharingStarted = true
-        context.getScope().launch {
+        context.getScope().launch(Dispatchers.IO) {
             val encryptedByteArray =
                 shareProcess.encryptToFile(if (password.isEmpty()) null else password, data) { it ->
                     val fullList = arrayListOf<DataHolder>()
@@ -31,6 +33,8 @@ class ShareOptions {
                     it.forEach { if (it is Note) fullList.addAll(it.db!!.findNoteContent(it.id)) }
                     return@encryptToFile fullList
                 }
+            if (processingFinished != null)
+                context.requireActivity().runOnUiThread(processingFinished)
             when (this@ShareOptions.method) {
                 SharingMethod.NFC -> {
                     context.requireActivity().runOnUiThread {
@@ -38,21 +42,19 @@ class ShareOptions {
                     }
                 }
                 SharingMethod.FILE -> {
-                    context.getScope().launch {
-                        val accessedFile = context.createFile(
-                            context.getString(R.string.share_to_file_filename),
-                            null,
-                            encryptedByteArray
-                        )
-                        sharingStarted = false
-                        if (accessedFile.result.hasPerformed()) {
-                            Snackbar.make(
-                                context.requireActivity().findViewById(R.id.main),
-                                    accessedFile.result.getActionDetails(FileAccessContext.CREATION),
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                            callback.invoke(accessedFile.result.success)
-                        }
+                    val accessedFile = context.createFile(
+                        context.getString(R.string.share_to_file_filename),
+                        null,
+                        encryptedByteArray
+                    )
+                    sharingStarted = false
+                    if (accessedFile.result.hasPerformed()) {
+                        Snackbar.make(
+                            context.requireActivity().findViewById(R.id.main),
+                                accessedFile.result.getActionDetails(FileAccessContext.CREATION),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        callback.invoke(accessedFile.result.success)
                     }
                 }
             }

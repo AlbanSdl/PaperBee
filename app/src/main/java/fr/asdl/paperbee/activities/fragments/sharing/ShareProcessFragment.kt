@@ -29,7 +29,8 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
             }
             view.findViewById<View>(R.id.share_file_group).visibility = View.VISIBLE
             view.findViewById<View>(R.id.share_to_file_button).setOnClickListener {
-                orig.shareOptions.process(this, orig.selection) { success ->
+                it.isEnabled = false
+                orig.shareOptions.process(this, orig.selection, { success ->
                     if (success)
                         activity?.supportFragmentManager?.popBackStack(
                             orig.tag,
@@ -38,12 +39,12 @@ class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
                     else
                         view.findViewById<TextView>(R.id.share_to_file_header).text =
                             getString(R.string.share_to_file_failed_retry)
-                }
+                }) {  it.isEnabled = true }
             }
         } else if (orig.shareOptions.method == SharingMethod.NFC) {
             view.findViewById<View>(R.id.share_nfc_group).visibility = View.VISIBLE
             view.findViewById<TextView>(R.id.share_nfc_message).setText(R.string.share_nfc_current)
-            orig.shareOptions.process(this, orig.selection) { }
+            orig.shareOptions.process(this, orig.selection, { })
             val fab = view.findViewById<FloatingActionButton>(R.id.next)
             fab.isEnabled = orig.shareOptions.isStoppable()
             fab.setOnClickListener {
