@@ -44,6 +44,10 @@
         <item name="buttonBarPositiveButtonStyle">@style/ColorPickerTheme.ButtonEnd</item>
     </style>
 
+    <style name="UrlEditorTheme" parent="ColorPickerTheme">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
     <style name="ColorPickerTheme.Button" parent="android:Widget.Material.ButtonBar.AlertDialog">
         <item name="android:backgroundTint">@color/colorAccent</item>
         <item name="android:textColor">@color/blank</item>

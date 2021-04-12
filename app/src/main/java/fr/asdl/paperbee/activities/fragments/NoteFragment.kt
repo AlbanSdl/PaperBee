@@ -147,7 +147,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
 
     private fun openUrlEditDialog(current: RichTextSpan?) {
         lateinit var dialog: AlertDialog
-        dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
+        dialog = AlertDialog.Builder(requireContext(), R.style.UrlEditorTheme)
             .setTitle(R.string.format_insert_link_dialog_name)
             .setView(R.layout.editor_format_link_insert)
             .setNegativeButton(R.string.format_insert_link_dialog_remove) { dial, _ ->
@@ -164,6 +164,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 ); dial.dismiss()
             }
             .show()
+        dialog.window?.setBackgroundDrawableResource(R.color.pickerBackground)
         dialog.findViewById<EditText>(R.id.insert_link_edit)
             ?.setText(current?.extra as String?)
     }
