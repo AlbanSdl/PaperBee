@@ -119,7 +119,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         this.currentEditor = if (hasSelection) editor else null
     }
 
-    fun onUrlLongClick(urlSpan: RichTextUrlSpan, from: NotePartEditor) {
+    fun onUrlLongClick(urlSpan: RichTextUrlSpan) {
         this.openUrlEditDialog(RichTextSpan(urlSpan, requireContext()))
     }
 
@@ -209,7 +209,7 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
                 val textView = (holder.findViewById(R.id.note_text) as? NotePartEditor)
                 textView?.attach(content)
                 textView?.setSelectionListener(this@NoteFragment::onUserSelection)
-                textView?.setUrlLongClickListener(this@NoteFragment::onUrlLongClick)
+                textView?.setUrlLongClickListener { span, _ -> this@NoteFragment.onUrlLongClick(span) }
             }
             if (content is CheckableNotePart) {
                 val checkBox = (holder.findViewById(R.id.note_checkbox) as? CheckBox)
