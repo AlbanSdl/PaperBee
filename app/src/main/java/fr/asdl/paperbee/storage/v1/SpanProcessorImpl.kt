@@ -53,7 +53,7 @@ class SpanProcessorImpl : SpanProcessor {
     override fun serialize(context: Context, editable: RichSpannable): String {
         val serialized = StringBuilder(escapeText(editable.toString()))
         val mappedSpan = hashMapOf<IndexRange, RichTextSpan>()
-        editable.getSpans(0, editable.length, null).forEach {
+        editable.getContainedSpans(0, editable.length, null).forEach {
             val range = IndexRange(editable.getSpanStart(it), editable.getSpanEnd(it))
             if (range.length > 1)
                 mappedSpan[range] = it

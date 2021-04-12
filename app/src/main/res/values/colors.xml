@@ -26,12 +26,12 @@
     <color name="noteColorOrange">#FFEEDC</color>
     <color name="noteColorRose">#FCE4F2</color>
     <!-- Highlight colors (if light theme, text colors otherwise) -->
-    <color name="auxColorRed">#FFBEBE</color>
-    <color name="auxColorGreen">#B6F5BE</color>
-    <color name="auxColorBlue">#BBCAFD</color>
-    <color name="auxColorYellow">#FFFFB4</color>
-    <color name="auxColorCyan">#B8E3E6</color>
-    <color name="auxColorMagenta">#F3BDF5</color>
-    <color name="auxColorOrange">#FFD2AA</color>
-    <color name="auxColorRose">#F2AAC8</color>
+    <color name="auxColorRed">#80FFBEBE</color>
+    <color name="auxColorGreen">#80B6F5BE</color>
+    <color name="auxColorBlue">#80BBCAFD</color>
+    <color name="auxColorYellow">#80FFFFB4</color>
+    <color name="auxColorCyan">#80B8E3E6</color>
+    <color name="auxColorMagenta">#80F3BDF5</color>
+    <color name="auxColorOrange">#80FFD2AA</color>
+    <color name="auxColorRose">#80F2AAC8</color>
 </resources>

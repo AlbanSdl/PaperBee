@@ -52,13 +52,14 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
     }
 
     protected fun getSelectionSpans(type: RichTextSpanType? = null): Array<RichTextSpan> {
-        return mAttachedSpannable?.getSpans(selectionStart, selectionEnd, type) ?: arrayOf()
+        return mAttachedSpannable?.getContainingSpans(selectionStart, selectionEnd, type) ?: arrayOf()
     }
 
     private fun updateContent() {
         val selection = IndexRange(selectionStart, selectionEnd)
         text = this.mAttachedSpannable!!
         setSelection(selection.start, selection.end)
+        this.performLongClick() // Keeping action mode ready on click
         this.onSelectionChanged(selectionStart, selectionEnd)
         onTextUpdated(this.mAttachedSpannable!!, mAttachedElement!!)
     }
@@ -70,33 +71,60 @@ abstract class RichTextEditable<T: TextNotePart>(context: Context, attributeSet:
      * inserted char right after the span will be included too.
      */
     protected fun applySpan(span: RichTextSpan) {
+        if (span.type.hasExtra && span.getExtraAsString() == null) {
+            Log.wtf(javaClass.simpleName, "Cannot use null extra !")
+            return
+        }
+
+        fun applySpan(span: RichTextSpan, range: IndexRange) =
+            mAttachedSpannable!!.setSpan(span, range.start, range.end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+
         if (this.hasSelection()) {
-            val coverage = arrayListOf<IndexRange>()
-            for (i in this.getSelectionSpans(span.type)) {
-                val startIndex = this.mAttachedSpannable!!.getSpanStart(i)
-                val endIndex = this.mAttachedSpannable!!.getSpanEnd(i)
+            val selection = IndexRange(selectionStart, selectionEnd)
+            val pendingSpans = hashMapOf<IndexRange, RichTextSpan>()
+            for (i in this.getSelectionSpans(span.type))
                 this.mAttachedSpannable!!.apply {
+                    pendingSpans[IndexRange(this.getSpanStart(i), this.getSpanEnd(i))] = i
                     removeSpan(i)
-                    coverage.add(IndexRange(startIndex, endIndex))
-                    if (selectionStart > startIndex)
-                        setSpan(span, startIndex, selectionStart, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                    if (selectionEnd < endIndex)
-                        setSpan(span, selectionEnd, endIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                    if (IndexRange.merge(*coverage.toTypedArray()).contains(
-                            IndexRange(selectionStart, selectionEnd)
-                        ) && i.extra == span.extra)
-                        return@applySpan this@RichTextEditable.updateContent()
+                }
+
+            val removal = pendingSpans.entries.find {
+                it.key.contains(selection) && it.value.extra == span.extra
+            }?.key
+            if (removal == null) pendingSpans[selection] = span
+            else {
+                if (selection.contains(removal)) pendingSpans.remove(removal)
+                else {
+                    var used = false
+                    if (removal.start < selectionStart) {
+                        pendingSpans[IndexRange(removal.start, selectionStart)] = span
+                        used = true
+                    }
+                    if (removal.end > selectionEnd)
+                        pendingSpans[IndexRange(selectionEnd, removal.end)] = if (used) span.copy() else span
                 }
             }
-            if (!span.type.hasExtra || span.getExtraAsString() != null) {
-                this.mAttachedSpannable!!.setSpan(
-                    span,
-                    this.selectionStart,
-                    this.selectionEnd,
-                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-                )
-            } else
-                Log.e(javaClass.simpleName, "Cannot apply span: missing extra !")
+
+            IndexRange.group(*pendingSpans.filter { entry -> entry.value.extra == span.extra }
+                .map { it.key }.toTypedArray()).forEach {
+                applySpan(span.copy(), it)
+            }
+
+            for (r in pendingSpans.filter { entry -> entry.value.extra != span.extra }) {
+                if (r.key.and(selection)?.length?.compareTo(0) == 1) {
+                    if (selection.contains(r.key))
+                        continue
+                    else if (r.key.contains(selection)) {
+                        applySpan(r.value.copy(), IndexRange(selectionEnd, r.key.end))
+                        r.key.shift(0, selectionStart - r.key.end)
+                    }
+                    else if (r.key.start in selectionStart..selectionEnd)
+                        r.key.shift(selectionEnd - r.key.start, 0)
+                    else r.key.shift(0, selectionStart - r.key.end)
+                }
+                if (r.key.length > 0) applySpan(r.value, r.key)
+            }
+
             this.updateContent()
         }
     }

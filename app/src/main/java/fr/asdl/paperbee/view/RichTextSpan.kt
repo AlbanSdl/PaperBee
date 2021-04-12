@@ -54,6 +54,10 @@ class RichTextSpan private constructor(val type: RichTextSpanType, val extra: An
         return raw
     }
 
+    fun copy(): RichTextSpan {
+        return RichTextSpan(this.type, this.extra)
+    }
+
     companion object {
 
         private fun getSpanType(span: CharacterStyle): RichTextSpanType? {

@@ -14,11 +14,15 @@ class IndexRange(start: Int, end: Int) {
 
     var start
         get() = _start
-        private set(value) { _start = value }
+        private set(value) {
+            _start = value
+        }
 
     var end
         get() = _end
-        private set(value) { _end = value }
+        private set(value) {
+            _end = value
+        }
 
     init {
         if (length <= 0) throw IllegalArgumentException("Bad range definition. Start and end are inverted.")
@@ -71,6 +75,10 @@ class IndexRange(start: Int, end: Int) {
         this.end += end
     }
 
+    override fun toString(): String {
+        return "IndexRange([$start;$end[)"
+    }
+
     val length get() = end - start + 1
 
     companion object {
@@ -103,6 +111,27 @@ class IndexRange(start: Int, end: Int) {
                 }
             }
             return iRanges.maxByOrNull { it.length } ?: throw IllegalArgumentException()
+        }
+
+        /**
+         * Merges index ranges together. Disjoint ranges won't be merged.
+         * Example:
+         * group(IndexRange(1, 5), IndexRange(4, 6), IndexRange(7, 9))
+         * is equivalent to [IndexRange(1, 6), IndexRange(7, 9)]
+         */
+        fun group(vararg ranges: IndexRange): Array<IndexRange> {
+            val outRanges = arrayListOf<IndexRange>()
+            for (i in ranges.toList()) {
+                val collided = outRanges.filter { it.and(i)?.length?.compareTo(0) == 1 }
+                if (collided.isNotEmpty()) {
+                    outRanges.removeAll(collided)
+                    outRanges.add(IndexRange(minOf(i.start, *collided.map { it.start }.toIntArray()),
+                        maxOf(i.end, *collided.map { it.end }.toIntArray())))
+                } else {
+                    outRanges.add(i);
+                }
+            }
+            return outRanges.toTypedArray()
         }
     }
 }

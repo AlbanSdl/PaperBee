@@ -23,12 +23,12 @@
     <color name="noteColorOrange">#321900</color>
     <color name="noteColorRose">#320023</color>
 
-    <color name="auxColorRed">#692828</color>
-    <color name="auxColorGreen">#205F28</color>
-    <color name="auxColorBlue">#253467</color>
-    <color name="auxColorYellow">#7D7D28</color>
-    <color name="auxColorCyan">#224D50</color>
-    <color name="auxColorMagenta">#5D275F</color>
-    <color name="auxColorOrange">#693C28</color>
-    <color name="auxColorRose">#5C2846</color>
+    <color name="auxColorRed">#80692828</color>
+    <color name="auxColorGreen">#80205F28</color>
+    <color name="auxColorBlue">#80253467</color>
+    <color name="auxColorYellow">#807D7D28</color>
+    <color name="auxColorCyan">#80224D50</color>
+    <color name="auxColorMagenta">#805D275F</color>
+    <color name="auxColorOrange">#80693C28</color>
+    <color name="auxColorRose">#805C2846</color>
 </resources>

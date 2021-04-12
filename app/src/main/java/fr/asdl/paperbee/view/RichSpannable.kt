@@ -32,12 +32,33 @@ class RichSpannable private constructor(context: Context, clearedText: Editable)
 
     private val spans = arrayListOf<RichTextSpan>()
 
-    fun getSpans(queryStart: Int, queryEnd: Int, type: RichTextSpanType?): Array<RichTextSpan> {
+    /**
+     * Returns all Spans containing the selection defined with [queryStart; queryEnd]
+     * You may also be looking for [getContainedSpans]
+     */
+    fun getContainingSpans(queryStart: Int, queryEnd: Int, type: RichTextSpanType?): Array<RichTextSpan> {
         return spans.filter {
             if (type == null || it.type === type) {
                 val sStart = getSpanStart(it)
                 val sEnd = getSpanEnd(it)
-                if (sStart >= 0 && sEnd >= 0 && (sStart in queryStart..queryEnd || sEnd in queryStart..queryEnd))
+                if (sStart >= 0 && sEnd >= 0 && (queryStart in sStart..sEnd || queryEnd in sStart..sEnd))
+                    return@filter true
+            }
+            false
+        }.toTypedArray()
+    }
+
+    /**
+     * Returns all Spans contained in the selection defined with [queryStart; queryEnd]
+     * You may also be looking for [getContainingSpans]
+     */
+    fun getContainedSpans(queryStart: Int, queryEnd: Int, type: RichTextSpanType?): Array<RichTextSpan> {
+        return spans.filter {
+            if (type == null || it.type === type) {
+                val sStart = getSpanStart(it)
+                val sEnd = getSpanEnd(it)
+                if (sStart >= 0 && sEnd >= 0 && (sStart in queryStart..queryEnd
+                            || sEnd in queryStart..queryEnd))
                     return@filter true
             }
             false
@@ -47,7 +68,7 @@ class RichSpannable private constructor(context: Context, clearedText: Editable)
     @Deprecated("Spans should not be queried this way. This includes spans added by " +
             "third party apps such as temporary spans from auto-corrector",
         ReplaceWith("getSpans(queryStart, queryEnd, type)"))
-    override fun <T : Any?> getSpans(queryStart: Int, queryEnd: Int, kind: Class<T>?): Array<T> {
+    fun <T : Any?> getContainingSpans(queryStart: Int, queryEnd: Int, kind: Class<T>?): Array<T> {
         return super.getSpans(queryStart, queryEnd, kind)
     }
 

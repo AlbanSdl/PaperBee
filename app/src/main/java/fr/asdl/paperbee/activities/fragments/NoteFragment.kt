@@ -151,11 +151,13 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
             R.id.background_color, R.id.font_color -> {
                 val spanType = RichTextSpan.findSpanType { it.id == v.id } ?: return
                 val current = this.currentEditor?.getCurrentSelectionFullSpan(spanType)
+                var currentColor = current?.extra as FontColor?
                 ColorPicker(
-                    requireContext(), FontColor.values(), current?.extra as FontColor?, false,
+                    requireContext(), FontColor.values(), currentColor, false,
                     colorContext = RichTextSpan.getColorTheme(requireContext(), spanType)
                 ) {
-                    this.currentEditor?.applyButtonSpanWithExtra(v.id, it)
+                    currentColor = it ?: currentColor
+                    this.currentEditor?.applyButtonSpanWithExtra(v.id, currentColor)
                 }
             }
             R.id.insert_link -> {

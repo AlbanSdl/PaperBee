@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:autofillHints="@string/note_content"
         android:background="@android:color/transparent"
+        android:cursorVisible="true"
         android:hint="@string/note_content"
         android:inputType="textMultiLine"
         android:textColor="@color/almostDark"
