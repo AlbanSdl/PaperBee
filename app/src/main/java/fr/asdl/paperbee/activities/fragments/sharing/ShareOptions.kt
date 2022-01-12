@@ -5,7 +5,6 @@ import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.Notable
 import fr.asdl.paperbee.note.Note
 import fr.asdl.paperbee.sharing.ShareProcess
-import fr.asdl.paperbee.sharing.files.FileAccessContext
 import fr.asdl.paperbee.view.sentient.DataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,20 +41,14 @@ class ShareOptions {
                     }
                 }
                 SharingMethod.FILE -> {
-                    val accessedFile = context.createFile(
-                        context.getString(R.string.share_to_file_filename),
-                        null,
-                        encryptedByteArray
-                    )
+                    val success = context.createFile(context.getString(R.string.share_to_file_filename), encryptedByteArray)
+                    Snackbar.make(
+                        context.requireActivity().findViewById(R.id.main),
+                        if (success) R.string.shared_to_file_ok else R.string.shared_to_file_exception,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                     sharingStarted = false
-                    if (accessedFile.result.hasPerformed()) {
-                        Snackbar.make(
-                            context.requireActivity().findViewById(R.id.main),
-                                accessedFile.result.getActionDetails(FileAccessContext.CREATION),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                        callback.invoke(accessedFile.result.success)
-                    }
+                    callback.invoke(success)
                 }
             }
         }

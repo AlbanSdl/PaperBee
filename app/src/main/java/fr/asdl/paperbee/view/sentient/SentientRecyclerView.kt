@@ -3,13 +3,16 @@ package fr.asdl.paperbee.view.sentient
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.paperbee.Fade
 import fr.asdl.paperbee.R
+import fr.asdl.paperbee.activities.fragments.AppFragment
 
 /**
  * A special [RecyclerView] that feels the presence of content in its data set.
@@ -78,6 +81,10 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
         rightUnderSwipeableViewRes = attributes.getResourceId(R.styleable.SentientRecyclerView_rightUnderSwipeableView, -1)
         attributes.recycle()
         if (this.layoutManager == null) this.layoutManager = SentientLinearLayoutManager(context)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         if (swipeDirection != 0) ItemTouchHelper(SentientSwipeBehaviour(swipeDirection,this)).attachToRecyclerView(this)
     }
 
@@ -99,7 +106,7 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
     private val emptyObserver: AdapterDataObserver = object : AdapterDataObserver() {
         private fun setupEmptyView(): Boolean {
             if (emptyView == null) {
-                emptyView = rootView.findViewById(emptyViewRes)
+                emptyView = (this@SentientRecyclerView.parent as View).findViewById(emptyViewRes)
                 if (emptyView == null) return false
             }
             return true

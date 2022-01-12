@@ -1,7 +1,6 @@
 package fr.asdl.paperbee.activities.fragments
 
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
@@ -44,10 +43,6 @@ class PreferenceLicenseFragment : AppFragment() {
 
     override fun onLayoutInflated(view: View) {
         (this.parentFragment as PreferenceFragmentRoot).setToolbarTitle(R.string.pref_app_third_party_license)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         val resources = requireContext().resources
         val libNames = resources.getStringArray(R.array.libs_name)
         val libsAuthors = resources.getStringArray(R.array.libs_author)

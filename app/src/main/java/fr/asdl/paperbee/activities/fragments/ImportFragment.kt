@@ -19,6 +19,12 @@ class ImportFragment : AppFragment(), FragmentContainer<ReceptionBaseFragment> {
     var content: List<DataHolder>? = null
     var destination: NoteFolder? = null
 
+    override val transitionIn: Int
+        get() = R.transition.slide_bottom
+
+    override val transitionOut: Int
+        get() = R.transition.folder_explode
+
     override val shouldRetainInstance: Boolean = true
 
     override val layoutId: Int = R.layout.share_layout

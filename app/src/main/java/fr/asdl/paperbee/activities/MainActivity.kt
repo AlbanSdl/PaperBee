@@ -6,13 +6,13 @@ import android.graphics.Rect
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.transition.TransitionInflater
 import com.google.android.material.navigation.NavigationView
 import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
                 R.id.drawer_settings -> {
                     val preferences = PreferenceFragmentRoot()
                     preferences.allowEnterTransitionOverlap = true
-                    this.loadFragment(preferences, "preferences", FragmentTransition.SLIDE_BOTTOM)
+                    this.loadFragment(preferences, "preferences")
                 }
                 R.id.goto_trash -> {
                     this.openNotable(dbProxy.findElementById(DatabaseProxy.TRASH_ID) as NoteFolder)
@@ -92,14 +92,14 @@ class MainActivity : AppCompatActivity(), DarkThemed {
         val fragment = SharingFragment()
         fragment.from(notable)
         fragment.allowEnterTransitionOverlap = true
-        this.loadFragment(fragment, "share${notable.id!!}", FragmentTransition.SLIDE_BOTTOM)
+        this.loadFragment(fragment, "share${notable.id!!}")
     }
 
     fun openImport(method: SharingMethod? = null): ImportFragment {
         val fragment = ImportFragment()
         if (method != null) fragment.method = method
         fragment.allowEnterTransitionOverlap = true
-        this.loadFragment(fragment, "import", FragmentTransition.SLIDE_BOTTOM)
+        this.loadFragment(fragment, "import")
         return fragment
     }
 
@@ -112,56 +112,37 @@ class MainActivity : AppCompatActivity(), DarkThemed {
             notable as Note
         ),
         if (addToBackStack) notable.id.toString() else null,
-        if (notable.id == ROOT_ID) FragmentTransition.LOADING_FADE else if (notable is NoteFolder) FragmentTransition.SLIDE else FragmentTransition.EXPLODE,
         *sharedViews
     )
 
     private fun loadFragment(
-        frag: AppFragment, addToBackStackTag: String?,
-        transition: FragmentTransition? = null, vararg sharedViews: View
+        frag: AppFragment, addToBackStackTag: String?, vararg sharedViews: View
     ) {
-
-        if (transition != null) {
-            val transitionInflater = TransitionInflater.from(this@MainActivity)
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.folder_contents)
-            if (currentFragment != null) {
-                if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                    currentFragment.sharedElementReturnTransition =
-                        transitionInflater.inflateTransition(R.transition.shared_elements_transition)
-                    currentFragment.exitTransition =
-                        transitionInflater.inflateTransition(transition.animOut)
-                } else {
-                    currentFragment.exitTransition =
-                        transitionInflater.inflateTransition(FragmentTransition.SLIDE.animOut)
-                }
-            }
-            if (sharedViews.isNotEmpty() || transition != FragmentTransition.EXPLODE) {
-                frag.sharedElementEnterTransition =
-                    transitionInflater.inflateTransition(R.transition.shared_elements_transition)
-                frag.enterTransition = transitionInflater.inflateTransition(transition.animIn)
-            } else {
-                frag.enterTransition =
-                    transitionInflater.inflateTransition(FragmentTransition.SLIDE.animIn)
-            }
+        val inflater = TransitionInflater.from(requireContext())
+        if (frag.transitionIn != null) {
+            frag.enterTransition = inflater.inflateTransition(frag.transitionIn!!)
+            frag.sharedElementEnterTransition = inflater.inflateTransition(
+                R.transition.shared_elements_transition)
+        }
+        val previousFragment = supportFragmentManager.primaryNavigationFragment as? AppFragment
+        if (previousFragment != null) {
+            previousFragment.exitTransition = inflater.inflateTransition(frag.transitionOut
+                ?: previousFragment.transitionOut ?: android.R.transition.fade)
+            previousFragment.sharedElementReturnTransition = inflater.inflateTransition(
+                R.transition.shared_elements_transition)
         }
 
         val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.folder_contents, frag, addToBackStackTag)
         transaction.setPrimaryNavigationFragment(frag)
         arrayOf(*sharedViews).forEach {
             val targetTransitionName =
                 (ViewCompat.getTransitionName(it) ?: "").replace(Regex("#\\d+"), "")
             transaction.addSharedElement(it, targetTransitionName)
         }
-        transaction.replace(R.id.folder_contents, frag, addToBackStackTag)
+        transaction.setReorderingAllowed(true)
         if (addToBackStackTag != null) transaction.addToBackStack(addToBackStackTag)
         transaction.commit()
-    }
-
-    private enum class FragmentTransition(val animIn: Int, val animOut: Int) {
-        SLIDE(R.transition.slide_right, R.transition.slide_left),
-        SLIDE_BOTTOM(R.transition.slide_bottom, R.transition.folder_explode),
-        LOADING_FADE(android.R.transition.no_transition, android.R.transition.fade),
-        EXPLODE(R.transition.folder_explode, R.transition.folder_explode)
     }
 
     override fun onBackPressed() {
@@ -176,7 +157,7 @@ class MainActivity : AppCompatActivity(), DarkThemed {
     override fun requireContext(): Context {
         return this
     }
-    
+
     /**
      * Removes system gesture on drawer when closed
      */

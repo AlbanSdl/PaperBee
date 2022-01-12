@@ -25,6 +25,12 @@ class SharingFragment : AppFragment(), FragmentContainer<ShareBaseFragment> {
     val selection = arrayListOf<Notable<*>>()
     val shareOptions = ShareOptions()
 
+    override val transitionIn: Int
+        get() = R.transition.slide_bottom
+
+    override val transitionOut: Int
+        get() = R.transition.folder_explode
+
     private lateinit var openedFrom: Notable<*>
 
     fun from(from: Notable<*>) {

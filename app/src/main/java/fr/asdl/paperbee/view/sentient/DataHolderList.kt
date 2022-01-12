@@ -199,6 +199,22 @@ abstract class DataHolderList<T: DataHolder> : DataHolder() {
         }
     }
 
+    fun hideAll() {
+        this.filters.addAll(this.filtered.contents.map { it.id!! })
+        this.onChange(ModificationType.CLEAR, 0, null)
+    }
+
+    fun revealNext() {
+        val next =
+            this.filters.map { id -> this.contents.find { it.id == id } }.minByOrNull { order }
+        if (next != null) show(next)
+    }
+
+    fun showAll() {
+        this.filters.clear()
+        this.onChange(ModificationType.CLEAR, 0, null)
+    }
+
     /**
      * Shows back the chosen element from the current [DataHolderList] after it has been hidden
      * with [hide]

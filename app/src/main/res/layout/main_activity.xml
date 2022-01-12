@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <fr.asdl.paperbee.view.FragmentContainer
+    <FrameLayout
         android:id="@+id/folder_contents"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </fr.asdl.paperbee.view.FragmentContainer>
+    </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav"

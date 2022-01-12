@@ -25,11 +25,18 @@ import fr.asdl.paperbee.storage.v1.NotableContract.NotableContractInfo.COLUMN_NA
 import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.options.ColorPicker
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
+import kotlinx.coroutines.async
 
 class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
 
     override lateinit var notable: NoteFolder
     override val layoutId: Int = R.layout.folder_content
+
+    override val transitionIn: Int
+        get() = R.transition.slide_right
+
+    override val transitionOut: Int
+        get() = R.transition.slide_left
 
     override fun attach(notable: NoteFolder): NotableFragment<NoteFolder> {
         this.menuLayoutId = when {
@@ -48,6 +55,8 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
     }
 
     override fun onLayoutInflated(view: View) {
+        super.onLayoutInflated(view)
+
         // Toolbar setup
         (activity as AppCompatActivity).apply {
             setSupportActionBar(view.findViewById(R.id.folder_toolbar))
@@ -71,9 +80,9 @@ class FolderFragment : NotableFragment<NoteFolder>(), View.OnClickListener {
         recycler.adapter = NoteAdapter(notable)
         // Floating action buttons
         if (notable.id != TRASH_ID) {
-            view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this)
-            view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this)
-            view.findViewById<FloatingActionButton>(R.id.add_folder_selector).setOnClickListener(this)
+            view.findViewById<FloatingActionButton>(R.id.add_note_button).setOnClickListener(this@FolderFragment)
+            view.findViewById<FloatingActionButton>(R.id.add_note_selector).setOnClickListener(this@FolderFragment)
+            view.findViewById<FloatingActionButton>(R.id.add_folder_selector).setOnClickListener(this@FolderFragment)
         } else {
             val fab = view.findViewById<FloatingActionButton>(R.id.add_note_button)
             fab.scaleX = 0f

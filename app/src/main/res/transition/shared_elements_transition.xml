@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<transitionSet xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
 
     <transitionSet>
         <targets>
@@ -16,12 +15,7 @@
         <targets>
             <target android:targetName="@string/transition_folder_color" />
         </targets>
-        <!-- We have to ignore a linting error because gradle doesn't recognize
-             androidx.transition.Transition and looks for android.transition.Transition
-             On another hand android requires the usage of androidx for transitions and
-             crashes otherwise -->
-        <transition class="fr.asdl.paperbee.view.transition.BackgroundTint"
-            tools:ignore="Instantiatable" />
+        <transition class="fr.asdl.paperbee.view.transition.BackgroundTint" />
     </transitionSet>
 
 </transitionSet>

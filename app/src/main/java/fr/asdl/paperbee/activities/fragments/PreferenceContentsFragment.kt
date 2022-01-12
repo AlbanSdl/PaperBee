@@ -2,6 +2,7 @@ package fr.asdl.paperbee.activities.fragments
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -13,6 +14,7 @@ class PreferenceContentsFragment : PreferenceFragmentCompat(), DarkThemed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireView() as ViewGroup).isTransitionGroup = true
         (this.parentFragment as PreferenceFragmentRoot).setToolbarTitle(R.string.settings)
     }
 

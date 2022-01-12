@@ -9,6 +9,12 @@ class PreferenceFragmentRoot : AppFragment() {
 
     override val layoutId: Int = R.layout.settings
 
+    override val transitionIn: Int
+        get() = R.transition.slide_bottom
+
+    override val transitionOut: Int
+        get() = R.transition.folder_explode
+
     override fun onLayoutInflated(view: View) {
         val toolbar = view.findViewById<Toolbar>(R.id.folder_toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_back)

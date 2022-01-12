@@ -6,17 +6,17 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
+import android.transition.TransitionValues
 import android.util.AttributeSet
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
-import androidx.transition.Transition
-import androidx.transition.TransitionValues
 import fr.asdl.paperbee.R
 
 /**
  * This transition fades Background tint
  */
-class BackgroundTint(context: Context, attributeSet: AttributeSet) : Transition(context, attributeSet) {
+class BackgroundTint(context: Context, attributeSet: AttributeSet) :
+    android.transition.Transition(context, attributeSet) {
 
     private val propName = "fr.asdl.paperbee.view.transition:BackgroundTint:background"
 
@@ -33,9 +33,9 @@ class BackgroundTint(context: Context, attributeSet: AttributeSet) : Transition(
     }
 
     private fun getTintColor(transitionValues: TransitionValues?, context: Context): Int {
-        return transitionValues?.values?.get(propName) as Int? ?:
-            (transitionValues?.view?.background as? ColorDrawable)?.color ?:
-            ResourcesCompat.getColor(context.resources, R.color.dark, context.theme)
+        return transitionValues?.values?.get(propName) as Int?
+            ?: (transitionValues?.view?.background as? ColorDrawable)?.color
+            ?: ResourcesCompat.getColor(context.resources, R.color.dark, context.theme)
     }
 
     override fun createAnimator(
@@ -52,7 +52,13 @@ class BackgroundTint(context: Context, attributeSet: AttributeSet) : Transition(
         if (startBackground != endBackground) {
             val animator = ValueAnimator.ofFloat(0f, 1f)
             animator.addUpdateListener {
-                view.backgroundTintList = ColorStateList.valueOf(argbEvaluator.evaluate(it.animatedFraction, startBackground, endBackground) as Int)
+                view.backgroundTintList = ColorStateList.valueOf(
+                    argbEvaluator.evaluate(
+                        it.animatedFraction,
+                        startBackground,
+                        endBackground
+                    ) as Int
+                )
             }
             return animator
         }

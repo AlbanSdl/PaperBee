@@ -10,7 +10,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.asdl.paperbee.PaperBeeApplication
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.fragments.SharingFragment
-import fr.asdl.paperbee.sharing.files.FileAccessor
+import fr.asdl.paperbee.sharing.FileAccessor
 
 class ShareProcessFragment : ShareBaseFragment(), FileAccessor {
 

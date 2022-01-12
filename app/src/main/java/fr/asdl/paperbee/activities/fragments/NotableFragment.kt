@@ -2,9 +2,7 @@ package fr.asdl.paperbee.activities.fragments
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import fr.asdl.paperbee.activities.MainActivity
@@ -29,6 +27,11 @@ abstract class NotableFragment<T: Notable<*>> : AppFragment() {
 
     abstract fun getTintBackgroundView(fragmentRoot: View): View?
 
+    @CallSuper
+    override fun onLayoutInflated(view: View) {
+        this.updateBackgroundTint(view)
+    }
+
     protected fun updateBackgroundTint(root: View? = null) {
         val view = getTintBackgroundView(root ?: this.view!!) ?: return
         if (notable.color == null)
@@ -41,16 +44,6 @@ abstract class NotableFragment<T: Notable<*>> : AppFragment() {
         val t = (this.activity as? MainActivity)?.dbProxy?.findElementById(savedInstanceState.getInt(SAVED_INSTANCE_TAG))
         if (this is FolderFragment && t is NoteFolder) this.attach(t)
         else if (this is NoteFragment && t is Note) this.attach(t)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-        this.updateBackgroundTint(view)
-        return view
     }
 
     override fun saveState(savedInstanceState: Bundle) {

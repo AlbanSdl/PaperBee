@@ -74,7 +74,7 @@ abstract class SharingFactory<T> {
 
     private fun runCipher(operationMode: Int, key: String, byteArray: ByteArray): ByteArray {
         val salt = ByteArray(16)
-        for (i in 0 until 16) salt[i] = key.toCharArray()[i % key.length].toByte()
+        for (i in 0 until 16) salt[i] = key.toCharArray()[i % key.length].code.toByte()
         val spec = PBEKeySpec(key.toCharArray(), salt, 1000, 256)
         val generated = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec)
         val generatedKey = SecretKeySpec(generated.encoded, encryptionAlgorithm)

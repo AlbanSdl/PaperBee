@@ -144,6 +144,6 @@ class DatabaseProxy<in T : DatabaseAccess>(context: Context, databaseClass: Clas
                     parentRemapped.add(it)
                 }
         }
-        holders.subtract(parentRemapped).forEach(whenOrphan)
+        holders.subtract(parentRemapped.toSet()).forEach(whenOrphan)
     }
 }

@@ -1,6 +1,7 @@
 package fr.asdl.paperbee.activities.fragments
 
 import android.content.Context
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.core.view.doOnDetach
+import androidx.core.view.doOnPreDraw
 import com.google.android.material.snackbar.Snackbar
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.activities.MainActivity
@@ -27,6 +29,7 @@ import fr.asdl.paperbee.view.options.FontColor
 import fr.asdl.paperbee.view.options.NoteColor
 import fr.asdl.paperbee.view.rounded.RoundedImageView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerView
+import kotlinx.coroutines.launch
 
 class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
 
@@ -46,50 +49,67 @@ class NoteFragment : NotableFragment<Note>(), View.OnClickListener {
         }
     })
 
+    override val transitionIn: Int
+        get() = R.transition.folder_explode
+
+    override val transitionOut: Int
+        get() = R.transition.folder_explode
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.postponeEnterTransition()
+    }
+
     override fun onLayoutInflated(view: View) {
-        val toolbar: Toolbar = view.findViewById(R.id.toolbar)
-        (activity as MainActivity).setSupportActionBar(toolbar)
-        (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        super.onLayoutInflated(view)
+        getScope().launch {
+            val toolbar: Toolbar = view.findViewById(R.id.toolbar)
+            (activity as MainActivity).setSupportActionBar(toolbar)
+            (activity as MainActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        val editorToolbar: LinearLayout = view.findViewById(R.id.editor_toolbar)
-        ((LayoutInflater.from(editorToolbar.context).inflate(
-            R.layout.editor_toolbar,
-            editorToolbar
-        ) as ViewGroup).getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>()
-            .forEach {
-                it.setOnClickListener(this)
+            val editorToolbar: LinearLayout = view.findViewById(R.id.editor_toolbar)
+            ((LayoutInflater.from(editorToolbar.context).inflate(
+                R.layout.editor_toolbar,
+                editorToolbar
+            ) as ViewGroup).getChildAt(0) as ViewGroup).children.filterIsInstance<RoundedImageView>()
+                .forEach {
+                    it.setOnClickListener(this@NoteFragment)
+                }
+            this@NoteFragment.updateContextToolbarEnabled(editorToolbar)
+
+            val editorFormatToolbar = view.findViewById<LinearLayout>(R.id.editor_format_toolbar)
+            ((LayoutInflater.from(editorFormatToolbar.context).inflate(
+                R.layout.editor_format_toolbar,
+                editorFormatToolbar
+            ) as ViewGroup).getChildAt(1) as ViewGroup).children.filterIsInstance<RoundedImageView>()
+                .forEach {
+                    it.setOnClickListener(this@NoteFragment)
+                }
+
+            // We add the note contents
+            (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
+            (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(object :
+                TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    notable.title = s.toString()
+                    notable.notifyDataChanged(COLUMN_NAME_PAYLOAD)
+                    notable.save()
+                }
+            })
+
+            val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
+            rec.visibility = View.VISIBLE
+            rec.addItemDecoration(NotePartDecoration())
+            val adapter = NotePartEditorAdapter(notable)
+            rec.adapter = adapter
+            rec.viewTreeObserver.addOnGlobalFocusChangeListener(focusWatcher)
+            rec.doOnDetach { it.viewTreeObserver.removeOnGlobalFocusChangeListener(focusWatcher) }
+            (view.parent as? ViewGroup)?.doOnPreDraw {
+                startPostponedEnterTransition()
             }
-        this.updateContextToolbarEnabled(editorToolbar)
-
-        val editorFormatToolbar = view.findViewById<LinearLayout>(R.id.editor_format_toolbar)
-        ((LayoutInflater.from(editorFormatToolbar.context).inflate(
-            R.layout.editor_format_toolbar,
-            editorFormatToolbar
-        ) as ViewGroup).getChildAt(1) as ViewGroup).children.filterIsInstance<RoundedImageView>()
-            .forEach {
-                it.setOnClickListener(this)
-            }
-
-        // We add the note contents
-        (view.findViewById<EditText>(R.id.note_editor_title)).setText(notable.title)
-        (view.findViewById<EditText>(R.id.note_editor_title)).addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                notable.title = s.toString()
-                notable.notifyDataChanged(COLUMN_NAME_PAYLOAD)
-                notable.save()
-            }
-        })
-
-        val rec = (view.findViewById<SentientRecyclerView>(R.id.note_editor_elements))
-        rec.visibility = View.VISIBLE
-        rec.addItemDecoration(NotePartDecoration())
-        val adapter = NotePartEditorAdapter(notable)
-        rec.adapter = adapter
-        rec.viewTreeObserver.addOnGlobalFocusChangeListener(focusWatcher)
-        rec.doOnDetach { it.viewTreeObserver.removeOnGlobalFocusChangeListener(focusWatcher) }
+        }
     }
 
     private fun updateContextToolbarEnabled(viewFrom: View) {
