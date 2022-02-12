@@ -3,16 +3,13 @@ package fr.asdl.paperbee.view.sentient
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.paperbee.Fade
 import fr.asdl.paperbee.R
-import fr.asdl.paperbee.activities.fragments.AppFragment
 
 /**
  * A special [RecyclerView] that feels the presence of content in its data set.
@@ -180,6 +177,11 @@ class SentientRecyclerView(context: Context, attr: AttributeSet, defStyleAttr: I
      * android:nestedScrollingEnabled="false"
      */
     private class SentientLinearLayoutManager(context: Context) : LinearLayoutManager(context) {
+
+        init {
+            this.initialPrefetchItemCount = 3
+            this.isItemPrefetchEnabled = true
+        }
 
         private var isScrollEnabled: Boolean = true
 

@@ -5,8 +5,6 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.doOnDetach
-import androidx.core.view.doOnLayout
-import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
 import fr.asdl.paperbee.R
 import fr.asdl.paperbee.note.Note
@@ -14,11 +12,6 @@ import fr.asdl.paperbee.note.NotePart
 
 
 class NotePartAdapterStatic(note: Note, private var clickDelegateView: View? = null) : NotePartAdapter(note) {
-
-    init {
-        note.hideAll()
-        note.revealNext()
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
@@ -38,9 +31,6 @@ class NotePartAdapterStatic(note: Note, private var clickDelegateView: View? = n
             }
             holder.itemView.doOnDetach { it.setOnClickListener(null) }
             holder.itemView.isClickable = true
-            holder.itemView.doOnPreDraw {
-                content.getNote()!!.revealNext()
-            }
         }
     }
 

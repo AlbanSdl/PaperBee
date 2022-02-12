@@ -5,6 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import fr.asdl.paperbee.PaperBeeApplication
+import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * An pre-implementation of the [RecyclerView.Adapter]. This handles the display of the contents of
@@ -21,6 +26,8 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     private val dataContainer: DataHolderList<T>
 ) : RecyclerView.Adapter<SentientRecyclerViewAdapter.ViewHolder>() {
 
+    data class LinkedViewHolder(val holder: WeakReference<ViewHolder>, val position: Int)
+
     /**
      * Called on the initialization of the Adapter.
      * Initializes the communication with the DataHolderList.
@@ -32,6 +39,11 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
         this.dataContainer.on(ModificationType.MOVED) { i: Int, it: Int? -> super.notifyItemMoved(i, it!!) }
         this.dataContainer.on(ModificationType.CLEAR) { _: Int, _: Int? -> super.notifyDataSetChanged() }
     }
+
+    protected abstract val shouldDelayItems: Boolean
+    private val loadingQueue: ArrayList<LinkedViewHolder> = arrayListOf()
+    private var loaderProcessing = false
+    private var loadingItems = if (this.dataContainer.size > 0) 1 else 0
 
     /**
      * Retrieves the [DataHolderList] containing the data set of the [SentientRecyclerViewAdapter].
@@ -54,7 +66,36 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     }
 
     final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (this.getHeldItem(position) != null) this.onBindViewHolder(holder, this.getHeldItem(position)!!)
+        if (this.shouldDelayItems) {
+            this.loadingQueue.add(LinkedViewHolder(WeakReference(holder), position))
+            if (!loaderProcessing) this.inflateNextViewHolder()
+        } else {
+            val item = this.getHeldItem(position)
+            if (item != null) this.onBindViewHolder(holder, item)
+        }
+    }
+
+    /**
+     * Inflates the next [ViewHolder] of the [SentientRecyclerView]. This method will be used
+     * when [shouldDelayItems] is set to true. This way, items are inflated asynchronously, one by
+     * one. This must be used when all the items of the RecyclerView take too long to render.
+     */
+    private fun inflateNextViewHolder() {
+        if (this.loadingQueue.isEmpty()) {
+            this.loaderProcessing = false
+            if (this.loadingItems != this.realItemCount) this.notifyItemInserted(this.loadingItems++)
+            return
+        }
+        this.loaderProcessing = true
+        val linkedData = this.loadingQueue.removeAt(0)
+        val holder = this.getHeldItem(linkedData.position)
+        val viewHolder = linkedData.holder.get()
+        if (holder != null && viewHolder != null) (viewHolder.itemView.context.applicationContext as PaperBeeApplication).paperScope.launch {
+            this@SentientRecyclerViewAdapter.onBindViewHolder(viewHolder, holder)
+        }.invokeOnCompletion {
+            if (it != null) throw it
+            inflateNextViewHolder()
+        } else this.loaderProcessing = false
     }
 
     /**
@@ -68,8 +109,12 @@ abstract class SentientRecyclerViewAdapter<T : DataHolder>(
     abstract fun onBindViewHolder(holder: ViewHolder, content: T)
 
     final override fun getItemCount(): Int {
-        return this.dataContainer.filtered.contents.size
+        return if (!this.shouldDelayItems || this.loadingItems >= this.realItemCount)
+            this.realItemCount else this.loadingItems
     }
+
+    private val realItemCount: Int
+        get() = this.dataContainer.filtered.contents.size
 
     /**
      * Retrieves the id of the layout to use when new [ViewHolder] are inflated by the

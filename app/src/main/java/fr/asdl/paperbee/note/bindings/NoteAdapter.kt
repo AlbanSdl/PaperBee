@@ -20,15 +20,11 @@ import fr.asdl.paperbee.view.sentient.SentientRecyclerView
 import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 import fr.asdl.paperbee.view.tree.TreeView
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class NoteAdapter(private val folder: NoteFolder) :
     SentientRecyclerViewAdapter<Notable<*>>(folder) {
 
-    init {
-        folder.hideAll()
-        folder.revealNext()
-    }
+    override val shouldDelayItems = true
 
     override fun getLayoutId(): Int {
         return R.layout.notes_layout
@@ -90,9 +86,6 @@ class NoteAdapter(private val folder: NoteFolder) :
                 fold?.visibility = View.VISIBLE
             else
                 fold?.visibility = View.GONE
-
-            // Reveal next element in folder
-            folder.revealNext()
         }.start()
     }
 

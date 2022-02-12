@@ -13,6 +13,8 @@ import fr.asdl.paperbee.view.sentient.SentientRecyclerViewAdapter
 
 abstract class NotePartAdapter(private val note: Note) : SentientRecyclerViewAdapter<NotePart>(note) {
 
+    override val shouldDelayItems = false
+
     override fun onBindViewHolder(holder: ViewHolder, content: NotePart) {
         // TextNoteParts
         val textView = (holder.findViewById(R.id.note_text) as TextView)
